@@ -1,9 +1,15 @@
-"use client"
+import DashboardModulePage from '@/components/Modules/DahsboardModule/DashboardPage';
+import type { Metadata } from 'next';
+import { Suspense } from 'react';
+
+export const metadata: Metadata = {
+  title: 'Dashboard | PredCare',
+};
 
 export default function DashboardPage() {
   return (
-    <div>
-      <h1>Dashboard</h1>
-    </div>
+    <Suspense fallback={null}>
+      <DashboardModulePage />
+    </Suspense>
   );
 }
