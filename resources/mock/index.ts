@@ -1,3 +1,5 @@
+export { dashboardAppointments } from './appointments';
+export type { AppointmentStatus, DashboardAppointment } from './appointments';
 export { dashboardStats } from './dashboardStats';
 export type { DashboardStat, DashboardStatIcon, DashboardStatTone } from './dashboardStats';
 export { clinics } from './clinics';

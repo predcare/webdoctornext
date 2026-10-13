@@ -119,9 +119,12 @@ export const SidebarWrapper = styled('aside', {
   .sidebar-nav {
     flex: 1;
     overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: ${({ theme }) => theme.palette.customColors.scrollbarThumb}
-      transparent;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 
   .sidebar-footer {

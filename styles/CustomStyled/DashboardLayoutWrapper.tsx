@@ -25,6 +25,27 @@ export const DashboardLayoutWrapper = styled(Box)`
     overflow-y: auto;
     padding-top: 16px;
     padding-bottom: 24px;
+    scrollbar-width: thin;
+    scrollbar-color: ${({ theme }) => theme.palette.customColors.brandTeal} transparent;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: ${({ theme }) => theme.palette.customColors.brandTeal};
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background-clip: padding-box;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: ${({ theme }) => theme.palette.customColors.brandTealDark};
+    }
   }
 
   ${({ theme }) => theme.breakpoints.up('sm')} {
