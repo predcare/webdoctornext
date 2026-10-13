@@ -1,0 +1,32 @@
+{
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#B17E32",
+    "activityBar.background": "#B17E32",
+    "activityBar.foreground": "#000000",
+    "activityBar.inactiveForeground": "#e7e7e799",
+    "activityBarBadge.background": "#FFE4BF",
+    "activityBarBadge.foreground": "#15202b",
+    "commandCenter.border": "#e7e7e799",
+    "sash.hoverBorder": "#B17E32",
+    "statusBar.background": "#D9B16C",
+    "statusBar.foreground": "#000000",
+    "statusBarItem.hoverBackground": "#B17E32",
+    "statusBarItem.remoteBackground": "#D9B16C",
+    "statusBarItem.remoteForeground": "#000000",
+    "titleBar.activeBackground": "#D9B16C",
+    "titleBar.activeForeground": "#000000",
+    "titleBar.inactiveBackground": "#00800099",
+    "titleBar.inactiveForeground": "#FFE4BF"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "peacock.color": "green",
+  "files.eol": "\n",
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  }
+}
