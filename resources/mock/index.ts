@@ -7,6 +7,10 @@ export type {
   AppointmentPrescription,
   PaymentStatus,
 } from './appointmentDetails';
+export { patients } from './patients';
+export type { Patient, PatientGender, PatientStatus } from './patients';
+export { cities, countries, getCities, getStates, states } from './locations';
+export type { City, Country, State } from './locations';
 export { dashboardStats } from './dashboardStats';
 export type { DashboardStat, DashboardStatIcon, DashboardStatTone } from './dashboardStats';
 export { clinics } from './clinics';

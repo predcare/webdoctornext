@@ -685,32 +685,11 @@ export const CustomTableWrapper = styled(Box)`
 
   .MuiTableContainer-root {
     overflow-x: auto;
-    scrollbar-width: thin;
-    scrollbar-color: ${({ theme }) => theme.palette.customColors.brandTeal} transparent;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 
     &::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: ${({ theme }) => theme.palette.customColors.brandTealLight};
-      border-radius: 999px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background-color: ${({ theme }) => theme.palette.customColors.brandTeal};
-      border-radius: 999px;
-      border: 1px solid transparent;
-      background-clip: padding-box;
-    }
-
-    &::-webkit-scrollbar-thumb:hover {
-      background-color: ${({ theme }) => theme.palette.customColors.brandTealDark};
-    }
-
-    &::-webkit-scrollbar-corner {
-      background: transparent;
+      display: none;
     }
   }
 

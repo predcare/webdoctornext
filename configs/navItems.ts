@@ -52,8 +52,8 @@ export const sideNavItems: SideNavItem[] = [
     icon: 'patients',
     section: 'main',
     children: [
-      { id: 'patients-all', name: 'Patients List' },
-      { id: 'patients-records', name: 'Add Patient' },
+      { id: 'patients-all', name: 'Patients List', href: projectRoutes.patients },
+      { id: 'patients-records', name: 'Add Patient', href: projectRoutes.addPatient },
     ],
   },
   {

@@ -6,54 +6,97 @@ import React, { forwardRef, useCallback, useState } from 'react';
 import PasswordNonVisibilityIcon from '../Icons/PasswordNonVisibilityIcon';
 import PasswordVisibilityIcon from '../Icons/PasswordVisibilityIcon';
 
+export const CustomInputLabel = styled(InputLabel, {
+  shouldForwardProp: (prop) => prop !== '$inputSize',
+}) <{ $inputSize?: 'medium' | 'large' }>`
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: 0.01em;
+  white-space: normal;
+  color: ${({ theme }) => theme.palette.customColors.heading};
+
+  &.Mui-focused {
+    color: ${({ theme }) => theme.palette.customColors.heading};
+  }
+
+  &.disabled-cls {
+    opacity: 0.5;
+  }
+
+  ${({ $inputSize }) =>
+    $inputSize === 'large' &&
+    `
+    margin-bottom: 8px;
+    font-size: 14px;
+  `}
+`;
+
 export const CustomInputWrap = styled(TextField, {
-    shouldForwardProp: (data) => data !== 'labelName' && data !== 'inputSize',
+  shouldForwardProp: (data) => data !== 'labelName' && data !== 'inputSize',
 }) <{ labelName?: boolean; inputSize?: 'medium' | 'large' }>`
   .MuiInputBase-root {
-    background: ${({ theme }) => theme.palette.customColors.inputBg};
-    border: 0.5px solid ${({ theme }) => theme.palette.customColors.inputBorder};
-    border-radius: 8px;
     min-height: 44px;
-    height: 100%;
-    padding: 0 10px;
-    box-shadow: none;
-    transition: border-color 0.15s ease;
+    padding: 0 14px;
+    border-radius: 10px;
+    border: 1px solid ${({ theme }) => theme.palette.customColors.inputBorder};
+    background: ${({ theme }) => theme.palette.customColors.inputBg};
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 
     &:hover {
-      border-color: ${({ theme }) => theme.palette.primary.main};
+      border-color: ${({ theme }) => theme.palette.customColors.textMuted};
     }
 
     &.Mui-focused {
-      border-color: ${({ theme }) => theme.palette.primary.light};
-      box-shadow: 0 0 0 3px ${({ theme }) => theme.palette.primary.light}1F;
+      border-color: ${({ theme }) => theme.palette.customColors.brandTeal};
+      box-shadow: 0 0 0 3px ${({ theme }) => theme.palette.customColors.brandTealLight};
+    }
+
+    &.Mui-error {
+      border-color: ${({ theme }) => theme.palette.customColors.error};
+
+      &.Mui-focused {
+        box-shadow: 0 0 0 3px ${({ theme }) => theme.palette.customColors.errorBg};
+      }
     }
 
     &.Mui-disabled {
-      background: ${({ theme }) => theme.palette.action.disabledBackground};
+      cursor: not-allowed;
+      box-shadow: none;
       border-color: ${({ theme }) => theme.palette.customColors.inputBorder};
-      opacity: 0.6;
+      background: ${({ theme }) => theme.palette.customColors.pageBg};
     }
 
-    @media (max-width: 599px) {
-      min-height: 34px;
-      height: 34px;
-      padding: 0 10px;
+    &.MuiInputBase-multiline {
+      height: auto;
+      padding: 12px 14px;
+      align-items: flex-start;
+
+      .MuiInputBase-input {
+        height: auto;
+        line-height: 20px;
+        resize: vertical;
+      }
     }
 
     .MuiInputBase-input {
+      height: 42px;
+      padding: 0;
+      box-sizing: border-box;
       font-size: 13px;
       font-weight: 400;
-      font-family: 'Poppins', sans-serif !important;
-      color: ${({ theme }) => theme.palette.text.primary};
-      padding: 0;
-      height: 34px;
-      box-sizing: border-box;
+      color: ${({ theme }) => theme.palette.customColors.heading};
 
       &::placeholder {
-        color: ${({ theme }) => theme.palette.text.secondary};
         opacity: 1;
-        -webkit-text-fill-color: ${({ theme }) => theme.palette.text.secondary};
         font-size: 13px;
+        color: ${({ theme }) => theme.palette.customColors.textMuted};
+        -webkit-text-fill-color: ${({ theme }) => theme.palette.customColors.textMuted};
       }
 
       &:-webkit-autofill,
@@ -62,46 +105,65 @@ export const CustomInputWrap = styled(TextField, {
       &:-webkit-autofill:active {
         -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
         box-shadow: 0 0 0 1000px transparent inset !important;
-        -webkit-text-fill-color: ${({ theme }) => theme.palette.text.primary};
-        caret-color: ${({ theme }) => theme.palette.text.primary};
+        -webkit-text-fill-color: ${({ theme }) => theme.palette.customColors.heading};
+        caret-color: ${({ theme }) => theme.palette.customColors.heading};
         transition: background-color 9999s ease-out 0s;
       }
 
-      &::-ms-input-placeholder {
-        color: ${({ theme }) => theme.palette.text.secondary};
-        -webkit-text-fill-color: ${({ theme }) => theme.palette.text.secondary};
-      }
-
       &.Mui-disabled {
-        opacity: 1;
-        color: ${({ theme }) => theme.palette.text.disabled};
-        -webkit-text-fill-color: ${({ theme }) => theme.palette.text.disabled};
+        color: ${({ theme }) => theme.palette.customColors.textMuted};
+        -webkit-text-fill-color: ${({ theme }) => theme.palette.customColors.textMuted};
+      }
+    }
+
+    .MuiSelect-select {
+      display: flex;
+      align-items: center;
+      padding-right: 28px !important;
+    }
+
+    .MuiSelect-icon {
+      right: 10px;
+      color: ${({ theme }) => theme.palette.customColors.textMuted};
+    }
+
+    .MuiInputAdornment-positionStart {
+      margin-right: 8px;
+      color: ${({ theme }) => theme.palette.customColors.textMuted};
+
+      svg {
+        width: 18px;
+        height: 18px;
       }
     }
 
     .MuiInputAdornment-positionEnd {
-      margin-left: 6px;
+      margin-left: 8px;
+      color: ${({ theme }) => theme.palette.customColors.textMuted};
 
       .MuiIconButton-root {
         padding: 0;
-        color: ${({ theme }) => theme.palette.text.secondary};
-
-        svg {
-          width: 16px;
-          height: 16px;
-        }
+        color: inherit;
       }
-    }
-
-    .MuiInputAdornment-positionStart {
-      margin-right: 6px;
-      color: ${({ theme }) => theme.palette.text.secondary};
 
       svg {
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
       }
     }
+
+    ${({ theme }) => theme.breakpoints.down('sm')} {
+      min-height: 40px;
+
+      .MuiInputBase-input {
+        height: 38px;
+      }
+    }
+  }
+
+  .MuiFormHelperText-root {
+    margin: 6px 0 0;
+    font-size: 11px;
   }
 
   fieldset {
@@ -110,7 +172,6 @@ export const CustomInputWrap = styled(TextField, {
 
   input[type='number'] {
     appearance: textfield;
-    -webkit-appearance: none;
     -moz-appearance: textfield;
 
     &::-webkit-inner-spin-button,
@@ -120,9 +181,14 @@ export const CustomInputWrap = styled(TextField, {
     }
   }
 
+  input[type='date']::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.55;
+  }
+
   ${({ inputSize }) =>
-        inputSize === 'large' &&
-        `
+    inputSize === 'large' &&
+    `
     .MuiInputBase-root {
       min-height: 56px;
       height: 56px;
@@ -133,7 +199,6 @@ export const CustomInputWrap = styled(TextField, {
     .MuiInputBase-root .MuiInputBase-input {
       font-size: 16px;
       height: 56px;
-      font-family: var(--font-inter), 'Inter', sans-serif !important;
     }
 
     .MuiInputBase-root .MuiInputBase-input::placeholder {
@@ -149,103 +214,91 @@ export const CustomInputWrap = styled(TextField, {
 `;
 
 type TCommonInputProps = StandardTextFieldProps & {
-    isPassword?: boolean;
-    startAdornment?: React.ReactNode;
-    endAdornment?: React.ReactNode;
-    inputLabelName?: string;
-    inputSize?: 'medium' | 'large';
+  isPassword?: boolean;
+  startAdornment?: React.ReactNode;
+  endAdornment?: React.ReactNode;
+  inputLabelName?: string;
+  inputSize?: 'medium' | 'large';
 };
 
 const CustomInput = forwardRef<HTMLInputElement, TCommonInputProps>(
-    (
-        {
-            isPassword = false,
-            startAdornment,
-            endAdornment,
-            inputLabelName,
-            inputSize = 'medium',
-            ...others
-        },
-        ref,
-    ) => {
-        const [showPassword, setShowPassword] = useState(false);
-
-        const handleClickShowPassword = useCallback(() => {
-            setShowPassword((prev) => !prev);
-        }, []);
-
-        const handleMouseDownPassword = useCallback(
-            (event: React.MouseEvent<HTMLButtonElement>) => {
-                event.preventDefault();
-            },
-            [],
-        );
-
-        return (
-            <>
-                {inputLabelName && (
-                    <InputLabel
-                        className={`inputLabel-txt-global ${others.disabled ? 'disabled-cls' : ''}`}
-                        sx={{
-                            fontSize: inputSize === 'large' ? '14px' : '11px',
-                            fontWeight: 500,
-                            color: inputSize === 'large' ? 'text.primary' : 'text.secondary',
-                            fontFamily:
-                                inputSize === 'large'
-                                    ? "var(--font-inter), 'Inter', sans-serif"
-                                    : "'Poppins', sans-serif",
-                            marginBottom: inputSize === 'large' ? '8px' : '4px',
-                            lineHeight: 1.4,
-                            '&.disabled-cls': {
-                                opacity: 0.5,
-                            },
-                        }}
-                    >
-                        {inputLabelName}
-                    </InputLabel>
-                )}
-                <CustomInputWrap
-                    fullWidth
-                    variant={others.variant ?? 'outlined'}
-                    type={
-                        isPassword ? (showPassword ? 'text' : 'password') : others?.type
-                    }
-                    labelName={!!inputLabelName}
-                    inputSize={inputSize}
-                    slotProps={{
-                        input: {
-                            inputRef: ref,
-                            startAdornment: startAdornment && (
-                                <InputAdornment position="start">
-                                    {startAdornment}
-                                </InputAdornment>
-                            ),
-                            endAdornment: isPassword ? (
-                                <InputAdornment position="end" className="password-icon">
-                                    <IconButton
-                                        onClick={handleClickShowPassword}
-                                        onMouseDown={handleMouseDownPassword}
-                                        disableRipple
-                                    >
-                                        {showPassword ? (
-                                            <PasswordVisibilityIcon />
-                                        ) : (
-                                            <PasswordNonVisibilityIcon />
-                                        )}
-                                    </IconButton>
-                                </InputAdornment>
-                            ) : (
-                                endAdornment && (
-                                    <InputAdornment position="end">{endAdornment}</InputAdornment>
-                                )
-                            ),
-                        },
-                    }}
-                    {...others}
-                />
-            </>
-        );
+  (
+    {
+      isPassword = false,
+      startAdornment,
+      endAdornment,
+      inputLabelName,
+      inputSize = 'medium',
+      ...others
     },
+    ref,
+  ) => {
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleClickShowPassword = useCallback(() => {
+      setShowPassword((prev) => !prev);
+    }, []);
+
+    const handleMouseDownPassword = useCallback(
+      (event: React.MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+      },
+      [],
+    );
+
+    return (
+      <>
+        {inputLabelName && (
+          <CustomInputLabel
+            htmlFor={others.id}
+            $inputSize={inputSize}
+            className={`inputLabel-txt-global ${others.disabled ? 'disabled-cls' : ''}`}
+          >
+            {inputLabelName}
+          </CustomInputLabel>
+        )}
+        <CustomInputWrap
+          fullWidth
+          variant={others.variant ?? 'outlined'}
+          type={
+            isPassword ? (showPassword ? 'text' : 'password') : others?.type
+          }
+          labelName={!!inputLabelName}
+          inputSize={inputSize}
+          slotProps={{
+            input: {
+              inputRef: ref,
+              startAdornment: startAdornment && (
+                <InputAdornment position="start">
+                  {startAdornment}
+                </InputAdornment>
+              ),
+              endAdornment: isPassword ? (
+                <InputAdornment position="end" className="password-icon">
+                  <IconButton
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    disableRipple
+                  >
+                    {showPassword ? (
+                      <PasswordVisibilityIcon />
+                    ) : (
+                      <PasswordNonVisibilityIcon />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ) : (
+                endAdornment && (
+                  <InputAdornment position="end">{endAdornment}</InputAdornment>
+                )
+              ),
+            },
+          }}
+          {...others}
+        />
+      </>
+    );
+  },
 );
 CustomInput.displayName = 'CustomInput';
 export default CustomInput;

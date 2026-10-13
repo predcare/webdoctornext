@@ -15,6 +15,8 @@ export const projectRoutes = {
   dashboard: '/dashboard',
   appointments: '/appointments',
   appointmentDetails: (id: string) => `/appointments/${id}`,
+  patients: '/patients',
+  addPatient: '/patients/add-patient',
 
   // Legal Pages
   privacyPolicy: '/privacy-policy',
