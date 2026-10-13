@@ -11,6 +11,9 @@ export const projectRoutes = {
   doctorLogin: '/auth/doctor/login',
   patientLogin: '/auth/patient/login',
 
+  // Doctor portal
+  dashboard: '/dashboard',
+
   // Legal Pages
   privacyPolicy: '/privacy-policy',
   termsOfService: '/terms-conditions',

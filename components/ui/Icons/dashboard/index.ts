@@ -1,0 +1,17 @@
+export { default as AppointmentsIcon } from './AppointmentsIcon';
+export { default as AvailabilityIcon } from './AvailabilityIcon';
+export { default as BellIcon } from './BellIcon';
+export { default as BillingIcon } from './BillingIcon';
+export { default as ChevronIcon } from './ChevronIcon';
+export { default as ClinicIcon } from './ClinicIcon';
+export { default as DashboardIcon } from './DashboardIcon';
+export { default as DoctorsIcon } from './DoctorsIcon';
+export { default as HelpIcon } from './HelpIcon';
+export { default as LogoutIcon } from './LogoutIcon';
+export { default as MenuIcon } from './MenuIcon';
+export { default as MoonIcon } from './MoonIcon';
+export { default as PatientsIcon } from './PatientsIcon';
+export { default as ReportsIcon } from './ReportsIcon';
+export { default as SettingsIcon } from './SettingsIcon';
+export { default as SubmenuIcon } from './SubmenuIcon';
+export { default as SunIcon } from './SunIcon';

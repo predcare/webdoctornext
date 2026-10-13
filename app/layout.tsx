@@ -15,6 +15,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'PredCare - Doctor Portal',
   description: 'PredCare Doctor Portal - Clinical Practice & Patient Management',
+  icons: {
+    icon: '/assets/images/logo2.png?v=1',
+    shortcut: '/assets/images/logo2.png?v=1',
+    apple: '/assets/images/logo2.png?v=1',
+  },
 };
 
 export default function RootLayout({

@@ -17,6 +17,7 @@ interface ICustomTabsGroupProps {
     onChange?: (event: SyntheticEvent, value: number) => void;
     showCount?: boolean;
     className?: string;
+    variant?: 'default' | 'segmented';
 }
 
 const CustomTabsGroup: React.FC<ICustomTabsGroupProps> = ({
@@ -25,19 +26,23 @@ const CustomTabsGroup: React.FC<ICustomTabsGroupProps> = ({
     onChange,
     showCount = true,
     className = '',
+    variant = 'default',
 }) => {
+    const isSegmented = variant === 'segmented';
+
     return (
         <CustomTabWrapper
-            className={className}
-            variant="scrollable"
+            className={`${className} ${isSegmented ? 'segmented' : ''}`.trim()}
+            variant={isSegmented ? 'fullWidth' : 'scrollable'}
             value={value}
             onChange={onChange}
-            scrollButtons="auto"
-            allowScrollButtonsMobile
+            scrollButtons={isSegmented ? false : 'auto'}
+            allowScrollButtonsMobile={!isSegmented}
         >
             {tabs.map((tab, index) => (
                 <Tab
                     key={index}
+                    disableRipple={isSegmented}
                     label={
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                             {tab.icon}

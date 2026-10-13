@@ -80,6 +80,73 @@ export const CustomTabWrapper = styled(Tabs)`
   .Mui-disabled {
     display: none;
   }
+
+  &.segmented {
+    border-radius: 8px;
+    padding: 4px;
+    overflow: hidden;
+    background: ${({ theme }) => theme.palette.customColors.authTabTrack};
+    min-height: 52px;
+
+    .MuiTabs-scroller {
+      overflow: visible !important;
+    }
+
+    .MuiTabs-flexContainer {
+      gap: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .MuiTabs-indicator {
+      display: block;
+      height: 100%;
+      top: 0;
+      bottom: auto;
+      border-radius: 8px;
+      z-index: 0;
+      background: linear-gradient(
+        135deg,
+        ${({ theme }) => theme.palette.customColors.authAccentStart} 0%,
+        ${({ theme }) => theme.palette.customColors.authAccentEnd} 100%
+      );
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .MuiTab-root {
+      min-height: 44px;
+      max-width: none;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: ${({ theme }) => theme.palette.text.secondary};
+      font-family: var(--font-inter), 'Inter', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      z-index: 1;
+
+      &:hover {
+        background: transparent;
+      }
+
+      @media (max-width: 599px) {
+        min-height: 40px;
+        padding: 8px 8px;
+        font-size: 1rem;
+      }
+
+      &.Mui-selected {
+        background: transparent;
+        color: #ffffff;
+      }
+
+      &.Mui-selected:hover {
+        background: transparent;
+        color: #ffffff;
+      }
+    }
+  }
 `;
 
 export const TabCountCircle = styled(Box)`

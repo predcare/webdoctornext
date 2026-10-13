@@ -7,8 +7,8 @@ import PasswordNonVisibilityIcon from '../Icons/PasswordNonVisibilityIcon';
 import PasswordVisibilityIcon from '../Icons/PasswordVisibilityIcon';
 
 export const CustomInputWrap = styled(TextField, {
-    shouldForwardProp: (data) => data !== 'labelName',
-}) <{ labelName?: boolean }>`
+    shouldForwardProp: (data) => data !== 'labelName' && data !== 'inputSize',
+}) <{ labelName?: boolean; inputSize?: 'medium' | 'large' }>`
   .MuiInputBase-root {
     background: ${({ theme }) => theme.palette.customColors.inputBg};
     border: 0.5px solid ${({ theme }) => theme.palette.customColors.inputBorder};
@@ -119,6 +119,33 @@ export const CustomInputWrap = styled(TextField, {
       margin: 0;
     }
   }
+
+  ${({ inputSize }) =>
+        inputSize === 'large' &&
+        `
+    .MuiInputBase-root {
+      min-height: 56px;
+      height: 56px;
+      border-radius: 12px;
+      padding: 0 16px;
+    }
+
+    .MuiInputBase-root .MuiInputBase-input {
+      font-size: 16px;
+      height: 56px;
+      font-family: var(--font-inter), 'Inter', sans-serif !important;
+    }
+
+    .MuiInputBase-root .MuiInputBase-input::placeholder {
+      font-size: 16px;
+    }
+
+    .MuiInputAdornment-positionStart svg,
+    .MuiInputAdornment-positionEnd svg {
+      width: 20px;
+      height: 20px;
+    }
+  `}
 `;
 
 type TCommonInputProps = StandardTextFieldProps & {
@@ -126,6 +153,7 @@ type TCommonInputProps = StandardTextFieldProps & {
     startAdornment?: React.ReactNode;
     endAdornment?: React.ReactNode;
     inputLabelName?: string;
+    inputSize?: 'medium' | 'large';
 };
 
 const CustomInput = forwardRef<HTMLInputElement, TCommonInputProps>(
@@ -135,6 +163,7 @@ const CustomInput = forwardRef<HTMLInputElement, TCommonInputProps>(
             startAdornment,
             endAdornment,
             inputLabelName,
+            inputSize = 'medium',
             ...others
         },
         ref,
@@ -158,11 +187,14 @@ const CustomInput = forwardRef<HTMLInputElement, TCommonInputProps>(
                     <InputLabel
                         className={`inputLabel-txt-global ${others.disabled ? 'disabled-cls' : ''}`}
                         sx={{
-                            fontSize: '11px',
+                            fontSize: inputSize === 'large' ? '14px' : '11px',
                             fontWeight: 500,
-                            color: 'text.secondary',
-                            fontFamily: "'Poppins', sans-serif",
-                            marginBottom: '4px',
+                            color: inputSize === 'large' ? 'text.primary' : 'text.secondary',
+                            fontFamily:
+                                inputSize === 'large'
+                                    ? "var(--font-inter), 'Inter', sans-serif"
+                                    : "'Poppins', sans-serif",
+                            marginBottom: inputSize === 'large' ? '8px' : '4px',
                             lineHeight: 1.4,
                             '&.disabled-cls': {
                                 opacity: 0.5,
@@ -179,6 +211,7 @@ const CustomInput = forwardRef<HTMLInputElement, TCommonInputProps>(
                         isPassword ? (showPassword ? 'text' : 'password') : others?.type
                     }
                     labelName={!!inputLabelName}
+                    inputSize={inputSize}
                     slotProps={{
                         input: {
                             inputRef: ref,

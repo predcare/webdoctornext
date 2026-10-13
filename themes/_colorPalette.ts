@@ -47,6 +47,17 @@ export const defaultPalette = (mode: PaletteMode): TCustomPalette => {
 
     hoverBg: 'rgba(15, 124, 115, 0.04)',
     scrollbarThumb: '#CBD5E1',
+
+    authGradientStart: '#041B66',
+    authGradientMid: '#1D4ED8',
+    authGradientEnd: '#7C3AED',
+    authAccentStart: '#3B82F6',
+    authAccentEnd: '#2563EB',
+    authAccentHoverStart: '#2563EB',
+    authAccentHoverEnd: '#1D4ED8',
+    authTabTrack: '#F1F5F9',
+    authLinkHover: '#93C5FD',
+    authOnGradient: 'rgba(255, 255, 255, 0.8)',
   };
 
   // 🌙 PredCare Doctor Dark Theme Color Tokens (predcare-dark-text.css parity)
@@ -87,6 +98,17 @@ export const defaultPalette = (mode: PaletteMode): TCustomPalette => {
 
     hoverBg: 'rgba(255, 255, 255, 0.04)',
     scrollbarThumb: '#334155',
+
+    authGradientStart: '#041B66',
+    authGradientMid: '#1D4ED8',
+    authGradientEnd: '#7C3AED',
+    authAccentStart: '#3B82F6',
+    authAccentEnd: '#2563EB',
+    authAccentHoverStart: '#2563EB',
+    authAccentHoverEnd: '#1D4ED8',
+    authTabTrack: '#F1F5F9',
+    authLinkHover: '#93C5FD',
+    authOnGradient: 'rgba(255, 255, 255, 0.8)',
   };
 
   const v = isLight ? lightVals : darkVals;

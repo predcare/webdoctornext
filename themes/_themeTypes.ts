@@ -47,6 +47,18 @@ declare module '@mui/material/styles' {
     // 💡 Surface & Overlays
     hoverBg: string;
     scrollbarThumb: string;
+
+    // 🔐 Auth login screen
+    authGradientStart: string;
+    authGradientMid: string;
+    authGradientEnd: string;
+    authAccentStart: string;
+    authAccentEnd: string;
+    authAccentHoverStart: string;
+    authAccentHoverEnd: string;
+    authTabTrack: string;
+    authLinkHover: string;
+    authOnGradient: string;
   }
 
   interface Palette {

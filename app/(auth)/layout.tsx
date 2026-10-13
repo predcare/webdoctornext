@@ -1,6 +1,8 @@
 'use client';
 
-import { Box, Container } from '@mui/material';
+import Assets from '@/resources/assets';
+import { AuthLayoutWrapper } from '@/styles/CustomStyled/AuthLayoutWrapper';
+import { Box, Typography } from '@mui/material';
 import React from 'react';
 
 interface AuthLayoutProps {
@@ -9,21 +11,20 @@ interface AuthLayoutProps {
 
 const AuthLayout = ({ children }: AuthLayoutProps) => {
   return (
-    <Box
-      component="main"
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        bgcolor: 'background.default',
-        py: { xs: 4, sm: 6 },
-      }}
-    >
-      <Container maxWidth="sm">
+    <AuthLayoutWrapper>
+      <Box className="auth-column">
+        <Box className="logo-wrap">
+          <Box
+            component="img"
+            className="auth-logo"
+            src={Assets.webLogo}
+            alt="PRED Care Logo"
+          />
+        </Box>
         {children}
-      </Container>
-    </Box>
+        <Typography className="copyright">© 2026 PRED Care. All rights reserved.</Typography>
+      </Box>
+    </AuthLayoutWrapper>
   );
 };
 
