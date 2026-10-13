@@ -27,34 +27,36 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   return (
     <DashboardLayoutWrapper>
-      <Sidebar
-        variant="permanent"
-        collapsed={collapsed}
-        onToggleCollapse={() => setCollapsed((value) => !value)}
-      />
-      <Drawer
-        anchor="left"
-        open={mobileOpen}
-        onClose={() => setMobileOpen(false)}
-        sx={{
-          display: { lg: 'none' },
-          '& .MuiDrawer-paper': {
-            width: SidebarWidth,
-            maxWidth: 'calc(100vw - 48px)',
-            backgroundColor: theme.palette.customColors.sidebarBg,
-            backgroundImage: 'none',
-            borderRight: `1px solid ${theme.palette.customColors.border}`,
-          },
-        }}
-      >
-        <Sidebar variant="drawer" onClose={() => setMobileOpen(false)} />
-      </Drawer>
-      <Box className="dashboard-column">
-        <DashboardHeader onMenuClick={() => setMobileOpen(true)} />
-        <Box component="main" className="dashboard-main">
-          <Container maxWidth="xl">{children}</Container>
+      <Container maxWidth="xl" disableGutters className="dashboard-shell">
+        <Sidebar
+          variant="permanent"
+          collapsed={collapsed}
+          onToggleCollapse={() => setCollapsed((value) => !value)}
+        />
+        <Drawer
+          anchor="left"
+          open={mobileOpen}
+          onClose={() => setMobileOpen(false)}
+          sx={{
+            display: { lg: 'none' },
+            '& .MuiDrawer-paper': {
+              width: SidebarWidth,
+              maxWidth: 'calc(100vw - 48px)',
+              backgroundColor: theme.palette.customColors.sidebarBg,
+              backgroundImage: 'none',
+              borderRight: `1px solid ${theme.palette.customColors.border}`,
+            },
+          }}
+        >
+          <Sidebar variant="drawer" onClose={() => setMobileOpen(false)} />
+        </Drawer>
+        <Box className="dashboard-column">
+          <DashboardHeader onMenuClick={() => setMobileOpen(true)} />
+          <Box component="main" className="dashboard-main">
+            <Box className="dashboard-content">{children}</Box>
+          </Box>
         </Box>
-      </Box>
+      </Container>
     </DashboardLayoutWrapper>
   );
 }

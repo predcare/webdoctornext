@@ -2,7 +2,7 @@
 
 import Assets from '@/resources/assets';
 import { AuthLayoutWrapper } from '@/styles/CustomStyled/AuthLayoutWrapper';
-import { Box, Typography } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import React from 'react';
 
 interface AuthLayoutProps {
@@ -12,18 +12,20 @@ interface AuthLayoutProps {
 const AuthLayout = ({ children }: AuthLayoutProps) => {
   return (
     <AuthLayoutWrapper>
-      <Box className="auth-column">
-        <Box className="logo-wrap">
-          <Box
-            component="img"
-            className="auth-logo"
-            src={Assets.webLogo}
-            alt="PRED Care Logo"
-          />
+      <Container maxWidth="xl" className="auth-container">
+        <Box className="auth-column">
+          <Box className="logo-wrap">
+            <Box
+              component="img"
+              className="auth-logo"
+              src={Assets.webLogo}
+              alt="PRED Care Logo"
+            />
+          </Box>
+          {children}
+          <Typography className="copyright">© 2026 PRED Care. All rights reserved.</Typography>
         </Box>
-        {children}
-        <Typography className="copyright">© 2026 PRED Care. All rights reserved.</Typography>
-      </Box>
+      </Container>
     </AuthLayoutWrapper>
   );
 };

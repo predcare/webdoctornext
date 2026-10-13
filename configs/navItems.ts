@@ -42,7 +42,7 @@ export const sideNavItems: SideNavItem[] = [
     icon: 'appointments',
     section: 'main',
     children: [
-      { id: 'appointments-upcoming', name: 'Appointment List' },
+      { id: 'appointments-upcoming', name: 'Appointment List', href: projectRoutes.appointments },
       { id: 'appointments-completed', name: 'Booked Appointment' },
     ],
   },

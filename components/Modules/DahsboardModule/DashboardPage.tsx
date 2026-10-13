@@ -1,5 +1,6 @@
 'use client';
 
+import AppointmentStatusBadge from '@/components/commons/AppointmentStatusBadge/AppointmentStatusBadge';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
 import { AppointmentsIcon } from '@/components/ui/Icons/dashboard';
 import StatCard from '@/components/ui/StatCard/StatCard';
@@ -7,14 +8,13 @@ import useStatIcons from '@/components/ui/StatCard/useStatIcons';
 import {
     dashboardAppointments,
     dashboardStats,
-    type AppointmentStatus,
 } from '@/resources/mock';
+import { projectRoutes } from '@/routes';
 import { DashboardStatsGrid } from '@/styles/CustomStyled/StatCardWrapper';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
     Box,
     Button,
-    Chip,
     IconButton,
     Menu,
     MenuItem,
@@ -22,13 +22,8 @@ import {
     TableRow,
     Typography,
 } from '@mui/material';
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
-
-const statusColor: Record<AppointmentStatus, 'info' | 'success' | 'error'> = {
-    Scheduled: 'info',
-    Completed: 'success',
-    Cancelled: 'error',
-};
 
 const headList = [
     'Patient',
@@ -142,6 +137,8 @@ export default function DashboardModulePage() {
                                 + Add Appointment
                             </Button>
                             <Button
+                                component={Link}
+                                href={projectRoutes.appointments}
                                 variant="text"
                                 sx={{
                                     minWidth: 0,
@@ -232,11 +229,7 @@ export default function DashboardModulePage() {
                             {row.startTime} to {row.endTime}
                         </TableCell>
                         <TableCell>
-                            <Chip
-                                label={row.status}
-                                size="small"
-                                color={statusColor[row.status]}
-                            />
+                            <AppointmentStatusBadge status={row.status} />
                         </TableCell>
                         <TableCell>
                             <Box

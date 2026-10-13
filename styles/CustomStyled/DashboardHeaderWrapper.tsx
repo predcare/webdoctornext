@@ -1,5 +1,5 @@
-import { Menu, styled } from '@mui/material';
 import { TopbarHeight } from '@/themes/themeConstant';
+import { Menu, styled } from '@mui/material';
 
 export const DashboardHeaderWrapper = styled('header')`
   position: sticky;
@@ -14,6 +14,13 @@ export const DashboardHeaderWrapper = styled('header')`
   padding: 10px 12px;
   background: ${({ theme }) => theme.palette.customColors.headerBg};
   border-bottom: 1px solid ${({ theme }) => theme.palette.customColors.border};
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  &:hover {
+    border-color: ${({ theme }) => theme.palette.customColors.inputBorder};
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+  }
   grid-template-columns: auto minmax(0, 1fr) auto;
   grid-template-areas: 'menu identity icons';
 

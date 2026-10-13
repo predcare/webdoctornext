@@ -14,14 +14,14 @@ import {
   SettingsIcon,
   SunIcon,
 } from '@/components/ui/Icons/dashboard';
-import { sideNavItems, type SideNavIcon } from '@/configs/navItems';
+import { sideNavItems, type SideNavIcon, type SideNavItem } from '@/configs/navItems';
 import Assets from '@/resources/assets';
 import { SidebarWrapper } from '@/styles/CustomStyled/SidebarWrapper';
 import { useThemeStore } from '@/zustand/stores/useThemeStore';
 import { Box, Button, Tooltip } from '@mui/material';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import type { ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
 import SidebarNavItem from './SidebarNavItem';
 
 const navIcons: Record<SideNavIcon, ReactNode> = {
@@ -36,6 +36,40 @@ const navIcons: Record<SideNavIcon, ReactNode> = {
   help: <HelpIcon />,
 };
 
+type NavListProps = {
+  items: SideNavItem[];
+  collapsed: boolean;
+  onNavigate?: () => void;
+};
+
+const NavList = ({ items, collapsed, onNavigate, currentPath }: NavListProps & { currentPath: string }) => (
+  <>
+    {items.map((item) => (
+      <SidebarNavItem
+        key={item.id}
+        item={item}
+        icon={navIcons[item.icon]}
+        currentPath={currentPath}
+        collapsed={collapsed}
+        onNavigate={onNavigate}
+      />
+    ))}
+  </>
+);
+
+const PathNavList = (props: NavListProps) => {
+  const pathname = usePathname();
+  const currentPath = pathname.length > 1 && pathname.endsWith('/') ? pathname.slice(0, -1) : pathname;
+
+  return <NavList {...props} currentPath={currentPath} />;
+};
+
+const SuspendedNavList = (props: NavListProps) => (
+  <Suspense fallback={<NavList {...props} currentPath="" />}>
+    <PathNavList {...props} />
+  </Suspense>
+);
+
 type SidebarProps = {
   variant: 'permanent' | 'drawer';
   collapsed?: boolean;
@@ -49,11 +83,6 @@ const Sidebar = ({
   onToggleCollapse,
   onClose,
 }: SidebarProps) => {
-  const pathname = usePathname();
-  const currentPath =
-    pathname.length > 1 && pathname.endsWith('/')
-      ? pathname.slice(0, -1)
-      : pathname;
   const mode = useThemeStore((state) => state.mode);
   const toggleMode = useThemeStore((state) => state.toggleMode);
   const isDrawer = variant === 'drawer';
@@ -105,29 +134,19 @@ const Sidebar = ({
       </Box>
 
       <nav className="sidebar-nav" aria-label="Main menu">
-        {mainItems.map((item) => (
-          <SidebarNavItem
-            key={item.id}
-            item={item}
-            icon={navIcons[item.icon]}
-            currentPath={currentPath}
-            collapsed={isCollapsed}
-            onNavigate={isDrawer ? onClose : undefined}
-          />
-        ))}
+        <SuspendedNavList
+          items={mainItems}
+          collapsed={isCollapsed}
+          onNavigate={isDrawer ? onClose : undefined}
+        />
       </nav>
 
       <Box className="sidebar-footer">
-        {footerItems.map((item) => (
-          <SidebarNavItem
-            key={item.id}
-            item={item}
-            icon={navIcons[item.icon]}
-            currentPath={currentPath}
-            collapsed={isCollapsed}
-            onNavigate={isDrawer ? onClose : undefined}
-          />
-        ))}
+        <SuspendedNavList
+          items={footerItems}
+          collapsed={isCollapsed}
+          onNavigate={isDrawer ? onClose : undefined}
+        />
         <Tooltip
           title={isCollapsed ? (isDark ? 'Light mode' : 'Dark mode') : ''}
           placement="right"

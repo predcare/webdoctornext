@@ -37,7 +37,8 @@ export const SidebarWrapper = styled('aside', {
     flex-shrink: 0;
     min-height: 72px;
     padding: 16px 16px 14px;
-    border-bottom: 1px solid ${({ theme }) => theme.palette.customColors.border};
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   .brand-logo-wrap {

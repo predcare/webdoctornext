@@ -28,6 +28,15 @@ export const AuthLayoutWrapper = styled(Box)`
     pointer-events: none;
   }
 
+  .auth-container {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .auth-column {
     width: 100%;
     max-width: 480px;

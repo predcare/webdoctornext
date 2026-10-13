@@ -13,6 +13,8 @@ export const projectRoutes = {
 
   // Doctor portal
   dashboard: '/dashboard',
+  appointments: '/appointments',
+  appointmentDetails: (id: string) => `/appointments/${id}`,
 
   // Legal Pages
   privacyPolicy: '/privacy-policy',

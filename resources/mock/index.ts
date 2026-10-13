@@ -1,5 +1,12 @@
-export { dashboardAppointments } from './appointments';
-export type { AppointmentStatus, DashboardAppointment } from './appointments';
+export { appointmentToday, dashboardAppointments } from './appointments';
+export type { AppointmentStatus, AppointmentVisitType, DashboardAppointment } from './appointments';
+export { getAppointmentDetails } from './appointmentDetails';
+export type {
+  AppointmentClinic,
+  AppointmentDetails,
+  AppointmentPrescription,
+  PaymentStatus,
+} from './appointmentDetails';
 export { dashboardStats } from './dashboardStats';
 export type { DashboardStat, DashboardStatIcon, DashboardStatTone } from './dashboardStats';
 export { clinics } from './clinics';

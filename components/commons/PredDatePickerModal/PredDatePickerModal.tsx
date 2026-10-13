@@ -10,7 +10,7 @@ import React, {
     useState,
 } from 'react';
 
-import { Box, Dialog, Typography } from '@mui/material';
+import { Box, Button, Dialog, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
 
@@ -110,13 +110,6 @@ function WheelColumn<T>({
             onScroll={handleScroll}
             role="listbox"
             aria-label={ariaLabel}
-            sx={{
-                paddingTop: `${ITEM_HEIGHT}px`,
-                paddingBottom: `${ITEM_HEIGHT}px`,
-                height: 44,
-                boxSizing: 'content-box',
-                scrollBehavior: 'smooth',
-            }}
         >
             {data.map((item, index) => (
                 <Box
@@ -300,7 +293,7 @@ const PredDatePickerModal: React.FC<PredDatePickerModalProps> = memo(
                             maxWidth: 380,
                             backgroundColor: 'transparent',
                             boxShadow: 'none',
-                            overflow: 'visible',
+                            overflow: 'hidden',
                             margin: 2,
                         },
                     },
@@ -351,23 +344,12 @@ const PredDatePickerModal: React.FC<PredDatePickerModalProps> = memo(
                     </Box>
 
                     <Box className="footer-row">
-                        <Box
-                            component="button"
-                            type="button"
-                            className="action-button cancel-button"
-                            onClick={onCancel}
-                        >
+                        <Button className="action-button cancel-button" onClick={onCancel}>
                             {cancelText}
-                        </Box>
-
-                        <Box
-                            component="button"
-                            type="button"
-                            className="action-button confirm-button"
-                            onClick={handleConfirm}
-                        >
+                        </Button>
+                        <Button className="action-button confirm-button" onClick={handleConfirm}>
                             {confirmText}
-                        </Box>
+                        </Button>
                     </Box>
                 </PredDatePickerWrapper>
             </Dialog>
@@ -416,7 +398,8 @@ const PredDatePickerWrapper = styled(Box)(({ theme }) => ({
     '& .picker-wrapper': {
         height: 132,
         position: 'relative',
-        margin: '4px 0',
+        margin: '4px 0 0',
+        overflow: 'hidden',
     },
 
     '& .selection-highlight': {
@@ -443,6 +426,10 @@ const PredDatePickerWrapper = styled(Box)(({ theme }) => ({
         flex: 1,
         minWidth: 0,
         height: 132,
+        maxHeight: 132,
+        boxSizing: 'border-box',
+        paddingTop: 44,
+        paddingBottom: 44,
         overflowY: 'auto',
         overscrollBehavior: 'contain',
         scrollSnapType: 'y mandatory',
@@ -486,32 +473,35 @@ const PredDatePickerWrapper = styled(Box)(({ theme }) => ({
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 18,
-        padding: '0 8px',
+        gap: 12,
+        marginTop: 12,
+        paddingTop: 8,
+        borderTop: `1px solid ${theme.palette.divider}`,
+        backgroundColor: theme.palette.background.paper,
+        position: 'relative',
+        zIndex: 2,
     },
 
     '& .action-button': {
         minWidth: 0,
-        padding: '10px 16px',
-        border: 0,
+        padding: '8px 12px',
         borderRadius: 8,
         background: 'transparent',
         fontSize: 16,
         fontWeight: 600,
-        fontFamily: 'inherit',
         textTransform: 'none',
-        cursor: 'pointer',
+        lineHeight: '24px',
 
         '&:hover': {
             backgroundColor: theme.palette.action.hover,
         },
     },
 
-    '& .cancel-button': {
+    '& .cancel-button.MuiButton-root': {
         color: theme.palette.text.secondary,
     },
 
-    '& .confirm-button': {
+    '& .confirm-button.MuiButton-root': {
         color: theme.palette.primary.main,
         fontWeight: 700,
     },

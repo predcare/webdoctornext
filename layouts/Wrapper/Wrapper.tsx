@@ -1,5 +1,6 @@
 "use client";
-import { Box } from "@mui/material";
+import { CmsLayoutWrapper } from "@/styles/CustomStyled/CmsLayoutWrapper";
+import { Box, Container } from "@mui/material";
 import Footer from "../Footer/Footer";
 import Header from "../Header/Header";
 
@@ -9,16 +10,13 @@ interface WrapperProps {
 
 const Wrapper = ({ children }: WrapperProps) => {
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    <CmsLayoutWrapper>
       <Header />
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, pt: { xs: "64px", sm: "72px" } }}
-      >
-        {children}
+      <Box component="main" className="cms-main">
+        <Container maxWidth="xl">{children}</Container>
       </Box>
       <Footer />
-    </Box>
+    </CmsLayoutWrapper>
   );
 };
 

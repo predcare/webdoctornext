@@ -717,13 +717,13 @@ export const CustomTableWrapper = styled(Box)`
   /* ─── Table Head ───────────────────────────────────────── */
   .MuiTableHead-root .MuiTableCell-root {
     font-family: var(--font-inter), Inter, sans-serif;
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: ${({ theme }) => theme.palette.text.secondary};
+    letter-spacing: 0.06em;
+    color: ${({ theme }) => theme.palette.customColors.textMuted};
     background: ${({ theme }) => theme.palette.customColors.pageBg};
-    padding: 13px 16px;
+    padding: 14px 18px;
     text-align: left;
     white-space: nowrap;
     border-bottom: 1px solid ${({ theme }) => theme.palette.customColors.border};
@@ -732,45 +732,37 @@ export const CustomTableWrapper = styled(Box)`
     z-index: 2;
   }
 
-  /* ─── Table Body ───────────────────────────────────────── */
   .MuiTableBody-root .MuiTableCell-root {
     font-family: var(--font-inter), Inter, sans-serif;
-    padding: 13px 16px;
+    padding: 16px 18px;
     font-size: 13px;
     color: ${({ theme }) => theme.palette.text.primary};
     border-bottom: 1px solid ${({ theme }) => theme.palette.customColors.border};
+    vertical-align: middle;
 
     &:first-of-type {
-      padding-left: 20px;
+      padding-left: 18px;
     }
   }
 
-  /* ─── Table Row ────────────────────────────────────────── */
   .MuiTableBody-root .MuiTableRow-root {
-    background: transparent;
-    transition: background 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    background: ${({ theme }) => theme.palette.customColors.cardBg};
+    transition: background 0.2s ease;
 
     &:last-child .MuiTableCell-root {
       border-bottom: none;
     }
 
     &:hover {
-      background: ${({ theme }) => theme.palette.action.hover};
-
-      .MuiTableCell-root {
-        border-bottom-color: ${({ theme }) => theme.palette.customColors.border};
-      }
+      background: ${({ theme }) => theme.palette.customColors.hoverBg};
     }
   }
 
-  /* Zebra striping */
   &.zebra .MuiTableBody-root .MuiTableRow-root:not(.skeletonRow):nth-of-type(even) {
-    background: ${({ theme }) => theme.palette.mode === 'light'
-    ? 'rgba(0,0,0,0.018)'
-    : 'rgba(255,255,255,0.018)'};
+    background: ${({ theme }) => theme.palette.customColors.pageBg};
 
     &:hover {
-      background: ${({ theme }) => theme.palette.action.hover};
+      background: ${({ theme }) => theme.palette.customColors.hoverBg};
     }
   }
 
