@@ -26,7 +26,7 @@ export const defaultPalette = (mode: PaletteMode): TCustomPalette => {
 
     heading: '#0A1B39',
     textPrimary: '#0F172A',
-    textSecondary: '#475569',
+    textSecondary: '#6c81a1',
     textMuted: '#858D9C',
 
     border: '#E7E8EB',
