@@ -13,10 +13,15 @@ export const projectRoutes = {
 
   // Doctor portal
   dashboard: '/dashboard',
-  appointments: '/appointments',
-  appointmentDetails: (id: string) => `/appointments/${id}`,
-  patients: '/patients',
-  addPatient: '/patients/add-patient',
+  appointments: '/dashboard/appointments',
+  appointmentDetails: (id: string) => `/dashboard/appointments/${id}`,
+  bookAppointment: (patientId?: string) =>
+    patientId
+      ? `/dashboard/appointments/book-appointment?patientId=${patientId}`
+      : '/dashboard/appointments/book-appointment',
+  patients: '/dashboard/patients',
+  addPatient: '/dashboard/patients/add-patient',
+  patientDetails: (id: string) => `/dashboard/patients/${id}`,
 
   // Legal Pages
   privacyPolicy: '/privacy-policy',

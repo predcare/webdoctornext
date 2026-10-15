@@ -9,15 +9,23 @@ import AppointmentFilters, {
 } from '@/components/Modules/AppointmentsModule/AppointmentFilters';
 import AppointmentRow from '@/components/Modules/AppointmentsModule/AppointmentRow';
 import AppointmentSummaryCards from '@/components/Modules/AppointmentsModule/AppointmentSummaryCards';
+import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
 import { dashboardAppointments } from '@/resources/mock';
 import { projectRoutes } from '@/routes';
 import { AppointmentListWrapper } from '@/styles/CustomStyled/AppointmentListWrapper';
-import { Button, Menu, MenuItem } from '@mui/material';
+import { Menu, MenuItem } from '@mui/material';
 import Link from 'next/link';
 import { useCallback, useMemo, useState } from 'react';
 
-const headList = ['Patient details', 'Modality', 'Schedule', 'Specialist', 'Status', 'Actions'];
+const headList = [
+  'Patient details',
+  'Modality',
+  'Schedule',
+  'Specialist',
+  'Status',
+  'Actions',
+];
 
 const breadcrumbItems = [
   { label: 'Dashboard', href: projectRoutes.dashboard },
@@ -25,20 +33,33 @@ const breadcrumbItems = [
 ];
 
 const addAppointmentAction = (
-  <Button className="page-action" variant="contained" disableElevation>
-    + Add Appointment
-  </Button>
+  <CustomButton
+    className="page-action"
+    text="+ Add Appointment"
+    action={projectRoutes.bookAppointment()}
+  />
 );
 
 export default function AppointmentListPage() {
   const [actionAnchor, setActionAnchor] = useState<HTMLElement | null>(null);
   const [actionRowId, setActionRowId] = useState<string | null>(null);
-  const [filters, setFilters] = useState<AppointmentFilterState>(defaultAppointmentFilters);
-  const appointments = useMemo(() => filterAppointments(dashboardAppointments, filters), [filters]);
-  const filtersActive = useMemo(() => hasActiveAppointmentFilters(filters), [filters]);
-  const handleFilterChange = useCallback((patch: Partial<AppointmentFilterState>) => {
-    setFilters((current) => ({ ...current, ...patch }));
-  }, []);
+  const [filters, setFilters] = useState<AppointmentFilterState>(
+    defaultAppointmentFilters,
+  );
+  const appointments = useMemo(
+    () => filterAppointments(dashboardAppointments, filters),
+    [filters],
+  );
+  const filtersActive = useMemo(
+    () => hasActiveAppointmentFilters(filters),
+    [filters],
+  );
+  const handleFilterChange = useCallback(
+    (patch: Partial<AppointmentFilterState>) => {
+      setFilters((current) => ({ ...current, ...patch }));
+    },
+    [],
+  );
   const handleClearFilters = useCallback(() => {
     setFilters(defaultAppointmentFilters);
   }, []);
@@ -51,7 +72,11 @@ export default function AppointmentListPage() {
     <AppointmentListWrapper>
       <PageBreadcrumb items={breadcrumbItems} action={addAppointmentAction} />
       <AppointmentSummaryCards appointments={dashboardAppointments} />
-      <AppointmentFilters filters={filters} onChange={handleFilterChange} onClear={handleClearFilters} />
+      <AppointmentFilters
+        filters={filters}
+        onChange={handleFilterChange}
+        onClear={handleClearFilters}
+      />
 
       <CustomTable
         className="appointment-table"
@@ -61,15 +86,13 @@ export default function AppointmentListPage() {
         isEmpty={appointments.length === 0}
         emptyText="No appointments found"
         emptyDescription={
-          filtersActive ? 'Change the filters or clear them to see appointments.' : undefined
+          filtersActive
+            ? 'Change the filters or clear them to see appointments.'
+            : undefined
         }
       >
         {appointments.map((row) => (
-          <AppointmentRow
-            key={row.id}
-            row={row}
-            onOpenMenu={handleOpenMenu}
-          />
+          <AppointmentRow key={row.id} row={row} onOpenMenu={handleOpenMenu} />
         ))}
       </CustomTable>
 

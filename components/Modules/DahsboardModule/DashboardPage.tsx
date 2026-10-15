@@ -122,6 +122,8 @@ export default function DashboardModulePage() {
                             }}
                         >
                             <Button
+                                component={Link}
+                                href={projectRoutes.bookAppointment()}
                                 variant="contained"
                                 disableElevation
                                 sx={{

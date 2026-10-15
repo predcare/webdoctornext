@@ -6,114 +6,110 @@ import { forwardRef, useEffect } from 'react';
 import CloseIcon from '../Icons/CloseIcon';
 
 interface ICustomModalWrapperProps {
-    open: boolean;
-    onClose?: () => void;
-    scroll?: 'paper' | 'body';
-    children: React.JSX.Element | React.JSX.Element[];
-    className?: string;
-    noCloseBtn?: boolean;
-    isWhiteBg?: boolean;
-    hasRoundedCross?: boolean;
-    heading?: string;
-    subheading?: string;
-    headerIcon?: React.ReactNode;
+  open: boolean;
+  onClose?: () => void;
+  scroll?: 'paper' | 'body';
+  children: React.JSX.Element | React.JSX.Element[];
+  className?: string;
+  noCloseBtn?: boolean;
+  isWhiteBg?: boolean;
+  hasRoundedCross?: boolean;
+  heading?: string;
+  subheading?: string;
+  headerIcon?: React.ReactNode;
 }
 
 const SlideDownTransition = forwardRef(function SlideDownTransition(
-    props: TransitionProps & { children: React.ReactElement },
-    ref: React.Ref<unknown>,
+  props: TransitionProps & { children: React.ReactElement },
+  ref: React.Ref<unknown>,
 ) {
-    return <Slide direction="up" ref={ref} {...props} />;
+  return <Slide direction="up" ref={ref} {...props} />;
 });
 
 export default function CustomModal({
-    open,
-    onClose,
-    scroll,
-    children,
-    className,
-    noCloseBtn,
-    isWhiteBg,
-    hasRoundedCross,
-    heading,
-    subheading,
-    headerIcon,
+  open,
+  onClose,
+  scroll,
+  children,
+  className,
+  noCloseBtn,
+  isWhiteBg,
+  hasRoundedCross,
+  heading,
+  subheading,
+  headerIcon,
 }: ICustomModalWrapperProps) {
-    useEffect(() => {
-        const html = document.documentElement;
-        const modalClass = 'modal-open';
-        if (open) {
-            html.classList.add(modalClass);
-        } else {
-            html.classList.remove(modalClass);
-        }
-        return () => {
-            html.classList.remove(modalClass);
-        };
-    }, [open]);
+  useEffect(() => {
+    const html = document.documentElement;
+    const modalClass = 'modal-open';
+    if (open) {
+      html.classList.add(modalClass);
+    } else {
+      html.classList.remove(modalClass);
+    }
+    return () => {
+      html.classList.remove(modalClass);
+    };
+  }, [open]);
 
-    const showCloseBtn = !noCloseBtn || hasRoundedCross;
+  const showCloseBtn = !noCloseBtn || hasRoundedCross;
 
-    return (
-        <MuiModalWrapperStyled
-            className={`common-modal ${className} ${isWhiteBg ? 'white-bg-cls' : ''}`}
-            open={open}
-            onClose={onClose}
-            scroll={scroll}
-            slots={{
-                transition: SlideDownTransition,
-            }}
-            transitionDuration={300}
-            aria-labelledby="responsive-dialog-title"
+  return (
+    <MuiModalWrapperStyled
+      className={`common-modal ${className} ${isWhiteBg ? 'white-bg-cls' : ''}`}
+      open={open}
+      onClose={onClose}
+      scroll={scroll}
+      slots={{
+        transition: SlideDownTransition,
+      }}
+      transitionDuration={300}
+      aria-labelledby="responsive-dialog-title"
+    >
+      {heading && (
+        <Box className="modal-header">
+          <Box className="modal-header-left">
+            {headerIcon && <span className="header-icon">{headerIcon}</span>}
+            <Box className="header-text">
+              <Typography className="heading">{heading}</Typography>
+              {subheading && (
+                <Typography className="heading-sub">{subheading}</Typography>
+              )}
+            </Box>
+          </Box>
+          {showCloseBtn && (
+            <IconButton onClick={onClose} disableRipple className="close-btn">
+              <CloseIcon IconColor="currentColor" />
+            </IconButton>
+          )}
+        </Box>
+      )}
+
+      {!heading && showCloseBtn && (
+        <IconButton
+          onClick={onClose}
+          autoFocus
+          disableRipple
+          className="close-btn-floating"
         >
-            {heading && (
-                <Box className="modal-header">
-                    <Box className="modal-header-left">
-                        {headerIcon && <span className="header-icon">{headerIcon}</span>}
-                        <Box className="header-text">
-                            <Typography className="heading">{heading}</Typography>
-                            {subheading && (
-                                <Typography className="heading-sub">{subheading}</Typography>
-                            )}
-                        </Box>
-                    </Box>
-                    {showCloseBtn && (
-                        <IconButton onClick={onClose} disableRipple className="close-btn">
-                            <CloseIcon IconColor="currentColor" />
-                        </IconButton>
-                    )}
-                </Box>
-            )}
+          <CloseIcon IconColor="currentColor" />
+        </IconButton>
+      )}
 
-            {!heading && showCloseBtn && (
-                <IconButton
-                    onClick={onClose}
-                    autoFocus
-                    disableRipple
-                    className="close-btn-floating"
-                >
-                    <CloseIcon IconColor="currentColor" />
-                </IconButton>
-            )}
-
-            <DialogContent>{children}</DialogContent>
-        </MuiModalWrapperStyled>
-    );
+      <DialogContent>{children}</DialogContent>
+    </MuiModalWrapperStyled>
+  );
 }
 
 export const MuiModalWrapperStyled = styled(Dialog)`
   .MuiDialog-paper {
     position: relative;
-    background-color: ${({ theme }) => theme.palette.background.paper};
     max-width: 1200px;
     width: 100%;
     height: 100%;
     border-radius: 16px;
     border: 1px solid ${({ theme }) => theme.palette.divider};
-    box-shadow: 0 12px 40px
-      ${({ theme }) => theme.palette.customColors.cardBorder};
     overflow: hidden;
-
     @media (max-width: 899px) {
       border-radius: 14px;
     }
@@ -260,8 +256,7 @@ export const MuiModalWrapperStyled = styled(Dialog)`
 
   /* ================= BACKDROP ================= */
   .MuiBackdrop-root {
-    background: ${({ theme }) => theme.palette.customColors.textPrimary};
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(1px);
   }
 
   /* ================= WHITE BG VARIANT ================= */
@@ -476,6 +471,46 @@ export const MuiModalWrapperStyled = styled(Dialog)`
     .MuiDialog-paper {
       width: 100%;
       max-width: 520px;
+      margin: 24px auto;
+      height: initial;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    @media (max-width: 599px) {
+      .MuiDialog-paper {
+        max-width: calc(100% - 20px);
+        margin: 10px;
+        border-radius: 16px;
+      }
+    }
+  }
+
+  /* ─── Add Family Member Modal ────────────────────────── */
+  &.familyMemberModal {
+    .MuiDialog-paper {
+      width: 100%;
+      max-width: 640px;
+      margin: 24px auto;
+      height: initial;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    @media (max-width: 599px) {
+      .MuiDialog-paper {
+        max-width: calc(100% - 20px);
+        margin: 10px;
+        border-radius: 16px;
+      }
+    }
+  }
+
+  /* ─── Upload Medical Record Modal ────────────────────── */
+  &.medicalRecordModal {
+    .MuiDialog-paper {
+      width: 100%;
+      max-width: 720px;
       margin: 24px auto;
       height: initial;
       border-radius: 20px;

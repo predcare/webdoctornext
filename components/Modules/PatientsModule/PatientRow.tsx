@@ -2,10 +2,12 @@
 
 import StatusChip from '@/components/commons/StatusChip/StatusChip';
 import type { Patient } from '@/resources/mock';
+import { projectRoutes } from '@/routes';
 import { avatarTone } from '@/utils/avatarTone';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Box, IconButton, TableCell, TableRow, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import { memo, type MouseEvent } from 'react';
 
 type PatientRowProps = {
@@ -14,8 +16,12 @@ type PatientRowProps = {
 };
 
 function PatientRow({ row, onOpenMenu }: PatientRowProps) {
+  const navigate = useRouter();
+  const handleView = () => {
+    navigate.push(projectRoutes.patientDetails(row.id));
+  };
   return (
-    <TableRow>
+    <TableRow onClick={handleView}>
       <TableCell>
         <Box className="patient-cell">
           <Box className={`patient-avatar ${avatarTone(row.initial)}`}>{row.initial}</Box>
