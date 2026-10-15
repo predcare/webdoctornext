@@ -25,5 +25,12 @@ export type {
 } from './dashboardStats';
 export { clinics } from './clinics';
 export type { Clinic } from './clinics';
+export { availabilityDoctors, availabilitySlots, formatAvailabilityDate } from './availability';
+export type {
+  AvailabilityConsultation,
+  AvailabilityDateMode,
+  AvailabilityDoctor,
+  AvailabilityRecord,
+} from './availability';
 export { notifications } from './notifications';
 export type { NotificationItem } from './notifications';
