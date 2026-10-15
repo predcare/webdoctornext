@@ -1,5 +1,7 @@
 'use client';
+/* eslint-disable @next/next/no-img-element -- landing images stay native img tags inside figure */
 
+import { CmsLandingWrapper } from '@/styles/CustomStyled/CmsLandingWrapper';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import YouTubeIcon from '@mui/icons-material/YouTube';
@@ -14,7 +16,6 @@ import {
 } from '@mui/material';
 import React from 'react';
 
-// X (Twitter) Vector Icon
 const XTwitterIcon = () => (
   <svg
     width="18"
@@ -54,116 +55,69 @@ const COMPANY_LINKS = [
   },
 ];
 
+const LIGHT_LOGO = 'https://stage.predcare.in/images/pred-care-logo.png';
+
 const Footer = () => {
+  const handleLogoError = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    event.currentTarget.src =
+      'https://placehold.co/150x50/transparent/white?text=PRED+CARE';
+  };
+
   return (
-    <Box
-      component="footer"
-      sx={{
-        backgroundColor: '#041B66',
-        borderTop: '1px solid #0A2F8F',
-        pt: { xs: 8, md: 10 },
-        pb: 5,
-        color: '#FFFFFF',
-      }}
-    >
+    <CmsLandingWrapper className="cms-footer" component="footer">
       <Container maxWidth="lg">
-        {/* Main 4-Column Footer Grid */}
-        <Grid container spacing={{ xs: 5, md: 6 }} sx={{ mb: 6 }}>
-          {/* Column 1: Logo & Mission Statement */}
+        <Grid className="footer-grid" container spacing={{ xs: 5, md: 6 }}>
           <Grid size={{ xs: 12, md: 4 }}>
-            <Box sx={{ mb: 2.5 }}>
-              <Box
-                component="img"
-                src="https://stage.predcare.in/images/pred-care-logo.png"
+            <figure className="media footer-brand">
+              <img
+                src={LIGHT_LOGO}
                 alt="PRED Care Logo"
-                sx={{
-                  height: 40,
-                  width: 'auto',
-                  objectFit: 'contain',
-                }}
-                onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                  e.currentTarget.src =
-                    'https://placehold.co/150x50/transparent/white?text=PRED+CARE';
-                }}
+                onError={handleLogoError}
               />
-            </Box>
-            <Typography
-              variant="body2"
-              sx={{
-                color: '#DBEAFE', // blue-100
-                fontSize: '0.95rem',
-                lineHeight: 1.7,
-                maxWidth: 320,
-              }}
-            >
+            </figure>
+            <Typography className="footer-mission" variant="body2">
               Empowering healthcare providers with next-generation technology to
               deliver better patient care.
             </Typography>
           </Grid>
 
-          {/* Column 2: Solutions */}
           <Grid size={{ xs: 6, sm: 4, md: 2.5 }}>
             <Typography
+              className="footer-title"
               variant="subtitle1"
-              sx={{
-                fontWeight: 600,
-                color: '#FFFFFF',
-                fontSize: '1rem',
-                mb: 2.5,
-              }}
+              component="p"
             >
               Solutions
             </Typography>
-            <Stack spacing={1.5}>
+            <Stack className="footer-links">
               {SOLUTIONS_LINKS.map((item) => (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  underline="none"
-                  sx={{
-                    color: '#BFDBFE', // blue-200
-                    fontSize: '0.95rem',
-                    transition: 'color 0.2s ease',
-                    '&:hover': {
-                      color: '#FFFFFF',
-                    },
-                  }}
-                >
+                <Link key={item.label} className="footer-link" href={item.href}>
                   {item.label}
                 </Link>
               ))}
             </Stack>
           </Grid>
 
-          {/* Column 3: Company */}
           <Grid size={{ xs: 6, sm: 4, md: 2.5 }}>
             <Typography
+              className="footer-title"
               variant="subtitle1"
-              sx={{
-                fontWeight: 600,
-                color: '#FFFFFF',
-                fontSize: '1rem',
-                mb: 2.5,
-              }}
+              component="p"
             >
               Company
             </Typography>
-            <Stack spacing={1.5}>
+            <Stack className="footer-links">
               {COMPANY_LINKS.map((item) => (
                 <Link
                   key={item.label}
+                  className="footer-link"
                   href={item.href}
-                  underline="none"
-                  target={item.href.startsWith('http') ? '_blank' : '_self'}
-                  rel="noopener noreferrer"
-                  sx={{
-                    color: '#BFDBFE',
-                    fontSize: '0.95rem',
-                    transition: 'color 0.2s ease',
-                    '&:hover': {
-                      color: '#FFFFFF',
-                    },
-                  }}
+                  target={item.href.startsWith('http') ? '_blank' : undefined}
+                  rel={
+                    item.href.startsWith('http')
+                      ? 'noopener noreferrer'
+                      : undefined
+                  }
                 >
                   {item.label}
                 </Link>
@@ -171,173 +125,102 @@ const Footer = () => {
             </Stack>
           </Grid>
 
-          {/* Column 4: Download App Badges */}
           <Grid size={{ xs: 12, sm: 4, md: 3 }}>
             <Typography
+              className="footer-title footer-download-title"
               variant="subtitle1"
-              sx={{
-                fontWeight: 600,
-                color: '#FFFFFF',
-                fontSize: '1rem',
-                mb: 1,
-              }}
+              component="p"
             >
               Download App
             </Typography>
-            <Typography
-              variant="body2"
-              sx={{
-                color: '#DBEAFE',
-                fontSize: '0.875rem',
-                mb: 2.5,
-              }}
-            >
+            <Typography className="footer-note" variant="body2">
               Get the app for iOS and Android
             </Typography>
-            <Stack spacing={1.5} sx={{ alignItems: 'flex-start' }}>
-              {/* Apple App Store */}
-              <Box
-                component="a"
+            <Stack className="footer-links">
+              <a
+                className="store-badge"
                 href="https://apps.apple.com/us/developer/pred-solutions/id1889453659"
                 target="_blank"
                 rel="noopener noreferrer"
-                sx={{
-                  display: 'inline-block',
-                  transition: 'opacity 0.2s',
-                  '&:hover': { opacity: 0.85 },
-                }}
               >
-                <Box
-                  component="img"
-                  src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83"
-                  alt="Download on the App Store"
-                  sx={{ width: 160, height: 'auto', display: 'block' }}
-                />
-              </Box>
+                <figure className="media">
+                  <img
+                    src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83"
+                    alt="Download on the App Store"
+                  />
+                </figure>
+              </a>
 
-              {/* Google Play Store */}
-              <Box
-                component="a"
+              <a
+                className="store-badge store-badge-play"
                 href="https://play.google.com/store/apps/developer?id=PRED+CARE"
                 target="_blank"
                 rel="noopener noreferrer"
-                sx={{
-                  display: 'inline-block',
-                  ml: '-10px',
-                  transition: 'opacity 0.2s',
-                  '&:hover': { opacity: 0.85 },
-                }}
               >
-                <Box
-                  component="img"
-                  src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
-                  alt="Get it on Google Play"
-                  sx={{ width: 180, height: 'auto', display: 'block' }}
-                />
-              </Box>
+                <figure className="media">
+                  <img
+                    src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+                    alt="Get it on Google Play"
+                  />
+                </figure>
+              </a>
             </Stack>
           </Grid>
         </Grid>
 
-        {/* Bottom Bar: Copyright & Social Links */}
-        <Box
-          sx={{
-            borderTop: '1px solid #0A2F8F',
-            pt: 4,
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
-          <Typography
-            variant="body2"
-            sx={{
-              color: '#BFDBFE',
-              fontSize: '0.875rem',
-              textAlign: { xs: 'center', sm: 'left' },
-            }}
-          >
+        <Box className="footer-bottom">
+          <Typography className="footer-copy" variant="body2">
             © 2026 PRED Solutions. All rights reserved.
           </Typography>
 
-          <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+          <Stack className="social-row" direction="row" spacing={2}>
             <IconButton
+              className="social-link"
               component="a"
               href="https://x.com/PredCare"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="X Twitter"
-              sx={{
-                color: '#BFDBFE',
-                p: 1,
-                '&:hover': {
-                  color: '#FFFFFF',
-                  bgcolor: 'rgba(255,255,255,0.08)',
-                },
-              }}
             >
               <XTwitterIcon />
             </IconButton>
 
             <IconButton
+              className="social-link"
               component="a"
               href="https://www.youtube.com/@PREDCARE"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="YouTube"
-              sx={{
-                color: '#BFDBFE',
-                p: 1,
-                '&:hover': {
-                  color: '#FFFFFF',
-                  bgcolor: 'rgba(255,255,255,0.08)',
-                },
-              }}
             >
-              <YouTubeIcon sx={{ fontSize: 22 }} />
+              <YouTubeIcon />
             </IconButton>
 
             <IconButton
+              className="social-link"
               component="a"
               href="https://www.facebook.com/profile.php?id=61580060363697"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
-              sx={{
-                color: '#BFDBFE',
-                p: 1,
-                '&:hover': {
-                  color: '#FFFFFF',
-                  bgcolor: 'rgba(255,255,255,0.08)',
-                },
-              }}
             >
-              <FacebookIcon sx={{ fontSize: 22 }} />
+              <FacebookIcon />
             </IconButton>
 
             <IconButton
+              className="social-link"
               component="a"
               href="https://www.instagram.com/predcare/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
-              sx={{
-                color: '#BFDBFE',
-                p: 1,
-                '&:hover': {
-                  color: '#FFFFFF',
-                  bgcolor: 'rgba(255,255,255,0.08)',
-                },
-              }}
             >
-              <InstagramIcon sx={{ fontSize: 22 }} />
+              <InstagramIcon />
             </IconButton>
           </Stack>
         </Box>
       </Container>
-    </Box>
+    </CmsLandingWrapper>
   );
 };
 

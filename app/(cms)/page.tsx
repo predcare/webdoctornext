@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import AppDownloadSection from "@/components/Modules/CmsModule/sections/AppDownloadSection";
-import ContactSection from "@/components/Modules/CmsModule/sections/ContactSection";
-import FeaturesSection from "@/components/Modules/CmsModule/sections/FeaturesSection";
-import HeroSection from "@/components/Modules/CmsModule/sections/HeroSection";
-import QueueSection from "@/components/Modules/CmsModule/sections/QueueSection";
-import RegistrationModal from "@/components/Modules/CmsModule/modals/RegistrationModal";
-import { Box } from "@mui/material";
-import React, { useState } from "react";
+import RegistrationModal from '@/components/Modules/CmsModule/modals/RegistrationModal';
+import AppDownloadSection from '@/components/Modules/CmsModule/sections/AppDownloadSection';
+import ContactSection from '@/components/Modules/CmsModule/sections/ContactSection';
+import FeaturesSection from '@/components/Modules/CmsModule/sections/FeaturesSection';
+import HeroSection from '@/components/Modules/CmsModule/sections/HeroSection';
+import QueueSection from '@/components/Modules/CmsModule/sections/QueueSection';
+import { CmsLandingWrapper } from '@/styles/CustomStyled/CmsLandingWrapper';
+import { useState } from 'react';
 
 const CmsHomePage = () => {
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
@@ -21,28 +21,17 @@ const CmsHomePage = () => {
   };
 
   return (
-    <Box sx={{ width: "100%", overflowX: "hidden" }}>
-      {/* Hero Section */}
-      <HeroSection onRegisterClick={handleOpenRegister} />
-
-      {/* About & Clinic Features Grid Section */}
+    <CmsLandingWrapper withPortals>
+      <HeroSection />
       <FeaturesSection onRegisterClick={handleOpenRegister} />
-
-      {/* Extended Features - QEase Queue Management Section */}
       <QueueSection />
-
-      {/* App Download Banner CTA */}
       <AppDownloadSection />
-
-      {/* Contact Us Section */}
       <ContactSection />
-
-      {/* Clinic Registration Modal Dialog */}
       <RegistrationModal
         open={registerModalOpen}
         onClose={handleCloseRegister}
       />
-    </Box>
+    </CmsLandingWrapper>
   );
 };
 

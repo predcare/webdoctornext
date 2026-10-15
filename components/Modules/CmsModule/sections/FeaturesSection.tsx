@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- landing images stay native img tags inside figure */
 
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import {
@@ -10,7 +11,6 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import React from "react";
 
 interface FeatureItem {
   id: number;
@@ -37,8 +37,7 @@ const FEATURES: FeatureItem[] = [
   {
     id: 3,
     title: "Electronic Medical Records",
-    description:
-      "Store, Manage, and Access patient medical information",
+    description: "Store, Manage, and Access patient medical information",
     iconSrc:
       "https://stage.predcare.in/images/icons/electronic-medical-records-emr-1.png",
   },
@@ -46,21 +45,18 @@ const FEATURES: FeatureItem[] = [
     id: 4,
     title: "Queue Management System",
     description: "Digital Queue System for superior customer experience",
-    iconSrc:
-      "https://stage.predcare.in/images/icons/queue-management-2-1.png",
+    iconSrc: "https://stage.predcare.in/images/icons/queue-management-2-1.png",
   },
   {
     id: 5,
     title: "Digital Prescription",
-    description:
-      "Now Prescription made easy! Go Digital with E-Prescription",
+    description: "Now Prescription made easy! Go Digital with E-Prescription",
     iconSrc: "https://stage.predcare.in/images/icons/e-prescription-4.png",
   },
   {
     id: 6,
     title: "Multi Centre - Multi Doctor",
-    description:
-      "Manage multiple doctors and centres at your fingertips",
+    description: "Manage multiple doctors and centres at your fingertips",
     iconSrc: "https://stage.predcare.in/images/icons/doctor-centres-1.png",
   },
   {
@@ -92,146 +88,45 @@ interface FeaturesSectionProps {
 
 const FeaturesSection = ({ onRegisterClick }: FeaturesSectionProps) => {
   return (
-    <Box
-      id="about"
-      component="section"
-      sx={{
-        py: { xs: 10, md: 14 },
-        backgroundColor: "#F8FAFC", // slate-50
-      }}
-    >
+    <Box id="about" className="cms-features" component="section">
       <Container maxWidth="lg">
-        {/* Section Header */}
-        <Box sx={{ textAlign: "center", mb: { xs: 7, md: 9 } }}>
+        <Box className="section-heading">
           <Typography
+            className="section-eyebrow section-eyebrow-accent"
             variant="overline"
-            sx={{
-              color: "#2563EB",
-              fontWeight: 700,
-              letterSpacing: "0.1em",
-              fontSize: "0.875rem",
-              textTransform: "uppercase",
-              display: "block",
-              mb: 1,
-            }}
           >
             PRED Care
           </Typography>
 
-          <Typography
-            variant="h2"
-            sx={{
-              fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
-              fontWeight: 700,
-              color: "#0F172A", // slate-900
-              mb: 2,
-              letterSpacing: "-0.02em",
-            }}
-          >
+          <Typography className="section-title" variant="h2">
             Clinic Management App
           </Typography>
 
-          <Typography
-            variant="body1"
-            sx={{
-              color: "#64748B", // slate-500
-              fontSize: { xs: "1rem", md: "1.125rem" },
-              maxWidth: 640,
-              mx: "auto",
-              lineHeight: 1.6,
-            }}
-          >
+          <Typography className="section-lead" variant="body1">
             Streamline your practice with our comprehensive suite of tools
             designed for modern healthcare providers.
           </Typography>
         </Box>
 
-        {/* Features 3-Column Grid */}
         <Grid
           id="features"
+          className="feature-grid"
           container
           spacing={{ xs: 3, md: 4 }}
-          sx={{ mb: { xs: 7, md: 9 } }}
         >
           {FEATURES.map((item) => (
             <Grid key={item.id} size={{ xs: 12, sm: 6, md: 4 }}>
-              <Card
-                elevation={0}
-                sx={{
-                  height: "100%",
-                  bgcolor: "#FFFFFF",
-                  p: { xs: 3, sm: 4 },
-                  borderRadius: "20px",
-                  border: "1px solid rgba(59, 130, 246, 0.09)",
-                  textAlign: "center",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.04)",
-                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                  "&:hover": {
-                    transform: "translateY(-6px)",
-                    boxShadow: "0 14px 28px -4px rgba(37, 99, 235, 0.09)",
-                  },
-                }}
-              >
-                <CardContent
-                  sx={{
-                    p: 0,
-                    width: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    "&:last-child": { pb: 0 },
-                  }}
-                >
-                  {/* Icon Container */}
-                  <Box
-                    sx={{
-                      width: 64,
-                      height: 64,
-                      borderRadius: "14px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mb: 3,
-                    }}
-                  >
-                    <Box
-                      component="img"
-                      src={item.iconSrc}
-                      alt={item.title}
-                      sx={{
-                        maxWidth: "100%",
-                        maxHeight: "100%",
-                        objectFit: "contain",
-                      }}
-                    />
-                  </Box>
+              <Card className="feature-card" elevation={0}>
+                <CardContent>
+                  <figure className="media feature-icon">
+                    <img src={item.iconSrc} alt={item.title} />
+                  </figure>
 
-                  {/* Title */}
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      fontSize: "1.25rem",
-                      fontWeight: 600,
-                      color: "#0F172A",
-                      mb: 1.5,
-                      lineHeight: 1.35,
-                    }}
-                  >
+                  <Typography className="feature-title" variant="h3">
                     {item.title}
                   </Typography>
 
-                  {/* Description */}
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontSize: "0.95rem",
-                      color: "#64748B",
-                      lineHeight: 1.6,
-                    }}
-                  >
+                  <Typography className="feature-text" variant="body2">
                     {item.description}
                   </Typography>
                 </CardContent>
@@ -240,9 +135,9 @@ const FeaturesSection = ({ onRegisterClick }: FeaturesSectionProps) => {
           ))}
         </Grid>
 
-        {/* CTA Button */}
-        <Box sx={{ display: "flex", justifyContent: "center" }}>
+        <Box className="features-cta">
           <Button
+            className="register-cta"
             component="a"
             href="https://stage.predcare.in/doctor/register"
             target="_blank"
@@ -255,23 +150,6 @@ const FeaturesSection = ({ onRegisterClick }: FeaturesSectionProps) => {
             }}
             variant="contained"
             endIcon={<ArrowForwardIcon />}
-            sx={{
-              bgcolor: "#2563EB",
-              color: "#FFFFFF",
-              fontSize: { xs: "1.05rem", md: "1.2rem" },
-              fontWeight: 600,
-              py: { xs: 1.75, md: 2 },
-              px: { xs: 4, md: 6 },
-              borderRadius: "50px",
-              textTransform: "none",
-              boxShadow: "0 10px 25px -3px rgba(37, 99, 235, 0.4)",
-              transition: "all 0.3s ease",
-              "&:hover": {
-                bgcolor: "#1D4ED8",
-                boxShadow: "0 15px 30px -3px rgba(37, 99, 235, 0.5)",
-                transform: "translateY(-3px)",
-              },
-            }}
           >
             Register Now
           </Button>

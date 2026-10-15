@@ -1,5 +1,7 @@
 'use client';
+/* eslint-disable @next/next/no-img-element -- landing images stay native img tags inside figure */
 
+import { CmsLandingWrapper } from '@/styles/CustomStyled/CmsLandingWrapper';
 import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MedicalServicesOutlinedIcon from '@mui/icons-material/MedicalServicesOutlined';
@@ -28,6 +30,9 @@ const NAV_LINKS = [
   { label: 'Contact Us', href: '#contact' },
 ];
 
+const LIGHT_LOGO = 'https://stage.predcare.in/images/pred-care-logo.png';
+const DARK_LOGO = '/assets/images/PRED_CARE_Logo_blue.png';
+
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -36,11 +41,7 @@ const Header = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 50);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -57,9 +58,7 @@ const Header = () => {
   };
 
   const scrollToTop = () => {
-    if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleNavClick = (
@@ -76,118 +75,60 @@ const Header = () => {
     }
   };
 
+  const handleLogoError = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    event.currentTarget.src =
+      'https://placehold.co/150x50/transparent/white?text=PRED+CARE';
+  };
+
   return (
-    <>
+    <CmsLandingWrapper className="cms-chrome">
       <AppBar
+        className={isScrolled ? 'cms-header is-scrolled' : 'cms-header'}
         position="fixed"
-        elevation={isScrolled ? 6 : 0}
-        sx={{
-          backgroundColor: isScrolled ? '#041B66' : 'transparent',
-          backgroundImage: 'none',
-          transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-        }}
+        elevation={0}
+        color="transparent"
       >
         <Container maxWidth="lg">
-          <Toolbar
-            disableGutters
-            sx={{
-              height: { xs: 72, md: 80 },
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            {/* Logo */}
-            <Box
-              onClick={scrollToTop}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                cursor: 'pointer',
-                userSelect: 'none',
-              }}
-            >
-              <Box
-                component="img"
-                src="https://stage.predcare.in/images/pred-care-logo.png"
-                alt="PRED Care Logo"
-                sx={{
-                  height: { xs: 40, md: 48 },
-                  width: 'auto',
-                  objectFit: 'contain',
-                }}
-                onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                  e.currentTarget.src =
-                    'https://placehold.co/150x50/transparent/white?text=PRED+CARE';
-                }}
-              />
-            </Box>
+          <Toolbar className="cms-toolbar" disableGutters>
+            <button type="button" className="brand-logo" onClick={scrollToTop}>
+              <figure className="media">
+                <img
+                  src={isScrolled ? DARK_LOGO : LIGHT_LOGO}
+                  alt="PRED Care Logo"
+                  onError={handleLogoError}
+                />
+              </figure>
+            </button>
 
-            {/* Desktop Navigation Links */}
-            <Stack
-              direction="row"
-              spacing={4}
-              sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}
-            >
+            <Stack className="desktop-nav" direction="row" component="nav">
               {NAV_LINKS.map((link) => (
                 <Typography
                   key={link.label}
+                  className="nav-link"
                   component="a"
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  sx={{
-                    color: '#FFFFFF',
-                    fontSize: '1rem',
-                    fontWeight: 400,
-                    textDecoration: 'none',
-                    cursor: 'pointer',
-                    transition: 'color 0.2s ease-in-out',
-                    '&:hover': {
-                      color: '#93C5FD', // light blue accent
-                    },
-                  }}
                 >
                   {link.label}
                 </Typography>
               ))}
             </Stack>
 
-            {/* Desktop Action Buttons */}
-            <Stack
-              direction="row"
-              spacing={2}
-              sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}
-            >
-              {/* Login Button with Dropdown */}
-              <Box sx={{ position: 'relative' }}>
+            <Stack className="desktop-actions" direction="row">
+              <Box>
                 <Button
+                  className="login-btn"
                   variant="contained"
                   onClick={handleLoginClick}
                   endIcon={
                     <KeyboardArrowDownIcon
-                      sx={{
-                        transform: openLoginMenu
-                          ? 'rotate(180deg)'
-                          : 'rotate(0deg)',
-                        transition: 'transform 0.2s ease',
-                      }}
+                      className={
+                        openLoginMenu
+                          ? 'login-chevron is-open'
+                          : 'login-chevron'
+                      }
                     />
                   }
-                  sx={{
-                    bgcolor: '#2563EB',
-                    color: '#FFFFFF',
-                    textTransform: 'none',
-                    fontSize: '0.95rem',
-                    fontWeight: 600,
-                    px: 3,
-                    py: 1.1,
-                    borderRadius: '50px',
-                    boxShadow: '0 4px 14px 0 rgba(37,99,235,0.39)',
-                    '&:hover': {
-                      bgcolor: '#1D4ED8',
-                    },
-                  }}
                 >
                   Login
                 </Button>
@@ -205,209 +146,113 @@ const Header = () => {
                   }}
                   slotProps={{
                     paper: {
-                      sx: {
-                        mt: 1.5,
-                        minWidth: 220,
-                        borderRadius: '16px',
-                        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)',
-                        p: 0.5,
-                      },
+                      className: 'login-menu-paper',
                     },
                   }}
                 >
                   <MenuItem
+                    className="login-menu-item"
                     component="a"
                     href="https://stage.predcare.in/doctor/login"
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={handleLoginClose}
-                    sx={{
-                      py: 1.5,
-                      px: 2,
-                      borderRadius: '10px',
-                      color: '#1E293B',
-                      fontWeight: 500,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1.5,
-                      '&:hover': {
-                        bgcolor: '#EFF6FF',
-                        color: '#2563EB',
-                      },
-                    }}
                   >
-                    <MedicalServicesOutlinedIcon sx={{ color: '#2563EB' }} />
+                    <MedicalServicesOutlinedIcon />
                     Login as Doctor
                   </MenuItem>
                 </Menu>
               </Box>
 
-              {/* Register Button */}
               <Button
+                className="register-btn"
                 component="a"
                 href="https://stage.predcare.in/doctor/register"
                 target="_blank"
                 rel="noopener noreferrer"
                 variant="contained"
-                sx={{
-                  bgcolor: '#FFFFFF',
-                  color: '#1D4ED8',
-                  textTransform: 'none',
-                  fontSize: '0.95rem',
-                  fontWeight: 600,
-                  px: 3,
-                  py: 1.1,
-                  borderRadius: '50px',
-                  boxShadow: '0 4px 14px 0 rgba(0,0,0,0.1)',
-                  '&:hover': {
-                    bgcolor: '#EFF6FF',
-                    color: '#1E40AF',
-                  },
-                }}
               >
                 Register
               </Button>
             </Stack>
 
-            {/* Mobile Hamburger Button */}
-            <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+            <Box className="mobile-toggle">
               <IconButton
+                className="menu-button"
                 aria-label="open drawer"
                 onClick={() => setMobileOpen(true)}
-                sx={{ color: '#FFFFFF' }}
               >
-                <MenuIcon sx={{ fontSize: '2rem' }} />
+                <MenuIcon />
               </IconButton>
             </Box>
           </Toolbar>
         </Container>
       </AppBar>
 
-      {/* Mobile Menu Drawer */}
       <Drawer
         anchor="right"
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
         slotProps={{
           paper: {
-            sx: {
-              width: '100%',
-              maxWidth: 360,
-              bgcolor: '#041B66',
-              color: '#FFFFFF',
-              p: 3,
-              display: 'flex',
-              flexDirection: 'column',
-            },
+            className: 'cms-drawer-paper',
           },
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            mb: 4,
-          }}
-        >
-          <Box
-            component="img"
-            src="https://stage.predcare.in/images/pred-care-logo.png"
-            alt="PRED Care Logo"
-            sx={{ height: 36, width: 'auto' }}
-          />
+        <Box className="drawer-top">
+          <figure className="media drawer-logo">
+            <img src={LIGHT_LOGO} alt="PRED Care Logo" />
+          </figure>
           <IconButton
+            className="drawer-close"
             onClick={() => setMobileOpen(false)}
-            sx={{ color: '#FFFFFF' }}
+            aria-label="close drawer"
           >
-            <CloseIcon sx={{ fontSize: '1.75rem' }} />
+            <CloseIcon />
           </IconButton>
         </Box>
 
-        <Stack spacing={2} sx={{ mb: 4 }}>
+        <Stack className="drawer-links" spacing={2}>
           {NAV_LINKS.map((link) => (
             <Typography
               key={link.label}
+              className="drawer-link"
               component="a"
               href={link.href}
               onClick={(e) => handleNavClick(e, link.href)}
-              sx={{
-                color: '#FFFFFF',
-                fontSize: '1.2rem',
-                fontWeight: 500,
-                textDecoration: 'none',
-                py: 1,
-                borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
-                '&:hover': {
-                  color: '#93C5FD',
-                },
-              }}
             >
               {link.label}
             </Typography>
           ))}
         </Stack>
 
-        <Box
-          sx={{ mt: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}
-        >
-          <Typography
-            sx={{
-              color: 'rgba(255, 255, 255, 0.7)',
-              fontWeight: 600,
-              fontSize: '0.9rem',
-            }}
-          >
-            AUTHENTICATION
-          </Typography>
+        <Box className="drawer-auth">
+          <Typography className="drawer-kicker">AUTHENTICATION</Typography>
 
           <Button
+            className="drawer-login"
             component="a"
             href="https://stage.predcare.in/doctor/login"
             target="_blank"
             variant="outlined"
             startIcon={<MedicalServicesOutlinedIcon />}
-            sx={{
-              borderColor: '#FFFFFF',
-              color: '#FFFFFF',
-              py: 1.5,
-              borderRadius: '12px',
-              fontWeight: 600,
-              textTransform: 'none',
-              fontSize: '1rem',
-              '&:hover': {
-                borderColor: '#FFFFFF',
-                bgcolor: 'rgba(255, 255, 255, 0.1)',
-              },
-            }}
           >
             Doctor Login
           </Button>
 
           <Button
+            className="drawer-register"
             component="a"
             href="https://stage.predcare.in/doctor/register"
             target="_blank"
             variant="contained"
             startIcon={<PersonAddOutlinedIcon />}
-            sx={{
-              bgcolor: '#FFFFFF',
-              color: '#041B66',
-              py: 1.5,
-              borderRadius: '12px',
-              fontWeight: 700,
-              textTransform: 'none',
-              fontSize: '1rem',
-              '&:hover': {
-                bgcolor: '#EFF6FF',
-              },
-            }}
           >
             Register Clinic
           </Button>
         </Box>
       </Drawer>
-    </>
+    </CmsLandingWrapper>
   );
 };
 
