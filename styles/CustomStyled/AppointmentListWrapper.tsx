@@ -8,6 +8,20 @@ export const AppointmentListWrapper = styled(Box)`
   gap: 20px;
   min-width: 0;
 
+  .page-action.MuiButton-contained {
+    background-color: ${({ theme }) => theme.palette.customColors.brandTeal};
+    color: ${({ theme }) => theme.palette.common.white};
+
+    &:hover {
+      --variant-containedColor: ${({ theme }) => theme.palette.common.white};
+      --variant-containedBg: ${({ theme }) =>
+        theme.palette.customColors.brandTealDark};
+      background-color: ${({ theme }) =>
+        theme.palette.customColors.brandTealDark};
+      color: ${({ theme }) => theme.palette.common.white};
+    }
+  }
+
   .appointment-table {
     width: 100%;
     min-width: 0;

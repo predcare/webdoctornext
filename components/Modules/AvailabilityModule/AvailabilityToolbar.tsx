@@ -8,7 +8,6 @@ import {
   type ConsultationFilter,
   type DateModeFilter,
 } from '@/components/Modules/AvailabilityModule/availabilityFilters';
-import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import { availabilityDoctors } from '@/resources/mock/availability';
 import { projectRoutes } from '@/routes';
 import { AvailabilityFilterPopover } from '@/styles/CustomStyled/AvailabilityListWrapper';
@@ -23,6 +22,7 @@ import {
   Select,
   Typography,
 } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import { memo, useState, type MouseEvent } from 'react';
 
 type DraftFilters = Pick<AvailabilityFilterState, 'dateMode' | 'consultation'>;
@@ -38,6 +38,7 @@ function AvailabilityToolbar({
   onChange,
   onClear,
 }: AvailabilityToolbarProps) {
+  const router = useRouter();
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const [draft, setDraft] = useState<DraftFilters>({
     dateMode: 'all',
@@ -104,11 +105,14 @@ function AvailabilityToolbar({
         </Button>
       </Badge>
 
-      <CustomButton
+      <Button
         className="add-availability"
-        text="+ Add Availability"
-        action={projectRoutes.manageAvailability}
-      />
+        type="button"
+        variant="contained"
+        onClick={() => router.push(projectRoutes.manageAvailability)}
+      >
+        + Add Availability
+      </Button>
 
       <AvailabilityFilterPopover
         open={Boolean(anchor)}

@@ -9,13 +9,13 @@ import AppointmentFilters, {
 } from '@/components/Modules/AppointmentsModule/AppointmentFilters';
 import AppointmentRow from '@/components/Modules/AppointmentsModule/AppointmentRow';
 import AppointmentSummaryCards from '@/components/Modules/AppointmentsModule/AppointmentSummaryCards';
-import CustomButton from '@/components/ui/CustomButton/CustomButton';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
 import { dashboardAppointments } from '@/resources/mock';
 import { projectRoutes } from '@/routes';
 import { AppointmentListWrapper } from '@/styles/CustomStyled/AppointmentListWrapper';
-import { Menu, MenuItem } from '@mui/material';
+import { Button, Menu, MenuItem } from '@mui/material';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 
 const headList = [
@@ -32,15 +32,8 @@ const breadcrumbItems = [
   { label: 'Appointment List' },
 ];
 
-const addAppointmentAction = (
-  <CustomButton
-    className="page-action"
-    text="+ Add Appointment"
-    action={projectRoutes.bookAppointment()}
-  />
-);
-
 export default function AppointmentListPage() {
+  const router = useRouter();
   const [actionAnchor, setActionAnchor] = useState<HTMLElement | null>(null);
   const [actionRowId, setActionRowId] = useState<string | null>(null);
   const [filters, setFilters] = useState<AppointmentFilterState>(
@@ -67,6 +60,17 @@ export default function AppointmentListPage() {
     setActionAnchor(anchor);
     setActionRowId(id);
   }, []);
+
+  const addAppointmentAction = (
+    <Button
+      className="page-action"
+      type="button"
+      variant="contained"
+      onClick={() => router.push(projectRoutes.bookAppointment())}
+    >
+      + Add Appointment
+    </Button>
+  );
 
   return (
     <AppointmentListWrapper>

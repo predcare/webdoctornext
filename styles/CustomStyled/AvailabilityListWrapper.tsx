@@ -64,6 +64,20 @@ export const AvailabilityListWrapper = styled(Box)`
     box-shadow: none;
   }
 
+  .add-availability.MuiButton-contained {
+    background-color: ${({ theme }) => theme.palette.customColors.brandTeal};
+    color: ${({ theme }) => theme.palette.common.white};
+
+    &:hover {
+      --variant-containedColor: ${({ theme }) => theme.palette.common.white};
+      --variant-containedBg: ${({ theme }) =>
+        theme.palette.customColors.brandTealDark};
+      background-color: ${({ theme }) =>
+        theme.palette.customColors.brandTealDark};
+      color: ${({ theme }) => theme.palette.common.white};
+    }
+  }
+
   .filter-btn.MuiButton-root {
     padding-left: 14px;
     padding-right: 14px;

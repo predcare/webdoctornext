@@ -45,11 +45,15 @@ function CustomAutocomplete<T>({
 }: CustomAutocompleteProps<T>) {
   return (
     <CustomAutocompleteWrapper className={className}>
-      <Autocomplete<T>
+      <Autocomplete<T, false, boolean, false>
         options={options}
         {...(value !== undefined ? { value } : {})}
-        {...(value === undefined && defaultValue !== undefined ? { defaultValue } : {})}
-        onChange={(_, next) => onChange?.(next)}
+        {...(value === undefined && defaultValue !== undefined
+          ? { defaultValue }
+          : {})}
+        onChange={(_event, next) => {
+          onChange?.(next);
+        }}
         getOptionLabel={getOptionLabel}
         isOptionEqualToValue={isOptionEqualToValue}
         disabled={disabled}
@@ -76,7 +80,9 @@ function CustomAutocomplete<T>({
               input: {
                 ...params.slotProps.input,
                 startAdornment: startAdornment ? (
-                  <InputAdornment position="start">{startAdornment}</InputAdornment>
+                  <InputAdornment position="start">
+                    {startAdornment}
+                  </InputAdornment>
                 ) : (
                   params.slotProps.input.startAdornment
                 ),
