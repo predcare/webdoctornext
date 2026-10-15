@@ -1,5 +1,10 @@
 import type { NextConfig } from 'next';
 
+const extraDevOrigins =
+  process.env.ALLOWED_DEV_ORIGINS?.split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean) ?? [];
+
 const nextConfig: NextConfig = {
   reactStrictMode: false,
   trailingSlash: true,
@@ -24,6 +29,13 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
+  allowedDevOrigins: [
+    '192.168.*.*',
+    '*.ngrok-free.dev',
+    '*.ngrok-free.app',
+    '*.ngrok.io',
+    ...extraDevOrigins,
+  ],
   env: {
     NEXT_APP_BASE_URL: process.env.NEXT_APP_BASE_URL,
     NEXT_APP_PROJECT_NAME: process.env.NEXT_APP_PROJECT_NAME,
