@@ -30,3 +30,10 @@ export { getPatientAppointments, getPatientDetails } from './patientDetails';
 export type { PatientDetails } from './patientDetails';
 export { patients } from './patients';
 export type { Patient, PatientGender, PatientStatus } from './patients';
+export { prescriptionWorkspace } from './prescriptionWorkspace';
+export type {
+  PrescriptionWorkspace,
+  PrescriptionWorkspacePatient,
+  PrescriptionWorkspaceStatus,
+  PrescriptionWorkspaceVitals,
+} from './prescriptionWorkspace';
