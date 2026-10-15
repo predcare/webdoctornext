@@ -1,3 +1,4 @@
+'use client';
 import { TopbarHeight } from '@/themes/themeConstant';
 import { Menu, styled } from '@mui/material';
 
@@ -15,7 +16,9 @@ export const DashboardHeaderWrapper = styled('header')`
   background: ${({ theme }) => theme.palette.customColors.headerBg};
   border-bottom: 1px solid ${({ theme }) => theme.palette.customColors.border};
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   cursor: pointer;
   &:hover {
     border-color: ${({ theme }) => theme.palette.customColors.inputBorder};
@@ -497,6 +500,16 @@ export const ProfileMenu = styled(Menu)`
 
   .profile-item {
     color: ${({ theme }) => theme.palette.customColors.textPrimary};
+  }
+
+  .profile-menu-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    color: inherit;
+    font: inherit;
+    text-decoration: none;
   }
 
   .profile-divider {

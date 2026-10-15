@@ -16,9 +16,17 @@ import {
   NoticeMenu,
   ProfileMenu,
 } from '@/styles/CustomStyled/DashboardHeaderWrapper';
-import { Box, Button, Chip, Divider, MenuItem, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Chip,
+  Divider,
+  MenuItem,
+  Typography,
+} from '@mui/material';
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 dayjs.extend(advancedFormat);
@@ -38,7 +46,8 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
   const [profileAnchor, setProfileAnchor] = useState<HTMLElement | null>(null);
   const [activeClinicId, setActiveClinicId] = useState(clinics[0].id);
   const [todayLabel, setTodayLabel] = useState('');
-  const activeClinic = clinics.find((clinic) => clinic.id === activeClinicId) ?? clinics[0];
+  const activeClinic =
+    clinics.find((clinic) => clinic.id === activeClinicId) ?? clinics[0];
 
   useEffect(() => {
     setTodayLabel(`Today is ${dayjs().format('dddd, MMMM Do, YYYY')}`);
@@ -189,12 +198,20 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
             </Typography>
           </Box>
         </Box>
-        <MenuItem className="profile-item" onClick={() => setProfileAnchor(null)}>
-          <PatientsIcon size={18} />
-          Profile Settings
+        <MenuItem
+          className="profile-item"
+          onClick={() => setProfileAnchor(null)}
+        >
+          <Link href="/dashboard/profile" className="profile-menu-link">
+            <PatientsIcon size={18} />
+            Profile Settings
+          </Link>
         </MenuItem>
         <Divider className="profile-divider" />
-        <MenuItem className="logout-item" onClick={() => setProfileAnchor(null)}>
+        <MenuItem
+          className="logout-item"
+          onClick={() => setProfileAnchor(null)}
+        >
           <LogoutIcon />
           Log Out
         </MenuItem>

@@ -11,6 +11,7 @@ import { memo, type ReactNode } from 'react';
 type CustomAutocompleteProps<T> = {
   options: T[];
   value?: T | null;
+  defaultValue?: T | null;
   onChange?: (value: T | null) => void;
   getOptionLabel: (option: T) => string;
   isOptionEqualToValue?: (option: T, value: T) => boolean;
@@ -19,6 +20,7 @@ type CustomAutocompleteProps<T> = {
   inputLabelName?: string;
   placeholder?: string;
   disabled?: boolean;
+  disableClearable?: boolean;
   noOptionsText?: ReactNode;
   name?: string;
   className?: string;
@@ -27,6 +29,7 @@ type CustomAutocompleteProps<T> = {
 function CustomAutocomplete<T>({
   options,
   value,
+  defaultValue,
   onChange,
   getOptionLabel,
   isOptionEqualToValue,
@@ -35,6 +38,7 @@ function CustomAutocomplete<T>({
   inputLabelName,
   placeholder,
   disabled = false,
+  disableClearable = false,
   noOptionsText = 'No options',
   name,
   className,
@@ -44,10 +48,12 @@ function CustomAutocomplete<T>({
       <Autocomplete<T>
         options={options}
         {...(value !== undefined ? { value } : {})}
+        {...(value === undefined && defaultValue !== undefined ? { defaultValue } : {})}
         onChange={(_, next) => onChange?.(next)}
         getOptionLabel={getOptionLabel}
         isOptionEqualToValue={isOptionEqualToValue}
         disabled={disabled}
+        disableClearable={disableClearable}
         noOptionsText={noOptionsText}
         slots={{ paper: CustomAutocompletePaper }}
         renderOption={

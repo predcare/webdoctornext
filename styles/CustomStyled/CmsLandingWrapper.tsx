@@ -38,17 +38,12 @@ const CmsLandingRoot = styled(Box)`
     background-image: none;
     box-shadow: none;
     border-bottom: 1px solid transparent;
-    transition:
-      background-color 0.3s ease,
-      box-shadow 0.3s ease,
-      border-color 0.3s ease;
+    transition: background-color 0.3s ease;
     z-index: ${({ theme }) => theme.zIndex.drawer + 1};
   }
 
   .cms-header.is-scrolled.MuiAppBar-root {
-    background: #ffffff;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-    border-bottom-color: #e7e8eb;
+    background-color: #041b66;
   }
 
   .cms-toolbar.MuiToolbar-root {
@@ -169,14 +164,6 @@ const CmsLandingRoot = styled(Box)`
     color: #93c5fd;
   }
 
-  .cms-header.is-scrolled .nav-link.MuiTypography-root {
-    color: #0f172a;
-  }
-
-  .cms-header.is-scrolled .nav-link.MuiTypography-root:hover {
-    color: #2563eb;
-  }
-
   .login-btn.MuiButton-contained,
   .register-btn.MuiButton-contained {
     text-transform: none;
@@ -215,18 +202,6 @@ const CmsLandingRoot = styled(Box)`
     color: #1e40af;
   }
 
-  .cms-header.is-scrolled .register-btn.MuiButton-contained {
-    background-color: transparent;
-    color: #1d4ed8;
-    border: 1px solid #2563eb;
-    box-shadow: none;
-  }
-
-  .cms-header.is-scrolled .register-btn.MuiButton-contained:hover {
-    background-color: #eff6ff;
-    color: #1e40af;
-  }
-
   .mobile-toggle {
     display: flex;
 
@@ -241,10 +216,6 @@ const CmsLandingRoot = styled(Box)`
 
   .menu-button .MuiSvgIcon-root {
     font-size: 2rem;
-  }
-
-  .cms-header.is-scrolled .menu-button.MuiIconButton-root {
-    color: #0f172a;
   }
 
   .cms-hero {

@@ -26,6 +26,7 @@ export const projectRoutes = {
   manageAvailability: '/dashboard/availability/manage-availability',
   availabilityCalendar: '/dashboard/availability/calendar',
   meeting: '/dashboard/meeting',
+  profile: '/dashboard/profile',
 
   // Legal Pages
   privacyPolicy: '/privacy-policy',

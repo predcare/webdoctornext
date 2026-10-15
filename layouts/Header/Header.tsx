@@ -31,7 +31,6 @@ const NAV_LINKS = [
 ];
 
 const LIGHT_LOGO = 'https://stage.predcare.in/images/pred-care-logo.png';
-const DARK_LOGO = '/assets/images/PRED_CARE_Logo_blue.png';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -40,13 +39,22 @@ const Header = () => {
   const openLoginMenu = Boolean(anchorEl);
 
   useEffect(() => {
+    const getScrollTop = () =>
+      window.scrollY ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(getScrollTop() > 50);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    document.addEventListener('scroll', handleScroll, {
+      passive: true,
+      capture: true,
+    });
     handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () =>
+      document.removeEventListener('scroll', handleScroll, { capture: true });
   }, []);
 
   const handleLoginClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -93,7 +101,7 @@ const Header = () => {
             <button type="button" className="brand-logo" onClick={scrollToTop}>
               <figure className="media">
                 <img
-                  src={isScrolled ? DARK_LOGO : LIGHT_LOGO}
+                  src={LIGHT_LOGO}
                   alt="PRED Care Logo"
                   onError={handleLogoError}
                 />
