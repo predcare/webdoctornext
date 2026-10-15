@@ -58,6 +58,10 @@ export const defaultPalette = (mode: PaletteMode): TCustomPalette => {
     authTabTrack: '#F1F5F9',
     authLinkHover: '#93C5FD',
     authOnGradient: 'rgba(255, 255, 255, 0.8)',
+
+    // 🌐 CMS & Landing Page Brand Tokens
+    brandDarkest: '#041B66',
+    brandDarkBorder: '#0A2F8F',
   };
 
   // 🌙 PredCare Doctor Dark Theme Color Tokens (predcare-dark-text.css parity)
@@ -109,6 +113,10 @@ export const defaultPalette = (mode: PaletteMode): TCustomPalette => {
     authTabTrack: '#F1F5F9',
     authLinkHover: '#93C5FD',
     authOnGradient: 'rgba(255, 255, 255, 0.8)',
+
+    // 🌐 CMS & Landing Page Brand Tokens
+    brandDarkest: '#041B66',
+    brandDarkBorder: '#0A2F8F',
   };
 
   const v = isLight ? lightVals : darkVals;

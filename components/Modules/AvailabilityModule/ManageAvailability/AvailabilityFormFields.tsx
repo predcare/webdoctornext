@@ -17,8 +17,12 @@ import { memo } from 'react';
 export type Meridiem = 'AM' | 'PM';
 export type ConsultationChoice = 'in-person' | 'video' | 'both';
 
-const hours = Array.from({ length: 12 }, (_, index) => String(index + 1).padStart(2, '0'));
-const minutes = Array.from({ length: 12 }, (_, index) => String(index * 5).padStart(2, '0'));
+const hours = Array.from({ length: 12 }, (_, index) =>
+  String(index + 1).padStart(2, '0'),
+);
+const minutes = Array.from({ length: 12 }, (_, index) =>
+  String(index * 5).padStart(2, '0'),
+);
 const meridiemOptions: Meridiem[] = ['AM', 'PM'];
 
 const durationOptions = [
@@ -67,7 +71,12 @@ function TimeSelects({
 }) {
   return (
     <Box className="time-picks">
-      <Select className="time-select" size="small" value={value.hour} onChange={(event) => onChange({ hour: event.target.value })}>
+      <Select
+        className="time-select"
+        size="small"
+        value={value.hour}
+        onChange={(event) => onChange({ hour: event.target.value })}
+      >
         {hours.map((hour) => (
           <MenuItem key={hour} value={hour}>
             {hour}
@@ -90,7 +99,9 @@ function TimeSelects({
         className="time-select"
         size="small"
         value={value.meridiem}
-        onChange={(event) => onChange({ meridiem: event.target.value as Meridiem })}
+        onChange={(event) =>
+          onChange({ meridiem: event.target.value as Meridiem })
+        }
       >
         {meridiemOptions.map((meridiem) => (
           <MenuItem key={meridiem} value={meridiem}>
@@ -123,7 +134,8 @@ function AvailabilityFormFields({
   onHideFeeChange,
   onRequirePaymentChange,
 }: AvailabilityFormFieldsProps) {
-  const showInPerson = consultationType === 'in-person' || consultationType === 'both';
+  const showInPerson =
+    consultationType === 'in-person' || consultationType === 'both';
   const showVideo = consultationType === 'video' || consultationType === 'both';
 
   return (
@@ -165,10 +177,20 @@ function AvailabilityFormFields({
             className="consult-options"
             row
             value={consultationType}
-            onChange={(event) => onConsultationChange(event.target.value as ConsultationChoice)}
+            onChange={(event) =>
+              onConsultationChange(event.target.value as ConsultationChoice)
+            }
           >
-            <FormControlLabel value="in-person" control={<Radio />} label="In-Person" />
-            <FormControlLabel value="video" control={<Radio />} label="Video Consultation" />
+            <FormControlLabel
+              value="in-person"
+              control={<Radio />}
+              label="In-Person"
+            />
+            <FormControlLabel
+              value="video"
+              control={<Radio />}
+              label="Video Consultation"
+            />
             <FormControlLabel value="both" control={<Radio />} label="Both" />
           </RadioGroup>
         </Box>
@@ -225,13 +247,23 @@ function AvailabilityFormFields({
         <Box className="check-list">
           <FormControlLabel
             className="check-row"
-            control={<Checkbox checked={hideFee} onChange={(event) => onHideFeeChange(event.target.checked)} />}
+            control={
+              <Checkbox
+                checked={hideFee}
+                onChange={(event) => onHideFeeChange(event.target.checked)}
+              />
+            }
             label="Do not show fee to patient"
           />
           <FormControlLabel
             className="check-row"
             control={
-              <Checkbox checked={requirePayment} onChange={(event) => onRequirePaymentChange(event.target.checked)} />
+              <Checkbox
+                checked={requirePayment}
+                onChange={(event) =>
+                  onRequirePaymentChange(event.target.checked)
+                }
+              />
             }
             label="Require online payment (appointment not booked without payment)"
           />

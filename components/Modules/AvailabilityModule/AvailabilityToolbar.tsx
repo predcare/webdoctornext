@@ -9,7 +9,7 @@ import {
   type DateModeFilter,
 } from '@/components/Modules/AvailabilityModule/availabilityFilters';
 import CustomButton from '@/components/ui/CustomButton/CustomButton';
-import { availabilityDoctors } from '@/resources/mock';
+import { availabilityDoctors } from '@/resources/mock/availability';
 import { projectRoutes } from '@/routes';
 import { AvailabilityFilterPopover } from '@/styles/CustomStyled/AvailabilityListWrapper';
 import FilterListIcon from '@mui/icons-material/FilterList';

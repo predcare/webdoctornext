@@ -1,6 +1,6 @@
 'use client';
 
-import { formatAvailabilityDate } from '@/resources/mock';
+import { formatAvailabilityDate } from '@/resources/mock/availability';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Box, Chip, IconButton, Typography } from '@mui/material';

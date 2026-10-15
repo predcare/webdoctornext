@@ -1,7 +1,14 @@
 'use client';
 
-import { CalendarIcon, InPersonIcon, VideoIcon } from '@/components/ui/Icons/appointments';
-import { formatAvailabilityDate, type AvailabilityRecord } from '@/resources/mock';
+import {
+  CalendarIcon,
+  InPersonIcon,
+  VideoIcon,
+} from '@/components/ui/Icons/appointments';
+import {
+  AvailabilityRecord,
+  formatAvailabilityDate,
+} from '@/resources/mock/availability';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Box, IconButton, TableCell, TableRow } from '@mui/material';
 import { memo, type MouseEvent } from 'react';
@@ -21,7 +28,9 @@ type AvailabilityRowProps = {
 
 function AvailabilityRow({ row, onOpenMenu }: AvailabilityRowProps) {
   const labels =
-    row.dateMode === 'recurring' ? row.weekdays : row.dates.map((date) => formatAvailabilityDate(date));
+    row.dateMode === 'recurring'
+      ? row.weekdays
+      : row.dates.map((date: any) => formatAvailabilityDate(date));
   const visibleLabels = labels.slice(0, visibleChipCount);
   const hiddenCount = Math.max(labels.length - visibleChipCount, 0);
   const showInPerson = row.consultationType !== 'video' && row.inPersonFee;
@@ -42,7 +51,9 @@ function AvailabilityRow({ row, onOpenMenu }: AvailabilityRowProps) {
               {label}
             </Box>
           ))}
-          {hiddenCount > 0 ? <Box className="more-chip">+{hiddenCount} more</Box> : null}
+          {hiddenCount > 0 ? (
+            <Box className="more-chip">+{hiddenCount} more</Box>
+          ) : null}
         </Box>
       </TableCell>
       <TableCell>
@@ -76,7 +87,9 @@ function AvailabilityRow({ row, onOpenMenu }: AvailabilityRowProps) {
           className="row-menu"
           size="small"
           aria-label="Availability actions"
-          onClick={(event: MouseEvent<HTMLButtonElement>) => onOpenMenu(event.currentTarget, row.id)}
+          onClick={(event: MouseEvent<HTMLButtonElement>) =>
+            onOpenMenu(event.currentTarget, row.id)
+          }
         >
           <MoreVertIcon fontSize="small" />
         </IconButton>

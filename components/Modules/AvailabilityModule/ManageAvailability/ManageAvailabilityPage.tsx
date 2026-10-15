@@ -7,7 +7,7 @@ import AvailabilityFormFields, {
   type Meridiem,
 } from '@/components/Modules/AvailabilityModule/ManageAvailability/AvailabilityFormFields';
 import RecurringDaysFields from '@/components/Modules/AvailabilityModule/ManageAvailability/RecurringDaysFields';
-import { availabilityDoctors } from '@/resources/mock';
+import { availabilityDoctors } from '@/resources/mock/availability';
 import { projectRoutes } from '@/routes';
 import { ManageAvailabilityWrapper } from '@/styles/CustomStyled/ManageAvailabilityWrapper';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -41,7 +41,16 @@ type FormValues = {
 };
 
 type FormErrors = Partial<
-  Record<'doctorId' | 'dates' | 'weekdays' | 'dateRange' | 'time' | 'inPersonFee' | 'videoFee', string>
+  Record<
+    | 'doctorId'
+    | 'dates'
+    | 'weekdays'
+    | 'dateRange'
+    | 'time'
+    | 'inPersonFee'
+    | 'videoFee',
+    string
+  >
 >;
 
 const initialValues: FormValues = {
@@ -129,17 +138,26 @@ const validate = (values: FormValues): FormErrors => {
     errors.dateRange = 'End date must be on or after the start date.';
   }
 
-  const start = toMinutes(values.fromHour, values.fromMinute, values.fromMeridiem);
+  const start = toMinutes(
+    values.fromHour,
+    values.fromMinute,
+    values.fromMeridiem,
+  );
   const end = toMinutes(values.toHour, values.toMinute, values.toMeridiem);
   if (end <= start) errors.time = 'End time must be after the start time.';
 
   if (
-    (values.consultationType === 'in-person' || values.consultationType === 'both') &&
+    (values.consultationType === 'in-person' ||
+      values.consultationType === 'both') &&
     !feeOk(values.inPersonFee)
   ) {
     errors.inPersonFee = 'Enter the in-person consultation fee.';
   }
-  if ((values.consultationType === 'video' || values.consultationType === 'both') && !feeOk(values.videoFee)) {
+  if (
+    (values.consultationType === 'video' ||
+      values.consultationType === 'both') &&
+    !feeOk(values.videoFee)
+  ) {
     errors.videoFee = 'Enter the video consultation fee.';
   }
 
@@ -147,7 +165,9 @@ const validate = (values: FormValues): FormErrors => {
 };
 
 const toggleValue = (items: string[], value: string) =>
-  items.includes(value) ? items.filter((item) => item !== value) : [...items, value];
+  items.includes(value)
+    ? items.filter((item) => item !== value)
+    : [...items, value];
 
 export default function ManageAvailabilityPage() {
   const router = useRouter();
@@ -215,7 +235,11 @@ export default function ManageAvailabilityPage() {
         <Typography component="p" className="card-title">
           Availability Slot
         </Typography>
-        <Box className="mode-switch" role="tablist" aria-label="Availability slot mode">
+        <Box
+          className="mode-switch"
+          role="tablist"
+          aria-label="Availability slot mode"
+        >
           {modes.map((mode) => (
             <Box
               key={mode.id}
@@ -238,7 +262,9 @@ export default function ManageAvailabilityPage() {
             endDate={values.recurringEnd}
             dayError={errors.weekdays}
             rangeError={errors.dateRange}
-            onToggleDay={(day) => patch({ weekdays: toggleValue(values.weekdays, day) })}
+            onToggleDay={(day) =>
+              patch({ weekdays: toggleValue(values.weekdays, day) })
+            }
             onStartChange={(recurringStart) => patch({ recurringStart })}
             onEndChange={(recurringEnd) => patch({ recurringEnd })}
           />
@@ -257,8 +283,16 @@ export default function ManageAvailabilityPage() {
       </Box>
 
       <AvailabilityFormFields
-        from={{ hour: values.fromHour, minute: values.fromMinute, meridiem: values.fromMeridiem }}
-        to={{ hour: values.toHour, minute: values.toMinute, meridiem: values.toMeridiem }}
+        from={{
+          hour: values.fromHour,
+          minute: values.fromMinute,
+          meridiem: values.fromMeridiem,
+        }}
+        to={{
+          hour: values.toHour,
+          minute: values.toMinute,
+          meridiem: values.toMeridiem,
+        }}
         consultationType={values.consultationType}
         duration={values.duration}
         inPersonFee={values.inPersonFee}
@@ -294,7 +328,12 @@ export default function ManageAvailabilityPage() {
         <Button className="footer-btn" variant="outlined" onClick={goBack}>
           Cancel
         </Button>
-        <Button className="footer-btn save-btn" variant="contained" disableElevation onClick={handleSave}>
+        <Button
+          className="footer-btn save-btn"
+          variant="contained"
+          disableElevation
+          onClick={handleSave}
+        >
           Save
         </Button>
       </Box>

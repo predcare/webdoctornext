@@ -1,6 +1,7 @@
 "use client";
 import { CmsLayoutWrapper } from "@/styles/CustomStyled/CmsLayoutWrapper";
-import { Box, Container } from "@mui/material";
+import { Box } from "@mui/material";
+import React from "react";
 import Footer from "../Footer/Footer";
 import Header from "../Header/Header";
 
@@ -13,7 +14,7 @@ const Wrapper = ({ children }: WrapperProps) => {
     <CmsLayoutWrapper>
       <Header />
       <Box component="main" className="cms-main">
-        <Container maxWidth="xl">{children}</Container>
+        {children}
       </Box>
       <Footer />
     </CmsLayoutWrapper>

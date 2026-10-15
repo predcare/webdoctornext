@@ -59,6 +59,10 @@ declare module '@mui/material/styles' {
     authTabTrack: string;
     authLinkHover: string;
     authOnGradient: string;
+
+    // 🌐 CMS & Landing Page Brand Tokens
+    brandDarkest: string;
+    brandDarkBorder: string;
   }
 
   interface Palette {

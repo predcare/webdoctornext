@@ -64,7 +64,7 @@ export const sideNavItems: SideNavItem[] = [
     children: [
       { id: 'availability-weekly', name: 'Availability List', href: projectRoutes.availability },
       { id: 'availability-time-off', name: 'Add Availability', href: projectRoutes.manageAvailability },
-      { id: 'availability-calendar', name: 'Calendar View' },
+      { id: 'availability-calendar', name: 'Calendar View', href: projectRoutes.availabilityCalendar },
     ],
   },
   {

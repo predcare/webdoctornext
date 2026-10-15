@@ -1,24 +1,31 @@
 'use client';
 
 import PageBreadcrumb from '@/components/commons/PageBreadcrumb/PageBreadcrumb';
-import AvailabilityRow from '@/components/Modules/AvailabilityModule/AvailabilityRow';
-import AvailabilityToolbar, {
-  AvailabilityActiveFilters,
-} from '@/components/Modules/AvailabilityModule/AvailabilityToolbar';
 import {
   defaultAvailabilityFilters,
   filterAvailability,
   hasActiveAvailabilityFilters,
   type AvailabilityFilterState,
 } from '@/components/Modules/AvailabilityModule/availabilityFilters';
+import AvailabilityRow from '@/components/Modules/AvailabilityModule/AvailabilityRow';
+import AvailabilityToolbar, {
+  AvailabilityActiveFilters,
+} from '@/components/Modules/AvailabilityModule/AvailabilityToolbar';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
-import { availabilitySlots } from '@/resources/mock';
+import { availabilitySlots } from '@/resources/mock/availability';
 import { projectRoutes } from '@/routes';
 import { AvailabilityListWrapper } from '@/styles/CustomStyled/AvailabilityListWrapper';
 import { Menu, MenuItem } from '@mui/material';
 import { useCallback, useMemo, useState } from 'react';
 
-const headList = ['Date Mode', 'Dates/Days', 'Time Slot', 'Duration', 'Consultation Type & Fee', ''];
+const headList = [
+  'Date Mode',
+  'Dates/Days',
+  'Time Slot',
+  'Duration',
+  'Consultation Type & Fee',
+  '',
+];
 
 const breadcrumbItems = [
   { label: 'Dashboard', href: projectRoutes.dashboard },
@@ -27,16 +34,27 @@ const breadcrumbItems = [
 
 export default function AvailabilityListPage() {
   const [rows, setRows] = useState(availabilitySlots);
-  const [filters, setFilters] = useState<AvailabilityFilterState>(defaultAvailabilityFilters);
+  const [filters, setFilters] = useState<AvailabilityFilterState>(
+    defaultAvailabilityFilters,
+  );
   const [actionAnchor, setActionAnchor] = useState<HTMLElement | null>(null);
   const [actionRowId, setActionRowId] = useState<string | null>(null);
 
-  const visibleRows = useMemo(() => filterAvailability(rows, filters), [rows, filters]);
-  const filtersActive = useMemo(() => hasActiveAvailabilityFilters(filters), [filters]);
+  const visibleRows = useMemo(
+    () => filterAvailability(rows, filters),
+    [rows, filters],
+  );
+  const filtersActive = useMemo(
+    () => hasActiveAvailabilityFilters(filters),
+    [filters],
+  );
 
-  const handleFilterChange = useCallback((patch: Partial<AvailabilityFilterState>) => {
-    setFilters((current) => ({ ...current, ...patch }));
-  }, []);
+  const handleFilterChange = useCallback(
+    (patch: Partial<AvailabilityFilterState>) => {
+      setFilters((current) => ({ ...current, ...patch }));
+    },
+    [],
+  );
 
   const handleClearFilters = useCallback(() => {
     setFilters((current) => ({
@@ -63,11 +81,19 @@ export default function AvailabilityListPage() {
       <PageBreadcrumb
         items={breadcrumbItems}
         action={
-          <AvailabilityToolbar filters={filters} onChange={handleFilterChange} onClear={handleClearFilters} />
+          <AvailabilityToolbar
+            filters={filters}
+            onChange={handleFilterChange}
+            onClear={handleClearFilters}
+          />
         }
       />
       {filtersActive ? (
-        <AvailabilityActiveFilters filters={filters} onChange={handleFilterChange} onClear={handleClearFilters} />
+        <AvailabilityActiveFilters
+          filters={filters}
+          onChange={handleFilterChange}
+          onClear={handleClearFilters}
+        />
       ) : null}
 
       <CustomTable
@@ -79,7 +105,9 @@ export default function AvailabilityListPage() {
         isEmpty={visibleRows.length === 0}
         emptyText="No availability found"
         emptyDescription={
-          filtersActive ? 'Change the filters or clear them to see availability.' : undefined
+          filtersActive
+            ? 'Change the filters or clear them to see availability.'
+            : undefined
         }
       >
         {visibleRows.map((row) => (
