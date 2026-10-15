@@ -22,6 +22,14 @@ export type {
   DashboardStatIcon,
   DashboardStatTone,
 } from './dashboardStats';
+export {
+  registerCities,
+  registerMedicalCouncils,
+  registerOptionLabel,
+  registerSpecializations,
+  sameRegisterOption,
+} from './doctorRegister';
+export type { RegisterSelectOption } from './doctorRegister';
 export { cities, countries, getCities, getStates, states } from './locations';
 export type { City, Country, State } from './locations';
 export { notifications } from './notifications';

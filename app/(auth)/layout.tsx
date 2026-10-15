@@ -3,6 +3,7 @@
 import Assets from '@/resources/assets';
 import { AuthLayoutWrapper } from '@/styles/CustomStyled/AuthLayoutWrapper';
 import { Box, Container, Typography } from '@mui/material';
+import { usePathname } from 'next/navigation';
 import React from 'react';
 
 interface AuthLayoutProps {
@@ -10,10 +11,13 @@ interface AuthLayoutProps {
 }
 
 const AuthLayout = ({ children }: AuthLayoutProps) => {
+  const pathname = usePathname();
+  const isRegisterPage = pathname.includes('/register');
+
   return (
     <AuthLayoutWrapper>
       <Container maxWidth="xl" className="auth-container">
-        <Box className="auth-column">
+        <Box className={`auth-column${isRegisterPage ? ' is-register' : ''}`}>
           <Box className="logo-wrap">
             <Box
               component="img"
@@ -23,7 +27,9 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
             />
           </Box>
           {children}
-          <Typography className="copyright">© 2026 PRED Care. All rights reserved.</Typography>
+          <Typography className="copyright">
+            © 2026 PRED Care. All rights reserved.
+          </Typography>
         </Box>
       </Container>
     </AuthLayoutWrapper>

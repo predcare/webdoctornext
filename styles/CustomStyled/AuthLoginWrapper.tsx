@@ -1,6 +1,10 @@
 import { Paper, styled } from '@mui/material';
 
 export const AuthLoginWrapper = styled(Paper)`
+  width: 100%;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
   border-radius: 24px;
   background-color: ${({ theme }) => theme.palette.customColors.cardBg};
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);

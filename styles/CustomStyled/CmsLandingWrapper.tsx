@@ -146,10 +146,16 @@ const CmsLandingRoot = styled(Box)`
     gap: 16px;
   }
 
-  .nav-link.MuiTypography-root {
+  .nav-link {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
     color: #ffffff;
+    font-family: inherit;
     font-size: 0.9rem;
     font-weight: 400;
+    line-height: 1.2;
     text-decoration: none;
     white-space: nowrap;
     cursor: pointer;
@@ -160,7 +166,7 @@ const CmsLandingRoot = styled(Box)`
     }
   }
 
-  .nav-link.MuiTypography-root:hover {
+  .nav-link:hover {
     color: #93c5fd;
   }
 
@@ -216,6 +222,15 @@ const CmsLandingRoot = styled(Box)`
 
   .menu-button .MuiSvgIcon-root {
     font-size: 2rem;
+  }
+
+  #home,
+  #about,
+  #features,
+  #pricing,
+  #contact,
+  #download {
+    scroll-margin-top: 88px;
   }
 
   .cms-hero {
@@ -1041,17 +1056,24 @@ const CmsPortalStyles = createGlobalStyle`
     margin-bottom: 32px;
   }
 
-  .drawer-link.MuiTypography-root {
+  .drawer-link {
     display: block;
+    width: 100%;
+    margin: 0;
+    border: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     padding: 8px 0;
+    background: transparent;
     color: #ffffff;
+    font-family: inherit;
     font-size: 1.2rem;
     font-weight: 500;
+    text-align: left;
     text-decoration: none;
+    cursor: pointer;
   }
 
-  .drawer-link.MuiTypography-root:hover {
+  .drawer-link:hover {
     color: #93c5fd;
   }
 

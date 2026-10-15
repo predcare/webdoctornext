@@ -9,7 +9,14 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import PhoneIphoneOutlinedIcon from '@mui/icons-material/PhoneIphoneOutlined';
 import SendIcon from '@mui/icons-material/Send';
-import { Box, Button, Checkbox, FormControlLabel, Link, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Link,
+  Typography,
+} from '@mui/material';
 import NextLink from 'next/link';
 import { FormEvent, useState } from 'react';
 
@@ -53,7 +60,6 @@ const DoctorLoginPage = () => {
           <Box component="form" onSubmit={handleSendOtp}>
             <Box className="field-lg">
               <CustomInput
-                inputSize="large"
                 inputLabelName="Mobile Number"
                 placeholder="Enter 10-digit mobile number"
                 type="tel"
@@ -78,7 +84,12 @@ const DoctorLoginPage = () => {
               Verify OTP
             </Button>
             <Box className="resend-row">
-              <Button type="button" variant="text" disableRipple className="resend-btn">
+              <Button
+                type="button"
+                variant="text"
+                disableRipple
+                className="resend-btn"
+              >
                 Resend OTP
               </Button>
             </Box>
@@ -89,7 +100,6 @@ const DoctorLoginPage = () => {
           <Box component="form" onSubmit={(event) => event.preventDefault()}>
             <Box className="field-md">
               <CustomInput
-                inputSize="large"
                 inputLabelName="Email Address"
                 placeholder="Enter your email"
                 type="email"
@@ -99,7 +109,6 @@ const DoctorLoginPage = () => {
             </Box>
             <Box className="field-sm">
               <CustomInput
-                inputSize="large"
                 inputLabelName="Password"
                 placeholder="Enter your password"
                 isPassword
@@ -126,11 +135,19 @@ const DoctorLoginPage = () => {
       <Box className="login-footer">
         <Typography className="footer-copy">
           Don&apos;t have an account?{' '}
-          <Link href="#" className="register-link">
+          <Link
+            component={NextLink}
+            href={projectRoutes.doctorRegister}
+            className="register-link"
+          >
             Register Now
           </Link>
         </Typography>
-        <Link component={NextLink} href={projectRoutes.home} className="back-home-link">
+        <Link
+          component={NextLink}
+          href={projectRoutes.home}
+          className="back-home-link"
+        >
           <ArrowBackIcon />
           Back to Home
         </Link>

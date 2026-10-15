@@ -1,5 +1,4 @@
 'use client';
-/* eslint-disable @next/next/no-img-element -- landing images stay native img tags inside figure */
 
 import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined';
 import SentimentSatisfiedAltOutlinedIcon from '@mui/icons-material/SentimentSatisfiedAltOutlined';
@@ -7,7 +6,7 @@ import { Box, Container, Grid, Stack, Typography } from '@mui/material';
 
 const QueueSection = () => {
   return (
-    <Box className="cms-queue" component="section">
+    <Box id="pricing" className="cms-queue" component="section">
       <Container maxWidth="lg">
         <Box className="section-heading section-heading-compact">
           <Typography

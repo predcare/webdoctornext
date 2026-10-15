@@ -1,6 +1,8 @@
 'use client';
+import Assets from '@/resources/assets';
 /* eslint-disable @next/next/no-img-element -- landing images stay native img tags inside figure */
 
+import { projectRoutes } from '@/routes';
 import { CmsLandingWrapper } from '@/styles/CustomStyled/CmsLandingWrapper';
 import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -20,23 +22,94 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 const NAV_LINKS = [
-  { label: 'Home', href: '#home' },
-  { label: 'About Us', href: '#about' },
-  { label: 'Features', href: '#features' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'Contact Us', href: '#contact' },
+  { label: 'Home', id: 'home' },
+  { label: 'About Us', id: 'about' },
+  { label: 'Features', id: 'features' },
+  { label: 'Pricing', id: 'pricing' },
+  { label: 'Contact Us', id: 'contact' },
 ];
 
-const LIGHT_LOGO = 'https://stage.predcare.in/images/pred-care-logo.png';
+const HEADER_OFFSET = 88;
+
+const getScroller = () =>
+  document.scrollingElement || document.documentElement || document.body;
+
+const scrollToSection = (sectionId: string) => {
+  const scroller = getScroller();
+
+  if (sectionId === 'home') {
+    scroller.scrollTo({ top: 0, behavior: 'smooth' });
+    return true;
+  }
+
+  const target = document.getElementById(sectionId);
+  if (!target) {
+    return false;
+  }
+
+  const top =
+    target.getBoundingClientRect().top + scroller.scrollTop - HEADER_OFFSET;
+  scroller.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  return true;
+};
 
 const Header = () => {
+  const router = useRouter();
+  const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openLoginMenu = Boolean(anchorEl);
+
+  const handleLoginClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleLoginClose = () => {
+    setAnchorEl(null);
+  };
+
+  const goToDoctorLogin = () => {
+    handleLoginClose();
+    setMobileOpen(false);
+    router.push(projectRoutes.doctorLogin);
+  };
+
+  const goToDoctorRegister = () => {
+    setMobileOpen(false);
+    router.push(projectRoutes.doctorRegister);
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleNavClick = (sectionId: string) => {
+    setMobileOpen(false);
+
+    window.setTimeout(() => {
+      const didScroll = scrollToSection(sectionId);
+      if (didScroll) {
+        return;
+      }
+
+      router.push(
+        sectionId === 'home'
+          ? projectRoutes.home
+          : `${projectRoutes.home}#${sectionId}`,
+      );
+    }, 50);
+  };
+
+  const handleLogoError = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    event.currentTarget.src =
+      'https://placehold.co/150x50/transparent/white?text=PRED+CARE';
+  };
 
   useEffect(() => {
     const getScrollTop = () =>
@@ -57,36 +130,18 @@ const Header = () => {
       document.removeEventListener('scroll', handleScroll, { capture: true });
   }, []);
 
-  const handleLoginClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleLoginClose = () => {
-    setAnchorEl(null);
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleNavClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    href: string,
-  ) => {
-    if (href.startsWith('#')) {
-      e.preventDefault();
-      setMobileOpen(false);
-      const target = document.querySelector(href);
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth' });
-      }
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '');
+    if (!hash) {
+      return;
     }
-  };
 
-  const handleLogoError = (event: React.SyntheticEvent<HTMLImageElement>) => {
-    event.currentTarget.src =
-      'https://placehold.co/150x50/transparent/white?text=PRED+CARE';
-  };
+    const timeoutId = window.setTimeout(() => {
+      scrollToSection(hash);
+    }, 120);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [pathname]);
 
   return (
     <CmsLandingWrapper className="cms-chrome">
@@ -101,7 +156,7 @@ const Header = () => {
             <button type="button" className="brand-logo" onClick={scrollToTop}>
               <figure className="media">
                 <img
-                  src={LIGHT_LOGO}
+                  src={Assets.webLogo}
                   alt="PRED Care Logo"
                   onError={handleLogoError}
                 />
@@ -110,15 +165,14 @@ const Header = () => {
 
             <Stack className="desktop-nav" direction="row" component="nav">
               {NAV_LINKS.map((link) => (
-                <Typography
+                <button
                   key={link.label}
                   className="nav-link"
-                  component="a"
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
+                  type="button"
+                  onClick={() => handleNavClick(link.id)}
                 >
                   {link.label}
-                </Typography>
+                </button>
               ))}
             </Stack>
 
@@ -127,6 +181,7 @@ const Header = () => {
                 <Button
                   className="login-btn"
                   variant="contained"
+                  type="button"
                   onClick={handleLoginClick}
                   endIcon={
                     <KeyboardArrowDownIcon
@@ -160,11 +215,7 @@ const Header = () => {
                 >
                   <MenuItem
                     className="login-menu-item"
-                    component="a"
-                    href="https://stage.predcare.in/doctor/login"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={handleLoginClose}
+                    onClick={goToDoctorLogin}
                   >
                     <MedicalServicesOutlinedIcon />
                     Login as Doctor
@@ -174,11 +225,9 @@ const Header = () => {
 
               <Button
                 className="register-btn"
-                component="a"
-                href="https://stage.predcare.in/doctor/register"
-                target="_blank"
-                rel="noopener noreferrer"
                 variant="contained"
+                type="button"
+                onClick={goToDoctorRegister}
               >
                 Register
               </Button>
@@ -187,6 +236,7 @@ const Header = () => {
             <Box className="mobile-toggle">
               <IconButton
                 className="menu-button"
+                type="button"
                 aria-label="open drawer"
                 onClick={() => setMobileOpen(true)}
               >
@@ -209,7 +259,7 @@ const Header = () => {
       >
         <Box className="drawer-top">
           <figure className="media drawer-logo">
-            <img src={LIGHT_LOGO} alt="PRED Care Logo" />
+            <img src={Assets.webLogo} alt="PRED Care Logo" />
           </figure>
           <IconButton
             className="drawer-close"
@@ -222,15 +272,14 @@ const Header = () => {
 
         <Stack className="drawer-links" spacing={2}>
           {NAV_LINKS.map((link) => (
-            <Typography
+            <button
               key={link.label}
               className="drawer-link"
-              component="a"
-              href={link.href}
-              onClick={(e) => handleNavClick(e, link.href)}
+              type="button"
+              onClick={() => handleNavClick(link.id)}
             >
               {link.label}
-            </Typography>
+            </button>
           ))}
         </Stack>
 
@@ -239,22 +288,20 @@ const Header = () => {
 
           <Button
             className="drawer-login"
-            component="a"
-            href="https://stage.predcare.in/doctor/login"
-            target="_blank"
+            type="button"
             variant="outlined"
             startIcon={<MedicalServicesOutlinedIcon />}
+            onClick={goToDoctorLogin}
           >
             Doctor Login
           </Button>
 
           <Button
             className="drawer-register"
-            component="a"
-            href="https://stage.predcare.in/doctor/register"
-            target="_blank"
+            type="button"
             variant="contained"
             startIcon={<PersonAddOutlinedIcon />}
+            onClick={goToDoctorRegister}
           >
             Register Clinic
           </Button>

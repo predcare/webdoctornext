@@ -9,6 +9,7 @@ export const projectRoutes = {
 
   // Auth Pages
   doctorLogin: '/auth/doctor/login',
+  doctorRegister: '/auth/doctor/register',
   patientLogin: '/auth/patient/login',
 
   // Doctor portal

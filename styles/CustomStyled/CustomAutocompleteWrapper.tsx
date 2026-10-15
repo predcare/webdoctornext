@@ -2,7 +2,9 @@
 
 import { Box, Paper, styled } from '@mui/material';
 
-export const CustomAutocompleteWrapper = styled(Box)`
+export const CustomAutocompleteWrapper = styled(Box, {
+  shouldForwardProp: (prop) => prop !== '$inputSize',
+})<{ $inputSize?: 'medium' | 'large' }>`
   width: 100%;
 
   .MuiAutocomplete-root .MuiInputBase-root {
@@ -32,6 +34,25 @@ export const CustomAutocompleteWrapper = styled(Box)`
     }
   }
 
+  ${({ $inputSize }) =>
+    $inputSize === 'large' &&
+    `
+    .MuiAutocomplete-root .MuiInputBase-root {
+      padding: 0 44px 0 16px;
+    }
+
+    .MuiAutocomplete-root.MuiAutocomplete-hasClearIcon .MuiInputBase-root {
+      padding-right: 72px;
+    }
+
+    .MuiAutocomplete-endAdornment {
+      right: 12px;
+
+      .MuiSvgIcon-root {
+        font-size: 22px;
+      }
+    }
+  `}
 `;
 
 export const CustomAutocompletePaper = styled(Paper)`

@@ -24,6 +24,7 @@ type CustomAutocompleteProps<T> = {
   noOptionsText?: ReactNode;
   name?: string;
   className?: string;
+  inputSize?: 'medium' | 'large';
 };
 
 function CustomAutocomplete<T>({
@@ -42,9 +43,10 @@ function CustomAutocomplete<T>({
   noOptionsText = 'No options',
   name,
   className,
+  inputSize = 'medium',
 }: CustomAutocompleteProps<T>) {
   return (
-    <CustomAutocompleteWrapper className={className}>
+    <CustomAutocompleteWrapper className={className} $inputSize={inputSize}>
       <Autocomplete<T, false, boolean, false>
         options={options}
         {...(value !== undefined ? { value } : {})}
@@ -73,6 +75,7 @@ function CustomAutocomplete<T>({
           <CustomInput
             {...params}
             name={name}
+            inputSize={inputSize}
             inputLabelName={inputLabelName}
             placeholder={placeholder}
             slotProps={{

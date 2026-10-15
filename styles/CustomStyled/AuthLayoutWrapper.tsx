@@ -49,6 +49,10 @@ export const AuthLayoutWrapper = styled(Box)`
     animation: authFadeIn 0.5s ease-in;
   }
 
+  .auth-column.is-register {
+    max-width: 740px;
+  }
+
   .logo-wrap {
     text-align: center;
     margin-bottom: clamp(6px, 1.2vh, 14px);
