@@ -1,5 +1,6 @@
 'use client';
 
+import AuthGate from '@/components/Modules/AuthModule/AuthGate';
 import DashboardHeader from '@/layouts/Dashboard/DashboardHeader';
 import Sidebar from '@/layouts/Dashboard/Sidebar';
 import { DashboardLayoutWrapper } from '@/styles/CustomStyled/DashboardLayoutWrapper';
@@ -26,7 +27,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   }, [isDesktop]);
 
   return (
-    <DashboardLayoutWrapper>
+    <AuthGate>
+      <DashboardLayoutWrapper>
         <Container maxWidth="xl" disableGutters className="dashboard-shell">
           <Sidebar
             variant="permanent"
@@ -58,5 +60,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </Box>
         </Container>
       </DashboardLayoutWrapper>
+    </AuthGate>
   );
 }

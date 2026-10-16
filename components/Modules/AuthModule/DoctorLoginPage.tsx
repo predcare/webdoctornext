@@ -1,5 +1,6 @@
 'use client';
 
+import { queryClient } from '@/components/Providers/ReactQueryProvider';
 import CommonErrorText from '@/components/commons/CommonErrorText/CommonErrorText';
 import CommonOtpInput from '@/components/commons/CommonOtpInput/CommonOtpInput';
 import CustomInput from '@/components/ui/CustomInput/CustomInput';
@@ -12,6 +13,7 @@ import {
 } from '@/hooks/react-query/auth/auth.hooks';
 import { ILoginVerifyOtpPayload } from '@/hooks/react-query/auth/payload.interfaces';
 import { getProfile } from '@/hooks/react-query/profile/profile.funcs';
+import { ProfileQueryKeys } from '@/hooks/react-query/query.keys';
 import { clearAuthToken, setAuthToken } from '@/lib/commons/authToken';
 import { setCookieClient } from '@/lib/functions/_storage.lib';
 import {
@@ -63,7 +65,7 @@ const DoctorLoginPage = () => {
       identifier: '',
       otp: '',
     },
-    mode: 'onChange',
+    mode: 'onSubmit',
   });
 
   const identifier = watch('identifier') || '';
@@ -176,6 +178,10 @@ const DoctorLoginPage = () => {
               if (profileRes?.data) {
                 doctorData = profileRes.data;
                 setUserData(profileRes.data);
+                queryClient.setQueryData(
+                  [ProfileQueryKeys.Profile],
+                  profileRes,
+                );
               }
             } catch (err) {
               console.error('Failed to fetch doctor profile after login:', err);

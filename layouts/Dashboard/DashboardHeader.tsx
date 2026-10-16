@@ -9,9 +9,13 @@ import {
   PatientsIcon,
 } from '@/components/ui/Icons/dashboard';
 import { dashboardDoctor } from '@/configs/dashboardNav';
-import { useDoctorClinics } from '@/hooks/react-query/profile/profile.hooks';
-import { _formatDoctorName, _toTitleCase, getAvatarColor, getInitials } from '@/lib/commons/common.utils';
-import { clinics, notifications } from '@/resources/mock';
+import {
+  _formatDoctorName,
+  _toTitleCase,
+  getAvatarColor,
+  getInitials,
+} from '@/lib/commons/common.utils';
+import { notifications } from '@/resources/mock';
 import {
   ClinicMenu,
   DashboardHeaderWrapper,
@@ -19,6 +23,7 @@ import {
   ProfileMenu,
 } from '@/styles/CustomStyled/DashboardHeaderWrapper';
 import { useAuthStore } from '@/zustand/stores/useAuthStore';
+import { useClinicStore } from '@/zustand/stores/useClinicStore';
 import {
   Avatar,
   Box,
@@ -31,7 +36,7 @@ import {
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 dayjs.extend(advancedFormat);
 
@@ -48,13 +53,27 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
   const [clinicAnchor, setClinicAnchor] = useState<HTMLElement | null>(null);
   const [bellAnchor, setBellAnchor] = useState<HTMLElement | null>(null);
   const [profileAnchor, setProfileAnchor] = useState<HTMLElement | null>(null);
-  const [activeClinicId, setActiveClinicId] = useState(clinics[0].id);
   const [todayLabel, setTodayLabel] = useState('');
-  const activeClinic =
-    clinics.find((clinic) => clinic.id === activeClinicId) ?? clinics[0];
 
-  const { userData } = useAuthStore((state) => state)
-  const { data: myClinics, isPending: isPendingClinics } = useDoctorClinics()
+  const { userData } = useAuthStore((state) => state);
+  const { clinics, activeClinic, setActiveClinic, isClinicsLoaded } =
+    useClinicStore((state) => state);
+
+  const clinicMenuWidth = clinicAnchor?.classList.contains('clinic-btn')
+    ? clinicAnchor.offsetWidth
+    : undefined;
+
+  const { clinicLabel, clinicName } = useMemo(() => {
+    const selectedClinic = clinics.find(
+      (clinic) => String(clinic.id) === String(userData?.clinic?.id),
+    );
+
+    return {
+      clinicLabel: selectedClinic?.is_primary ? 'Primary center' : 'Clinic',
+      clinicName:
+        selectedClinic?.name || userData?.clinic_name || 'Select clinic',
+    };
+  }, [clinics, userData?.clinic?.id, userData?.clinic_name]);
 
   useEffect(() => {
     setTodayLabel(`Today is ${dayjs().format('dddd, MMMM Do, YYYY')}`);
@@ -74,7 +93,7 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
       <Box className="identity">
         <Box className="greeting-row">
           <Typography component="h1" className="greeting-text">
-            {`Welcome back, ${_formatDoctorName(userData?.name || "", userData?.salutation)}`}
+            {`Welcome back, ${_formatDoctorName(userData?.name || '', userData?.salutation)}`}
           </Typography>
           <Chip label={dashboardDoctor.plan} className="plan-chip" />
         </Box>
@@ -88,14 +107,15 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
         disableElevation
         aria-haspopup="menu"
         aria-expanded={Boolean(clinicAnchor)}
+        disabled={!isClinicsLoaded}
         onClick={(event) => setClinicAnchor(event.currentTarget)}
       >
         <span className="clinic-icon">
           <ClinicIcon />
         </span>
         <span className="clinic-copy">
-          <span className="clinic-label">{activeClinic.label}</span>
-          <span className="clinic-name">{activeClinic.name}</span>
+          <span className="clinic-label">{clinicLabel}</span>
+          <span className="clinic-name">{clinicName}</span>
         </span>
         <span className="clinic-caret">
           <ChevronIcon direction="down" />
@@ -109,6 +129,7 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
           aria-label="Clinics"
           aria-haspopup="menu"
           aria-expanded={Boolean(clinicAnchor)}
+          disabled={!isClinicsLoaded}
           onClick={(event) => setClinicAnchor(event.currentTarget)}
         >
           <ClinicIcon />
@@ -140,15 +161,27 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
         anchorEl={clinicAnchor}
         open={Boolean(clinicAnchor)}
         onClose={() => setClinicAnchor(null)}
+        slotProps={{
+          paper: {
+            style: clinicMenuWidth
+              ? {
+                width: clinicMenuWidth,
+                minWidth: clinicMenuWidth,
+                maxWidth: clinicMenuWidth,
+              }
+              : undefined,
+          },
+        }}
         {...menuOrigin}
       >
         {clinics.map((clinic) => (
           <MenuItem
             key={clinic.id}
             className="clinic-item"
-            selected={clinic.id === activeClinic.id}
+            selected={String(clinic.id) === String(userData?.clinic?.id)}
+            disabled={String(clinic.id) === String(userData?.clinic?.id)}
             onClick={() => {
-              setActiveClinicId(clinic.id);
+              setActiveClinic(String(clinic.id));
               setClinicAnchor(null);
             }}
           >
@@ -156,7 +189,9 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
               <ClinicIcon size={16} />
             </span>
             <span className="clinic-item-copy">
-              <span className="clinic-item-label">{clinic.label}</span>
+              <span className="clinic-item-label">
+                {clinic.is_primary ? 'Primary center' : 'Clinic'}
+              </span>
               <span className="clinic-item-name">{clinic.name}</span>
             </span>
           </MenuItem>
@@ -195,15 +230,23 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
         {...menuOrigin}
       >
         <Box className="profile-head">
-          <Avatar src={userData?.profile_image} alt={userData?.name} sx={{ width: 56, height: 56, bgcolor: getAvatarColor(userData?.name) }}>
-            {getInitials(userData?.name || "")}
+          <Avatar
+            src={userData?.profile_image}
+            alt={userData?.name}
+            sx={{
+              width: 56,
+              height: 56,
+              bgcolor: getAvatarColor(userData?.name),
+            }}
+          >
+            {getInitials(userData?.name || '')}
           </Avatar>
           <Box className="profile-copy">
             <Typography className="profile-name" component="p">
-              {_formatDoctorName(userData?.name || "", userData?.salutation)}
+              {_formatDoctorName(userData?.name || '', userData?.salutation)}
             </Typography>
             <Typography className="profile-role" component="p">
-              {_toTitleCase(userData?.user_type || "User")}
+              {_toTitleCase(userData?.user_type || 'User')}
             </Typography>
           </Box>
         </Box>

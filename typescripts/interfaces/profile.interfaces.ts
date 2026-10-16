@@ -35,6 +35,7 @@ export interface IMyProfileDoc {
   clinic_phone: string;
   clinic_email: string;
   clinic_gstin: string;
+  currentRole: string;
   blood_type?: string;
   sub_specializations: any;
   address: string;

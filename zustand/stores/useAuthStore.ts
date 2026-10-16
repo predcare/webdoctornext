@@ -1,5 +1,8 @@
+'use client';
+
 import { clearAuthToken } from '@/lib/commons/authToken';
 import { IMyProfileDoc } from '@/typescripts/interfaces/profile.interfaces';
+import { useClinicStore } from '@/zustand/stores/useClinicStore';
 import { useEffect, useState } from 'react';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -12,6 +15,10 @@ type TAuthState = {
   logout: () => Promise<void>;
 };
 
+const clearClinicSession = () => {
+  useClinicStore.getState().resetClinics();
+};
+
 export const useAuthStore = create<TAuthState>()(
   persist(
     (set) => ({
@@ -20,6 +27,7 @@ export const useAuthStore = create<TAuthState>()(
       isDoctor: false,
       setUserData: (user: IMyProfileDoc | null) => {
         if (!user) {
+          clearClinicSession();
           set({
             userData: null,
             isLoggedIn: false,
@@ -36,6 +44,7 @@ export const useAuthStore = create<TAuthState>()(
 
       logout: async () => {
         clearAuthToken();
+        clearClinicSession();
         set({
           userData: null,
           isLoggedIn: false,
@@ -55,16 +64,18 @@ export const useAuthStore = create<TAuthState>()(
   ),
 );
 
-export const useAuthStoreHydration = () => {
+export const useAuthHydration = () => {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const unsub = useAuthStore.persist.onFinishHydration(() => {
+    const unsubFinishHydration = useAuthStore.persist.onFinishHydration(() => {
       setHydrated(true);
     });
+
     setHydrated(useAuthStore.persist.hasHydrated());
+
     return () => {
-      unsub();
+      unsubFinishHydration();
     };
   }, []);
 

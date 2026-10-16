@@ -5,6 +5,7 @@ import ProjectThemeProvider from '@/themes/ProjectThemeProvider';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import { Toaster } from 'sonner';
 import './globals.css';
 
 const inter = Inter({
@@ -39,6 +40,20 @@ export default function RootLayout({
               {children}
               <GlobalBackdropLoader />
               <EventListener />
+              <Toaster
+                position="top-right"
+                richColors
+                expand={false}
+                closeButton
+                duration={2500}
+                toastOptions={{
+                  style: {
+                    fontFamily: 'var(--font-inter), Inter, sans-serif',
+                    fontSize: '13px',
+                    borderRadius: '12px',
+                  },
+                }}
+              />
             </ReactQueryProvider>
           </ProjectThemeProvider>
         </AppRouterCacheProvider>

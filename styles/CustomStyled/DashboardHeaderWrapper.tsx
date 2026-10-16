@@ -152,10 +152,10 @@ export const DashboardHeaderWrapper = styled('header')`
   && .clinic-btn {
     align-items: center;
     justify-content: flex-start;
-    gap: 8px;
+    gap: 6px;
     min-width: 0;
-    min-height: 44px;
-    padding: 4px 10px 4px 4px;
+    min-height: 40px;
+    padding: 3px 8px 3px 3px;
     border-radius: 12px;
     border: 1px solid ${({ theme }) => theme.palette.customColors.border};
     background: ${({ theme }) => theme.palette.customColors.headerBg};
@@ -168,9 +168,9 @@ export const DashboardHeaderWrapper = styled('header')`
   }
 
   .clinic-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -182,23 +182,25 @@ export const DashboardHeaderWrapper = styled('header')`
   .clinic-copy {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    gap: 0;
     min-width: 0;
-    flex: 1;
+    flex: 0 1 auto;
   }
 
   .clinic-label {
     font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    line-height: 14px;
+    line-height: 12px;
     color: ${({ theme }) => theme.palette.customColors.textMuted};
   }
 
   .clinic-name {
     font-size: 13px;
     font-weight: 600;
-    line-height: 20px;
+    line-height: 16px;
     color: ${({ theme }) => theme.palette.customColors.heading};
     white-space: nowrap;
     overflow: hidden;
@@ -214,7 +216,7 @@ export const DashboardHeaderWrapper = styled('header')`
   .icon-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
   }
 
   && .avatar-btn {
@@ -259,14 +261,14 @@ export const DashboardHeaderWrapper = styled('header')`
     }
 
     .icon-actions {
-      gap: 10px;
+      gap: 8px;
     }
   }
 
   ${({ theme }) => theme.breakpoints.up('lg')} {
-    column-gap: 20px;
-    padding: 16px 28px;
-    grid-template-columns: minmax(0, 1fr) minmax(180px, 340px) auto;
+    column-gap: 12px;
+    padding: 14px 24px;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     grid-template-areas: 'identity clinic icons';
 
     && .menu-btn {
@@ -282,8 +284,9 @@ export const DashboardHeaderWrapper = styled('header')`
     && .clinic-btn {
       display: flex;
       grid-area: clinic;
-      width: auto;
-      max-width: 340px;
+      justify-self: end;
+      width: max-content;
+      max-width: 320px;
       margin-top: 0;
       align-self: center;
     }
@@ -346,9 +349,9 @@ export const ClinicMenu = styled(Menu)`
   }
 
   .clinic-item-name {
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 600;
-    line-height: 18px;
+    line-height: 16px;
     color: ${({ theme }) => theme.palette.customColors.heading};
   }
 `;

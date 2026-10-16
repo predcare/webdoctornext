@@ -1,5 +1,6 @@
 import { _projectToken } from '@/configs/keys.constants';
 import { getCookieVal } from '@/lib/commons/common.utils';
+import { useClinicStore } from '@/zustand/stores/useClinicStore';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import {
   globalError,
@@ -26,9 +27,12 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(async (config) => {
   const token = getCookieVal(_projectToken);
-  console.log('dev token ==================>', token);
   if (token && !!config.headers) {
     config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  const clinicId = useClinicStore.getState().activeClinic;
+  if (clinicId && config.headers) {
+    config.headers['x-clinic-id'] = clinicId;
   }
   return config;
 });

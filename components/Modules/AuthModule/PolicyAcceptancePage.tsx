@@ -122,11 +122,9 @@ const PolicyAcceptancePage = () => {
     postPolicyAcceptanceMutation(formStates, {
       onSuccess: async (res) => {
         if (res?.success) {
-          await queryClient.invalidateQueries({
-            queryKey: [ProfileQueryKeys.Profile],
-          });
           const profileRes = await getProfile();
           if (profileRes?.data) {
+            queryClient.setQueryData([ProfileQueryKeys.Profile], profileRes);
             setUserData(profileRes.data);
           }
           hideLoader();
