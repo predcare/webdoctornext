@@ -1,6 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { CommonQueryKeys } from '../query.keys';
-import { fetchAllUsers, getCities, getCountries, getStates } from './common.func';
+import {
+  fetchAllUsers,
+  getCities,
+  getCountries,
+  getStates,
+} from './common.func';
 
 export const useCountries = () =>
   useQuery({
@@ -37,10 +42,13 @@ export const useCitiesBySId = (params?: { sId?: number }) =>
     },
   });
 
-export const useGetAllUsers = (doctorId?: string | number, enabled: boolean = true) =>
+export const useGetAllUsers = (
+  doctorId?: string | number,
+  enabled: boolean = true,
+) =>
   useQuery({
     queryKey: [CommonQueryKeys.GET_ALL_USERS, doctorId],
     queryFn: () => fetchAllUsers(doctorId),
     enabled,
-    select: v => v.users,
+    select: (v) => v.users,
   });

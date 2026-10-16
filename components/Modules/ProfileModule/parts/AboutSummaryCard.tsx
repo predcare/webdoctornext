@@ -1,13 +1,20 @@
 'use client';
 
+import { formatDate, formatSpecialization } from '@/lib/commons/common.utils';
+import { useAuthStore } from '@/zustand/stores/useAuthStore';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
+import CakeOutlinedIcon from '@mui/icons-material/CakeOutlined';
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
+import LocalHospitalOutlinedIcon from '@mui/icons-material/LocalHospitalOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import NotesOutlinedIcon from '@mui/icons-material/NotesOutlined';
 import PhoneAndroidOutlinedIcon from '@mui/icons-material/PhoneAndroidOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
+import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
+import TranslateOutlinedIcon from '@mui/icons-material/TranslateOutlined';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
@@ -50,7 +57,30 @@ function SummaryRow({
   );
 }
 
+const displayValue = (value: unknown) => {
+  if (Array.isArray(value)) {
+    const items = value
+      .map((item) => {
+        if (typeof item === 'string') return item.trim();
+        if (item && typeof item === 'object' && 'name' in item) {
+          return String(item.name || '').trim();
+        }
+        return '';
+      })
+      .filter(Boolean);
+
+    return items.length ? items.join(', ') : 'N/A';
+  }
+
+  if (typeof value === 'string' && value.trim()) return value.trim();
+  if (typeof value === 'number') return String(value);
+  return 'N/A';
+};
+
 export default function AboutSummaryCard() {
+  const { userData } = useAuthStore((state) => state);
+  const dateOfBirth = formatDate(userData?.date_of_birth) || 'N/A';
+
   return (
     <Box className="summary-card">
       <Typography component="h2" className="card-title">
@@ -58,47 +88,77 @@ export default function AboutSummaryCard() {
       </Typography>
       <Box className="summary-list">
         <SummaryRow
+          icon={<CakeOutlinedIcon />}
+          label="Date of Birth"
+          value={dateOfBirth}
+        />
+        <SummaryRow
+          icon={<SchoolOutlinedIcon />}
+          label="Qualifications"
+          value={displayValue(userData?.qualifications)}
+        />
+        <SummaryRow
+          icon={<LocalHospitalOutlinedIcon />}
+          label="Sub Specialization"
+          value={formatSpecialization({ specialization: userData?.specialization, sub_specializations: userData?.sub_specializations || {} })}
+          wide
+        />
+        <SummaryRow
+          icon={<TranslateOutlinedIcon />}
+          label="Languages Spoken"
+          value={displayValue(userData?.languages_spoken)}
+          wide
+        />
+        <SummaryRow
+          icon={<NotesOutlinedIcon />}
+          label="Bio"
+          value={displayValue(userData?.bio)}
+          wide
+        />
+        <SummaryRow
           icon={<BadgeOutlinedIcon />}
           label="Medical License Number"
-          value="k112"
+          value={userData?.license_number || 'N/A'}
         />
         <SummaryRow
           icon={<PhoneOutlinedIcon />}
           label="Phone Number"
-          value="6283385429"
-          verified="Oct 15, 2026"
+          value={userData?.phone_number || 'N/A'}
         />
         <SummaryRow
           icon={<PhoneAndroidOutlinedIcon />}
           label="Alternate Number"
-          value="6283385429"
+          value={userData?.alternate_number || 'N/A'}
         />
         <SummaryRow
           icon={<ChatOutlinedIcon />}
           label="WhatsApp Number"
-          value="6283385429"
+          value={userData?.whatsapp_number || 'N/A'}
         />
         <SummaryRow
           icon={<EmailOutlinedIcon />}
           label="Email Address"
-          value="anusri@predsolutions.com"
-          verified="Oct 15, 2026"
+          value={userData?.email || 'N/A'}
+          verified={
+            userData?.email_verified_at
+              ? formatDate(userData?.email_verified_at)
+              : undefined
+          }
         />
         <SummaryRow
           icon={<WorkOutlineOutlinedIcon />}
           label="Years of Experience"
-          value="0 Years"
+          value={`${userData?.experience_years || 0} Years`}
         />
         <SummaryRow
           icon={<LocationOnOutlinedIcon />}
           label="Address"
-          value="street, Howrah, West Bengal, India, 123456"
-          wide
+          value={userData?.full_address || 'N/A'}
         />
         <SummaryRow
           icon={<FingerprintOutlinedIcon />}
           label="Doctor ID"
-          value="DBD6CDB"
+          value={String(userData?.doctor_id || 'N/A')}
         />
       </Box>
     </Box>

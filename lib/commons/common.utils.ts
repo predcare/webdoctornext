@@ -1,9 +1,18 @@
+import { ISpecializationData } from '@/typescripts/interfaces/common.interfaces';
 import dayjs from 'dayjs';
 import { parseCookies } from 'nookies';
 
 export const getCookieVal = (key: string, fallback = ''): string => {
   const cookies = parseCookies();
   return cookies?.[key] ?? fallback;
+};
+
+export const formatDate = (
+  date: Date | string | null | undefined,
+  format = 'DD/MM/YYYY',
+): string => {
+  if (!date) return '';
+  return dayjs(date).format(format);
 };
 
 export function parseDuration(duration?: string): number | undefined {
@@ -160,3 +169,26 @@ export const _toTitleCase = (value: string): string => {
 
 export const _formatDoctorName = (name: string, salutation?: string): string =>
   `${salutation?.trim() || 'Dr.'} ${name.trim()}`;
+
+export const formatSpecialization = ({
+  specialization,
+  sub_specializations = {},
+}: ISpecializationData): string => {
+  const specializations = Array.isArray(specialization)
+    ? specialization
+    : (specialization?.split(',') ?? []);
+
+  return specializations
+    .map((item) => {
+      const name = item.trim();
+      if (!name) return '';
+
+      const subSpecializations = sub_specializations[name] ?? [];
+
+      return subSpecializations.length
+        ? `${name} (${subSpecializations.join(', ')})`
+        : name;
+    })
+    .filter(Boolean)
+    .join(', ');
+};

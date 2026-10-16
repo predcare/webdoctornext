@@ -1,14 +1,17 @@
 'use client';
 
+import LogoutOptionsModal from '@/components/Modules/AuthModule/Modals/LogoutOptionsModal';
+import { queryClient } from '@/components/Providers/ReactQueryProvider';
 import {
   BellIcon,
   ChevronIcon,
   ClinicIcon,
   LogoutIcon,
   MenuIcon,
-  PatientsIcon,
+  SettingsIcon,
 } from '@/components/ui/Icons/dashboard';
 import { dashboardDoctor } from '@/configs/dashboardNav';
+import { useUserLogout } from '@/hooks/react-query/auth/auth.hooks';
 import {
   _formatDoctorName,
   _toTitleCase,
@@ -16,6 +19,8 @@ import {
   getInitials,
 } from '@/lib/commons/common.utils';
 import { notifications } from '@/resources/mock';
+import { projectRoutes } from '@/routes';
+import { setIntentionalLogoutMode } from '@/services/api/apiClient';
 import {
   ClinicMenu,
   DashboardHeaderWrapper,
@@ -24,6 +29,7 @@ import {
 } from '@/styles/CustomStyled/DashboardHeaderWrapper';
 import { useAuthStore } from '@/zustand/stores/useAuthStore';
 import { useClinicStore } from '@/zustand/stores/useClinicStore';
+import { useLoadingStore } from '@/zustand/stores/useLoadingStore';
 import {
   Avatar,
   Box,
@@ -36,6 +42,7 @@ import {
 import dayjs from 'dayjs';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 dayjs.extend(advancedFormat);
@@ -53,9 +60,13 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
   const [clinicAnchor, setClinicAnchor] = useState<HTMLElement | null>(null);
   const [bellAnchor, setBellAnchor] = useState<HTMLElement | null>(null);
   const [profileAnchor, setProfileAnchor] = useState<HTMLElement | null>(null);
+  const [logoutOpen, setLogoutOpen] = useState(false);
   const [todayLabel, setTodayLabel] = useState('');
+  const router = useRouter();
 
-  const { userData } = useAuthStore((state) => state);
+  const { userData, logout } = useAuthStore((state) => state);
+  const { showLoader, hideLoader } = useLoadingStore((state) => state);
+  const { mutate: userLogout, isPending: isLogoutLoading } = useUserLogout();
   const { clinics, activeClinic, setActiveClinic, isClinicsLoaded } =
     useClinicStore((state) => state);
 
@@ -74,6 +85,31 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
         selectedClinic?.name || userData?.clinic_name || 'Select clinic',
     };
   }, [clinics, userData?.clinic?.id, userData?.clinic_name]);
+
+  const handleLogout = (allDevices: boolean) => {
+    showLoader(allDevices ? 'Signing out of all devices...' : 'Signing out...');
+    setIntentionalLogoutMode(true);
+    userLogout(
+      { all_devices: allDevices },
+      {
+        onSettled: async () => {
+          setLogoutOpen(false);
+          await queryClient.cancelQueries();
+          await queryClient.clear();
+          await logout();
+          hideLoader();
+          router.replace(projectRoutes.doctorLogin);
+          setTimeout(() => {
+            setIntentionalLogoutMode(false);
+          }, 1000);
+        },
+        onError: (error) => {
+          hideLoader();
+          console.error(error);
+        },
+      },
+    );
+  };
 
   useEffect(() => {
     setTodayLabel(`Today is ${dayjs().format('dddd, MMMM Do, YYYY')}`);
@@ -152,8 +188,14 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
           aria-expanded={Boolean(profileAnchor)}
           onClick={(event) => setProfileAnchor(event.currentTarget)}
         >
-          {dashboardDoctor.avatar}
-          <span className="online-dot" />
+          <Avatar
+            className="profile-avatar"
+            src={userData?.profile_image}
+            alt={userData?.name}
+            sx={{ bgcolor: getAvatarColor(userData?.name) }}
+          >
+            {getInitials(userData?.name || '')}
+          </Avatar>
         </Button>
       </Box>
 
@@ -231,13 +273,10 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
       >
         <Box className="profile-head">
           <Avatar
+            className="profile-avatar"
             src={userData?.profile_image}
             alt={userData?.name}
-            sx={{
-              width: 56,
-              height: 56,
-              bgcolor: getAvatarColor(userData?.name),
-            }}
+            sx={{ bgcolor: getAvatarColor(userData?.name) }}
           >
             {getInitials(userData?.name || '')}
           </Avatar>
@@ -255,19 +294,37 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
           onClick={() => setProfileAnchor(null)}
         >
           <Link href="/dashboard/profile" className="profile-menu-link">
-            <PatientsIcon size={18} />
-            Profile Settings
+            <span className="profile-item-icon">
+              <SettingsIcon size={16} />
+            </span>
+            <span className="profile-item-label">Profile Settings</span>
           </Link>
         </MenuItem>
         <Divider className="profile-divider" />
         <MenuItem
           className="logout-item"
-          onClick={() => setProfileAnchor(null)}
+          onClick={() => {
+            setProfileAnchor(null);
+            setLogoutOpen(true);
+          }}
         >
-          <LogoutIcon />
-          Log Out
+          <span className="profile-item-icon">
+            <LogoutIcon size={16} />
+          </span>
+          <span className="profile-item-label">Log Out</span>
         </MenuItem>
       </ProfileMenu>
+
+      {logoutOpen && (
+        <LogoutOptionsModal
+          open={logoutOpen}
+          isLoading={isLogoutLoading}
+          onClose={() => setLogoutOpen(false)}
+          onConfirmLogout={(allDevices) => {
+            handleLogout(allDevices);
+          }}
+        />
+      )}
     </DashboardHeaderWrapper>
   );
 };

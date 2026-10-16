@@ -433,12 +433,13 @@ export const NoticeMenu = styled(Menu)`
 
 export const ProfileMenu = styled(Menu)`
   .MuiPaper-root {
-    width: 260px;
+    width: 280px;
     margin-top: 8px;
-    border-radius: 12px;
+    border-radius: 14px;
     background: ${({ theme }) => theme.palette.customColors.cardBg};
     border: 1px solid ${({ theme }) => theme.palette.customColors.border};
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.1);
+    overflow: hidden;
   }
 
   .MuiList-root {
@@ -448,25 +449,27 @@ export const ProfileMenu = styled(Menu)`
   .profile-head {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 8px 12px;
+    gap: 12px;
+    margin: 0 0 8px;
+    padding: 12px;
+    border-radius: 10px;
+    background: ${({ theme }) => theme.palette.customColors.brandTealLight};
   }
 
-  .profile-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  && .profile-avatar {
+    width: 44px;
+    height: 44px;
     flex-shrink: 0;
-    background: ${({ theme }) => theme.palette.customColors.brandTeal};
-    color: #ffffff;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
+    color: #ffffff;
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.palette.customColors.cardBg};
   }
 
   .profile-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
     min-width: 0;
   }
 
@@ -481,21 +484,25 @@ export const ProfileMenu = styled(Menu)`
   .profile-name {
     font-size: 14px;
     font-weight: 600;
-    line-height: 20px;
+    line-height: 18px;
     color: ${({ theme }) => theme.palette.customColors.heading};
   }
 
   .profile-role {
-    font-size: 12px;
-    font-weight: 400;
-    line-height: 16px;
-    color: ${({ theme }) => theme.palette.customColors.textSecondary};
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 14px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: ${({ theme }) => theme.palette.customColors.brandTeal};
   }
 
   .profile-item,
   .logout-item {
-    min-height: 40px;
-    border-radius: 8px;
+    min-height: 44px;
+    margin: 0;
+    padding: 6px 8px;
+    border-radius: 10px;
     gap: 10px;
     font-size: 14px;
     font-weight: 500;
@@ -503,6 +510,10 @@ export const ProfileMenu = styled(Menu)`
 
   .profile-item {
     color: ${({ theme }) => theme.palette.customColors.textPrimary};
+
+    &:hover {
+      background: ${({ theme }) => theme.palette.customColors.hoverBg};
+    }
   }
 
   .profile-menu-link {
@@ -515,12 +526,40 @@ export const ProfileMenu = styled(Menu)`
     text-decoration: none;
   }
 
+  .profile-item-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: ${({ theme }) => theme.palette.customColors.brandTealLight};
+    color: ${({ theme }) => theme.palette.customColors.brandTeal};
+  }
+
+  .profile-item-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .profile-divider {
-    margin: 4px 8px;
+    margin: 6px 8px;
     border-color: ${({ theme }) => theme.palette.customColors.border};
   }
 
   .logout-item {
     color: ${({ theme }) => theme.palette.customColors.error};
+
+    .profile-item-icon {
+      background: ${({ theme }) => theme.palette.customColors.errorBg};
+      color: ${({ theme }) => theme.palette.customColors.error};
+    }
+
+    &:hover {
+      background: ${({ theme }) => theme.palette.customColors.errorBg};
+    }
   }
 `;

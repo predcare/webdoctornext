@@ -23,7 +23,7 @@ export const profileTabs: ProfileTabItem[] = [
   { id: 'about', label: 'About', href: profilePath },
   {
     id: 'basic-info',
-    label: 'Basic Info',
+    label: 'Profile',
     href: `${profilePath}?tab=basic-info`,
   },
   {

@@ -12,7 +12,7 @@ export interface IPatientEMRRoot {
 }
 
 export interface IMyProfileDoc {
-  doctor_id: number;
+  doctor_id: string | number;
   email: string;
   id: number;
   name: string;
@@ -36,6 +36,7 @@ export interface IMyProfileDoc {
   clinic_email: string;
   clinic_gstin: string;
   currentRole: string;
+  full_address: string;
   blood_type?: string;
   sub_specializations: any;
   address: string;

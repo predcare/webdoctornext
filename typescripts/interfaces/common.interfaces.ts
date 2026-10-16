@@ -81,3 +81,8 @@ export interface IIconProps {
   IconWidth?: string;
   IconClass?: string;
 }
+
+export interface ISpecializationData {
+  specialization?: string | string[];
+  sub_specializations?: Record<string, string[]>;
+}

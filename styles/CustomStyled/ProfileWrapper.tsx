@@ -31,14 +31,21 @@ export const ProfileWrapper = styled(Box)`
     display: flex;
     align-items: center;
     gap: 10px;
+    width: 100%;
     min-height: 46px;
+    margin: 0;
     padding: 10px 16px;
+    border: 0;
     border-bottom: 1px solid ${({ theme }) => theme.palette.customColors.border};
+    background: transparent;
     color: ${({ theme }) => theme.palette.customColors.textSecondary};
+    font-family: inherit;
     font-size: 14px;
     font-weight: 500;
     line-height: 20px;
+    text-align: left;
     text-decoration: none;
+    cursor: pointer;
     transition:
       background-color 0.15s ease,
       color 0.15s ease;
@@ -119,13 +126,6 @@ export const ProfileWrapper = styled(Box)`
     font-size: 12.5px;
     line-height: 18px;
     color: ${({ theme }) => theme.palette.customColors.textMuted};
-  }
-
-  .avatar-field {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
   }
 
   .section-head {
@@ -216,34 +216,27 @@ export const ProfileWrapper = styled(Box)`
     gap: 18px;
   }
 
-  .identity-avatar,
-  .profile-avatar {
+  .identity-avatar {
     display: grid;
     place-items: center;
     flex-shrink: 0;
     font-weight: 700;
   }
 
-  .identity-avatar {
+  && .identity-avatar {
     width: 72px;
     height: 72px;
     border-radius: 18px;
     background: ${({ theme }) => theme.palette.customColors.brandTeal};
     color: ${({ theme }) => theme.palette.common.white};
     font-size: 30px;
+    font-weight: 700;
     box-shadow: 0 10px 22px
       ${({ theme }) => theme.palette.customColors.brandTealGlow};
-  }
 
-  .profile-avatar {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    border: 1px solid ${({ theme }) => theme.palette.customColors.border};
-    background: ${({ theme }) => theme.palette.customColors.pageBg};
-    color: ${({ theme }) => theme.palette.customColors.textMuted};
-    font-size: 28px;
-    font-weight: 600;
+    .MuiAvatar-img {
+      border-radius: 18px;
+    }
   }
 
   .identity-copy {
@@ -408,6 +401,8 @@ export const ProfileWrapper = styled(Box)`
     line-height: 20px;
     color: ${({ theme }) => theme.palette.customColors.heading};
     overflow-wrap: anywhere;
+    word-break: break-word;
+
   }
 
   .static-box {

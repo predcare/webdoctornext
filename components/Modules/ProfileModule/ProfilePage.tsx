@@ -4,6 +4,7 @@ import PageBreadcrumb from '@/components/commons/PageBreadcrumb/PageBreadcrumb';
 import { projectRoutes } from '@/routes';
 import { ProfileWrapper } from '@/styles/CustomStyled/ProfileWrapper';
 import { Box } from '@mui/material';
+import { useState } from 'react';
 import ProfileTabNav from './ProfileTabNav';
 import type { ProfileTabId } from './profileTabs';
 import AboutSection from './sections/AboutSection';
@@ -46,17 +47,25 @@ type ProfilePageProps = {
 };
 
 export default function ProfilePage({ tab }: ProfilePageProps) {
+  const [activeTab, setActiveTab] = useState(tab);
+  const [sectionKey, setSectionKey] = useState(0);
+
+  const handleTabChange = (tabId: ProfileTabId) => {
+    setActiveTab(tabId);
+    setSectionKey((current) => current + 1);
+  };
+
   return (
     <ProfileWrapper>
       <PageBreadcrumb items={breadcrumbItems} />
       <Box
         className={
-          tab === 'about' ? 'profile-layout is-about' : 'profile-layout'
+          activeTab === 'about' ? 'profile-layout is-about' : 'profile-layout'
         }
       >
-        <ProfileTabNav activeId={tab} />
+        <ProfileTabNav activeId={activeTab} onTabChange={handleTabChange} />
         <Box className="profile-main">
-          <ProfileSection tab={tab} />
+          <ProfileSection key={`${activeTab}-${sectionKey}`} tab={activeTab} />
         </Box>
       </Box>
     </ProfileWrapper>

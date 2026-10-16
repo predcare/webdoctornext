@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileQueryKeys } from '../query.keys';
-import { getDoctorClinics, getProfile } from './profile.funcs';
+import { getDoctorClinics, getProfile, updateProfile } from './profile.funcs';
 
 type TQueryEnabled = {
   enabled?: boolean;
@@ -25,4 +25,9 @@ export const useDoctorClinics = (options?: TQueryEnabled) =>
     staleTime: options?.staleTime ?? 5 * 60 * 1000, // 5 minutes
     enabled: options?.enabled ?? true,
     refetchOnMount: options?.refetchOnMount,
+  });
+
+export const useUpdateProfile = () =>
+  useMutation({
+    mutationFn: updateProfile,
   });
