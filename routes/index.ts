@@ -11,6 +11,8 @@ export const projectRoutes = {
   doctorLogin: '/auth/doctor/login',
   doctorRegister: '/auth/doctor/register',
   patientLogin: '/auth/patient/login',
+  policyAcceptance: '/auth/doctor/policy-acceptance',
+  patientPolicyAcceptance: '/auth/patient/policy-acceptance',
 
   // Doctor portal
   dashboard: '/dashboard',

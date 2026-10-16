@@ -53,6 +53,10 @@ export const AuthLayoutWrapper = styled(Box)`
     max-width: 740px;
   }
 
+  .auth-column.is-policy {
+    max-width: 720px;
+  }
+
   .logo-wrap {
     text-align: center;
     margin-bottom: clamp(6px, 1.2vh, 14px);

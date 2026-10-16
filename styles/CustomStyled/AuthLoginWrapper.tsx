@@ -71,7 +71,7 @@ export const AuthLoginWrapper = styled(Paper)`
 
   .login-footer {
     text-align: center;
-    margin-top: 32px;
+    margin-top: 22px;
     padding-top: 24px;
     border-top: 1px solid ${({ theme }) => theme.palette.customColors.border};
   }
@@ -115,7 +115,7 @@ export const AuthLoginWrapper = styled(Paper)`
 
   && .submit-btn {
     width: 100%;
-    margin-top: 8px;
+    margin-top: 0px;
     height: 56px;
     border-radius: 12px;
     font-size: 1.125rem;

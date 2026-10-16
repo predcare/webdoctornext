@@ -4,10 +4,10 @@ import OTPInput from 'react-otp-input';
 import CommonErrorText from '../CommonErrorText/CommonErrorText';
 
 interface ICommonOtpInputProps {
-    numDigits?: number;
-    onOtpChange: (otp: string) => void;
-    error?: string;
-    autoFocus?: boolean;
+  numDigits?: number;
+  onOtpChange: (otp: string) => void;
+  error?: string;
+  autoFocus?: boolean;
 }
 
 const OtpInputStyle = styled(Box)`
@@ -52,35 +52,35 @@ const OtpInputStyle = styled(Box)`
 `;
 
 const CommonOtpInput = ({ numDigits = 4, onOtpChange, error = '' }: ICommonOtpInputProps) => {
-    const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState('');
 
-    const handleChange = (val: string) => {
-        setOtp(val);
-        onOtpChange(val);
-    };
+  const handleChange = (val: string) => {
+    setOtp(val);
+    onOtpChange(val);
+  };
 
-    return (
-        <OtpInputStyle className='otpContainer'>
-            <OTPInput
-                value={otp}
-                onChange={handleChange}
-                numInputs={numDigits}
-                containerStyle={{ width: '100%', display: 'flex', justifyContent: 'center' }}
-                renderSeparator={<span style={{ width: '8px' }}></span>}
-                renderInput={props => (
-                    <input
-                        {...props}
-                        type='text'
-                        inputMode='numeric'
-                        pattern='[0-9]*'
-                        autoComplete='one-time-code'
-                        style={{ ...props.style, width: '48px', height: '56px' }}
-                    />
-                )}
-            />
-            <CommonErrorText message={error} />
-        </OtpInputStyle>
-    );
+  return (
+    <OtpInputStyle className='otpContainer'>
+      <OTPInput
+        value={otp}
+        onChange={handleChange}
+        numInputs={numDigits}
+        containerStyle={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+        renderSeparator={<span style={{ width: '8px' }}></span>}
+        renderInput={props => (
+          <input
+            {...props}
+            type='text'
+            inputMode='numeric'
+            pattern='[0-9]*'
+            autoComplete='one-time-code'
+            style={{ ...props.style, width: '48px', height: '56px' }}
+          />
+        )}
+      />
+      <CommonErrorText message={error} />
+    </OtpInputStyle>
+  );
 };
 
 export default CommonOtpInput;

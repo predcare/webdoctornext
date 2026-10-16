@@ -1,8 +1,10 @@
+import { IRootResponse } from './common.interfaces';
+
 export interface IMyProfileRoot {
   success: boolean;
   doctor: IMyProfileDoc;
 }
-
+export type TMyClinicsRoot = IRootResponse<IMyClinicsDoc[]>;
 export interface IPatientEMRRoot {
   success: boolean;
   count: number;
@@ -140,4 +142,29 @@ export interface IMyClinic {
   created_at?: string;
   updated_at?: string;
   email?: string;
+}
+
+export interface IMyClinicsDoc {
+  id: string;
+  name: string;
+  email: string;
+  gst_number: string;
+  clinic_reg_number: string;
+  line1: string;
+  city: string;
+  state: string;
+  country: string;
+  pincode: string;
+  about: string;
+  location: ILocation;
+  specialities: string[];
+  contact_numbers: string[];
+  clinic_status: string;
+  qr_code: string;
+  is_owner: boolean;
+  is_primary: boolean;
+  status: string;
+  approval_status: string;
+  created_at: string;
+  updated_at: string;
 }

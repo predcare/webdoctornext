@@ -29,6 +29,7 @@ export const endpoints = {
     get: '/users/profile',
     update: '/doctors/user/',
     allPatients: '/users/doctor-all-users',
+    doctorClinics: '/doctors/my-clinics',
   },
   patients: {
     get: '/doctors/my-patients',

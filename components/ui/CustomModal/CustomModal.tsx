@@ -526,6 +526,33 @@ export const MuiModalWrapperStyled = styled(Dialog)`
     }
   }
 
+  /* ─── Policy Viewer Modal ────────────────────────────── */
+  &.policyViewerModal {
+    .MuiDialog-paper {
+      width: 100%;
+      max-width: 720px;
+      margin: 24px auto;
+      height: initial;
+      max-height: min(80vh, 680px);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .MuiDialogContent-root {
+      padding-top: 20px;
+      padding-bottom: 24px;
+    }
+
+    @media (max-width: 599px) {
+      .MuiDialog-paper {
+        max-width: calc(100% - 20px);
+        margin: 10px;
+        max-height: calc(100dvh - 20px);
+        border-radius: 16px;
+      }
+    }
+  }
+
   @media (max-width: 599px) {
     max-height: calc(100vh - 60px);
   }

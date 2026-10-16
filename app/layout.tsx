@@ -1,3 +1,5 @@
+import GlobalBackdropLoader from '@/components/commons/BackdropLoader/GlobalBackdropLoader';
+import EventListener from '@/components/commons/EventListener/EventListener';
 import ReactQueryProvider from '@/components/Providers/ReactQueryProvider';
 import ProjectThemeProvider from '@/themes/ProjectThemeProvider';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
@@ -33,7 +35,11 @@ export default function RootLayout({
       <body>
         <AppRouterCacheProvider>
           <ProjectThemeProvider>
-            <ReactQueryProvider>{children}</ReactQueryProvider>
+            <ReactQueryProvider>
+              {children}
+              <GlobalBackdropLoader />
+              <EventListener />
+            </ReactQueryProvider>
           </ProjectThemeProvider>
         </AppRouterCacheProvider>
       </body>

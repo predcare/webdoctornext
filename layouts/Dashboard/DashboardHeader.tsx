@@ -9,6 +9,8 @@ import {
   PatientsIcon,
 } from '@/components/ui/Icons/dashboard';
 import { dashboardDoctor } from '@/configs/dashboardNav';
+import { useDoctorClinics } from '@/hooks/react-query/profile/profile.hooks';
+import { _formatDoctorName, _toTitleCase, getAvatarColor, getInitials } from '@/lib/commons/common.utils';
 import { clinics, notifications } from '@/resources/mock';
 import {
   ClinicMenu,
@@ -16,7 +18,9 @@ import {
   NoticeMenu,
   ProfileMenu,
 } from '@/styles/CustomStyled/DashboardHeaderWrapper';
+import { useAuthStore } from '@/zustand/stores/useAuthStore';
 import {
+  Avatar,
   Box,
   Button,
   Chip,
@@ -49,6 +53,9 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
   const activeClinic =
     clinics.find((clinic) => clinic.id === activeClinicId) ?? clinics[0];
 
+  const { userData } = useAuthStore((state) => state)
+  const { data: myClinics, isPending: isPendingClinics } = useDoctorClinics()
+
   useEffect(() => {
     setTodayLabel(`Today is ${dayjs().format('dddd, MMMM Do, YYYY')}`);
   }, []);
@@ -67,7 +74,7 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
       <Box className="identity">
         <Box className="greeting-row">
           <Typography component="h1" className="greeting-text">
-            {dashboardDoctor.greeting}
+            {`Welcome back, ${_formatDoctorName(userData?.name || "", userData?.salutation)}`}
           </Typography>
           <Chip label={dashboardDoctor.plan} className="plan-chip" />
         </Box>
@@ -188,13 +195,15 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
         {...menuOrigin}
       >
         <Box className="profile-head">
-          <span className="profile-avatar">{dashboardDoctor.avatar}</span>
+          <Avatar src={userData?.profile_image} alt={userData?.name} sx={{ width: 56, height: 56, bgcolor: getAvatarColor(userData?.name) }}>
+            {getInitials(userData?.name || "")}
+          </Avatar>
           <Box className="profile-copy">
             <Typography className="profile-name" component="p">
-              {dashboardDoctor.name}
+              {_formatDoctorName(userData?.name || "", userData?.salutation)}
             </Typography>
             <Typography className="profile-role" component="p">
-              {dashboardDoctor.role}
+              {_toTitleCase(userData?.user_type || "User")}
             </Typography>
           </Box>
         </Box>

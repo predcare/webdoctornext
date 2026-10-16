@@ -33,6 +33,8 @@ export enum UserRoles {
   PATIENT = 'patient',
 }
 
+export const AllProjectRoles = [UserRoles.DOCTOR, UserRoles.PATIENT] as const;
+
 export enum DevMode {
   Production = 'production',
   Development = 'development',
@@ -42,3 +44,5 @@ export enum ThemeMode {
   Light = 'light',
   Dark = 'dark',
 }
+
+export type TLoginMode = 'mobile' | 'email';

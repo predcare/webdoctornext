@@ -13,11 +13,17 @@ interface AuthLayoutProps {
 const AuthLayout = ({ children }: AuthLayoutProps) => {
   const pathname = usePathname();
   const isRegisterPage = pathname.includes('/register');
+  const isPolicyAcceptancePage = pathname.includes('/policy-acceptance');
+  const columnModifier = isRegisterPage
+    ? ' is-register'
+    : isPolicyAcceptancePage
+      ? ' is-policy'
+      : '';
 
   return (
     <AuthLayoutWrapper>
       <Container maxWidth="xl" className="auth-container">
-        <Box className={`auth-column${isRegisterPage ? ' is-register' : ''}`}>
+        <Box className={`auth-column${columnModifier}`}>
           <Box className="logo-wrap">
             <Box
               component="img"
