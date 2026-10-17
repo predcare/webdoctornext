@@ -25,7 +25,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { memo, useState, type MouseEvent } from 'react';
 
 type DraftFilters = Pick<PatientFilterState, 'gender' | 'clinicStatus'>;
@@ -49,6 +49,7 @@ function PatientListToolbar({
   onSearchChange,
   searchDebounce = 500,
 }: PatientListToolbarProps) {
+  const router = useRouter();
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const [draft, setDraft] = useState<DraftFilters>({ gender: 'all', clinicStatus: 'all' });
   const activeCount = filters ? activePatientFilterCount(filters) : 0;
@@ -127,8 +128,8 @@ function PatientListToolbar({
           )}
 
           <Button
-            component={Link}
-            href={projectRoutes.addPatient}
+            type="button"
+            onClick={() => router.push(projectRoutes.addPatient)}
             className="toolbar-btn add-patient"
             variant="contained"
             disableElevation
