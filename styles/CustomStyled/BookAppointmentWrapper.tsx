@@ -104,31 +104,82 @@ export const BookAppointmentWrapper = styled(Box)`
     color: ${({ theme }) => theme.palette.customColors.textMuted};
   }
 
-  .selected-patient {
+  .change-patient-btn.MuiButton-root {
+    min-width: 0;
+    padding: 0;
+    text-transform: none;
+    background: transparent;
+
+    &:hover {
+      background: transparent;
+    }
+  }
+
+  .selected-panel {
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid ${({ theme }) => theme.palette.customColors.border};
+    border-left: 3px solid
+      ${({ theme }) => theme.palette.customColors.brandTeal};
+    background: ${({ theme }) => theme.palette.customColors.pageBg};
+  }
+
+  .selected-avatar.MuiAvatar-root {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: ${({ theme }) => theme.palette.customColors.brandTeal};
+    background: ${({ theme }) => theme.palette.customColors.brandTealLight};
   }
 
   .selected-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .selected-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     min-width: 0;
   }
 
   .selected-name {
-    margin: 0 0 6px;
-    font-size: 16px;
+    margin: 0;
+    overflow: hidden;
+    font-size: 14px;
     font-weight: 700;
-    line-height: 22px;
+    line-height: 20px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     color: ${({ theme }) => theme.palette.customColors.heading};
+  }
+
+  .selected-id {
+    flex-shrink: 0;
+    padding: 0 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 18px;
+    color: ${({ theme }) => theme.palette.customColors.brandTeal};
+    background: ${({ theme }) => theme.palette.customColors.brandTealLight};
   }
 
   .selected-meta {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px 14px;
-    margin: 0;
+    gap: 2px 12px;
     font-size: 12px;
     line-height: 18px;
     color: ${({ theme }) => theme.palette.customColors.textMuted};
@@ -137,10 +188,16 @@ export const BookAppointmentWrapper = styled(Box)`
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .selected-profile {
+      text-transform: capitalize;
     }
 
     .MuiSvgIcon-root {
-      font-size: 14px;
+      font-size: 13px;
     }
   }
 
@@ -161,13 +218,21 @@ export const BookAppointmentWrapper = styled(Box)`
     min-height: 76px;
     padding: 14px 16px;
     border-radius: 14px;
+    width: 100%;
+    font: inherit;
+    text-align: left;
     border: 1px solid ${({ theme }) => theme.palette.customColors.border};
     background: ${({ theme }) => theme.palette.customColors.cardBg};
-    cursor: default;
+    cursor: pointer;
     transition:
       border-color 0.18s ease,
       background 0.18s ease,
       box-shadow 0.18s ease;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
 
     .choice-icon {
       width: 44px;
@@ -278,6 +343,51 @@ export const BookAppointmentWrapper = styled(Box)`
     background: ${({ theme }) => theme.palette.customColors.brandTealLight};
   }
 
+  .calendar-btn.MuiIconButton-root.Mui-disabled,
+  .nav-btn.MuiIconButton-root.Mui-disabled {
+    opacity: 0.45;
+    border-color: ${({ theme }) => theme.palette.customColors.border};
+    color: ${({ theme }) => theme.palette.customColors.textMuted};
+    background: ${({ theme }) => theme.palette.customColors.cardBg};
+  }
+
+  .date-lock-hint {
+    margin: -8px 0 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: ${({ theme }) => theme.palette.customColors.textMuted};
+  }
+
+  .empty-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 86px;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px dashed ${({ theme }) => theme.palette.customColors.border};
+    background: ${({ theme }) => theme.palette.customColors.pageBg};
+    text-align: center;
+
+    p {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 500;
+      color: ${({ theme }) => theme.palette.customColors.textMuted};
+    }
+  }
+
+  .date-skeleton {
+    flex: 0 0 92px;
+  }
+
+  .slot-group-skeleton,
+  .card-title-skeleton {
+    margin-bottom: 12px;
+  }
+
   .date-row {
     display: flex;
     gap: 10px;
@@ -294,16 +404,29 @@ export const BookAppointmentWrapper = styled(Box)`
     justify-content: center;
     gap: 0;
     min-height: 86px;
+    min-width: 0;
     padding: 10px 8px 8px;
     overflow: hidden;
     border-radius: 12px;
+    font: inherit;
+    text-transform: none;
     border: 1px solid ${({ theme }) => theme.palette.customColors.border};
     background: ${({ theme }) => theme.palette.customColors.cardBg};
     text-align: center;
-    cursor: default;
+    cursor: pointer;
     transition:
       border-color 0.18s ease,
-      box-shadow 0.18s ease;
+      box-shadow 0.18s ease,
+      opacity 0.18s ease;
+
+    &.disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+
+      &:hover {
+        border-color: ${({ theme }) => theme.palette.customColors.border};
+      }
+    }
 
     .weekday,
     .day-num,
@@ -396,12 +519,6 @@ export const BookAppointmentWrapper = styled(Box)`
     color: ${({ theme }) => theme.palette.customColors.heading};
   }
 
-  .slot-range {
-    margin: 0;
-    font-size: 12px;
-    color: ${({ theme }) => theme.palette.customColors.textMuted};
-  }
-
   .slot-count {
     margin-left: auto;
     padding: 2px 8px;
@@ -427,12 +544,13 @@ export const BookAppointmentWrapper = styled(Box)`
     border-radius: 10px;
     border: 1px solid ${({ theme }) => theme.palette.customColors.border};
     background: ${({ theme }) => theme.palette.customColors.cardBg};
+    font-family: inherit;
     font-size: 12px;
     font-weight: 600;
     line-height: 16px;
     text-align: center;
     color: ${({ theme }) => theme.palette.customColors.textSecondary};
-    cursor: default;
+    cursor: pointer;
     transition:
       border-color 0.15s ease,
       color 0.15s ease,
@@ -451,34 +569,86 @@ export const BookAppointmentWrapper = styled(Box)`
       box-shadow: 0 4px 12px
         ${({ theme }) => theme.palette.customColors.brandTealGlow};
     }
+
+    &.booked {
+      cursor: not-allowed;
+      opacity: 0.5;
+      text-decoration: line-through;
+      color: ${({ theme }) => theme.palette.customColors.textMuted};
+      background: ${({ theme }) => theme.palette.customColors.pageBg};
+
+      &:hover {
+        border-color: ${({ theme }) => theme.palette.customColors.border};
+        color: ${({ theme }) => theme.palette.customColors.textMuted};
+      }
+    }
   }
 
   .summary-card {
-    padding: 24px;
+    padding: 20px;
     border-radius: 16px;
-    background: ${({ theme }) => theme.palette.customColors.pageBg};
+    background: ${({ theme }) => theme.palette.customColors.cardBg};
     border: 1px solid ${({ theme }) => theme.palette.customColors.border};
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+
+  .summary-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
   }
 
   .summary-title {
-    margin: 0 0 16px;
-    font-size: 16px;
+    margin: 0;
+    font-size: 15px;
     font-weight: 700;
+    line-height: 22px;
     color: ${({ theme }) => theme.palette.customColors.heading};
   }
 
   .summary-grid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 16px;
   }
 
   .summary-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     min-width: 0;
-    padding: 14px 16px;
-    border-radius: 12px;
-    background: ${({ theme }) => theme.palette.customColors.cardBg};
-    border: 1px solid ${({ theme }) => theme.palette.customColors.border};
+    padding: 8px 0;
+    border-bottom: 1px dashed
+      ${({ theme }) => theme.palette.customColors.border};
+  }
+
+  .summary-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    color: ${({ theme }) => theme.palette.customColors.textMuted};
+    background: ${({ theme }) => theme.palette.customColors.pageBg};
+
+    .MuiSvgIcon-root {
+      font-size: 16px;
+    }
+  }
+
+  .summary-item.filled .summary-icon {
+    color: ${({ theme }) => theme.palette.customColors.brandTeal};
+    background: ${({ theme }) => theme.palette.customColors.brandTealLight};
+  }
+
+  .summary-copy {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
   }
 
   .summary-label,
@@ -487,25 +657,67 @@ export const BookAppointmentWrapper = styled(Box)`
   }
 
   .summary-label {
-    margin-bottom: 6px;
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-weight: 600;
+    line-height: 16px;
     color: ${({ theme }) => theme.palette.customColors.textMuted};
   }
 
   .summary-value {
+    overflow: hidden;
     font-size: 13px;
     font-weight: 700;
     line-height: 18px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     color: ${({ theme }) => theme.palette.customColors.heading};
-    overflow-wrap: anywhere;
 
     &.muted {
       font-weight: 500;
       color: ${({ theme }) => theme.palette.customColors.textMuted};
     }
+  }
+
+  .summary-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: ${({ theme }) => theme.palette.customColors.brandTealLight};
+  }
+
+  .summary-total-skeleton {
+    margin-top: 14px;
+  }
+
+  .summary-total-label,
+  .summary-total-note,
+  .summary-total-amount {
+    margin: 0;
+  }
+
+  .summary-total-label {
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 18px;
+    color: ${({ theme }) => theme.palette.customColors.heading};
+  }
+
+  .summary-total-note {
+    font-size: 11px;
+    line-height: 16px;
+    color: ${({ theme }) => theme.palette.customColors.textMuted};
+  }
+
+  .summary-total-amount {
+    flex-shrink: 0;
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 26px;
+    color: ${({ theme }) => theme.palette.customColors.brandTeal};
   }
 
   .confirm-wrap {
@@ -529,10 +741,6 @@ export const BookAppointmentWrapper = styled(Box)`
     .slot-list {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
-
-    .summary-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
   }
 
   ${({ theme }) => theme.breakpoints.down('md')} {
@@ -541,10 +749,6 @@ export const BookAppointmentWrapper = styled(Box)`
     }
 
     .slot-list {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .summary-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
@@ -565,8 +769,8 @@ export const BookAppointmentWrapper = styled(Box)`
       grid-template-columns: 1fr;
     }
 
-    .selected-patient {
-      flex-direction: column;
+    .selected-panel {
+      align-items: flex-start;
     }
 
     .summary-grid {

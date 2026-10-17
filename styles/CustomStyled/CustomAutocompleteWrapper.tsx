@@ -4,7 +4,7 @@ import { Box, Paper, styled } from '@mui/material';
 
 export const CustomAutocompleteWrapper = styled(Box, {
   shouldForwardProp: (prop) => prop !== '$inputSize',
-})<{ $inputSize?: 'medium' | 'large' }>`
+}) <{ $inputSize?: 'medium' | 'large' }>`
   width: 100%;
 
   .MuiAutocomplete-root .MuiInputBase-root {
@@ -133,14 +133,140 @@ export const CustomAutocompletePaper = styled(Paper)`
     color: inherit;
   }
 
+  .MuiAutocomplete-option:has(.patient-option) {
+    padding: 8px 12px;
+    border-radius: 10px;
+
+    & + .MuiAutocomplete-option {
+      margin-top: 2px;
+    }
+  }
+
+  .patient-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    min-width: 0;
+    cursor: pointer;
+  }
+
+  .patient-option-avatar.MuiAvatar-root {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: ${({ theme }) => theme.palette.customColors.brandTeal};
+    background: ${({ theme }) => theme.palette.customColors.brandTealLight};
+    border: 1px solid ${({ theme }) => theme.palette.customColors.border};
+  }
+
+  .patient-option-copy {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .patient-option-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .patient-option-name {
+    overflow: hidden;
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 18px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: ${({ theme }) => theme.palette.customColors.heading};
+  }
+
+  .patient-option-id {
+    flex-shrink: 0;
+    padding: 0 6px;
+    border-radius: 4px;
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 17px;
+    color: ${({ theme }) => theme.palette.customColors.brandTeal};
+    background: ${({ theme }) => theme.palette.customColors.brandTealLight};
+  }
+
+  .patient-option-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 14px;
+    font-size: 11.5px;
+    line-height: 16px;
+    color: ${({ theme }) => theme.palette.customColors.textMuted};
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .MuiSvgIcon-root {
+      font-size: 13px;
+    }
+  }
+
+  .patient-option-profile {
+    text-transform: capitalize;
+  }
+
+  .patient-option-email {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .patient-option-check {
+    flex-shrink: 0;
+    font-size: 18px;
+    visibility: hidden;
+    color: ${({ theme }) => theme.palette.customColors.brandTeal};
+  }
+
+  .MuiAutocomplete-option[aria-selected='true'] {
+    .patient-option-check {
+      visibility: visible;
+    }
+
+    .patient-option-avatar.MuiAvatar-root {
+      border-color: ${({ theme }) => theme.palette.customColors.brandTeal};
+    }
+
+    .patient-option-name {
+      color: ${({ theme }) => theme.palette.customColors.brandTeal};
+    }
+  }
+
   .option-subtitle {
     font-size: 11px;
     line-height: 16px;
     color: ${({ theme }) => theme.palette.customColors.textMuted};
   }
 
-  .MuiAutocomplete-noOptions {
+  .MuiAutocomplete-noOptions,
+  .MuiAutocomplete-loading {
     font-size: 13px;
     color: ${({ theme }) => theme.palette.customColors.textMuted};
+  }
+
+  .listbox-loading-more {
+    display: flex;
+    justify-content: center;
+    padding: 8px 0;
+    list-style: none;
+    color: ${({ theme }) => theme.palette.customColors.brandTeal};
   }
 `;

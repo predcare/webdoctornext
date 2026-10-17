@@ -1,6 +1,7 @@
 import axiosInstance from '../../../services/api/apiClient';
 import { endpoints } from '../../../services/api/endpoints';
 import {
+  TBookAppointmentRoot,
   TGetApptTokenRoot,
   TMyAppointmentInfoRoot,
   TMyAppointmentRoot,
@@ -11,22 +12,28 @@ import { ICreateAppointmentPayload } from '../auth/payload.interfaces';
 import { IMyApptQueryParams } from './payload.interafce';
 
 export const getMyAppointments = async (params: IMyApptQueryParams) => {
-  const res = await axiosInstance.get<TMyAppointmentRoot>(`${endpoints.appointments.get}`, {
-    params: params,
-  });
+  const res = await axiosInstance.get<TMyAppointmentRoot>(
+    `${endpoints.appointments.get}`,
+    {
+      params: params,
+    },
+  );
   return res.data;
 };
 
 export const getMyAppointmentStats = async (params?: { date?: string }) => {
-  const res = await axiosInstance.get<TMyAppointmentStats>(`${endpoints.appointments.apptStats}`, {
-    params: params,
-  });
+  const res = await axiosInstance.get<TMyAppointmentStats>(
+    `${endpoints.appointments.apptStats}`,
+    {
+      params: params,
+    },
+  );
   return res.data;
 };
 
 export const getApptToken = async (appointmentId: number | string) => {
   const res = await axiosInstance.get<TGetApptTokenRoot>(
-    `${endpoints.appointments.getToken(appointmentId)}`
+    `${endpoints.appointments.getToken(appointmentId)}`,
   );
   return res.data;
 };
@@ -60,9 +67,12 @@ export interface IHeartbeatApiResponse {
 }
 
 export const sendHeartBeat = async (
-  body: ISendHeartbeatPayload
+  body: ISendHeartbeatPayload,
 ): Promise<IHeartbeatApiResponse> => {
-  const res = await axiosInstance.post(`${endpoints.appointments.heartbeat}`, body);
+  const res = await axiosInstance.post(
+    `${endpoints.appointments.heartbeat}`,
+    body,
+  );
   return res.data;
 };
 
@@ -76,25 +86,31 @@ export const changeAppointmentStatus = async (body: {
     {
       status: body.status,
       call_end_reason: body.call_end_reason,
-    }
+    },
   );
   return res.data;
 };
 
 export const bookAppointments = async (body: ICreateAppointmentPayload) => {
-  const res = await axiosInstance.post(endpoints.appointments.bookByDoc, body);
+  const res = await axiosInstance.post<TBookAppointmentRoot>(
+    endpoints.appointments.bookByDoc,
+    body,
+  );
   return res.data;
 };
 
 export const getMyAppointmentInfo = async (id: number | string) => {
   const res = await axiosInstance.get<TMyAppointmentInfoRoot>(
-    `${endpoints.appointments.getdetails(id)}`
+    `${endpoints.appointments.getdetails(id)}`,
   );
   return res.data;
 };
 
 export const rescheduleAppointment = async (id: number | string, body: any) => {
-  const res = await axiosInstance.patch(endpoints.appointments.reschedule(id), body);
+  const res = await axiosInstance.patch(
+    endpoints.appointments.reschedule(id),
+    body,
+  );
   return res.data;
 };
 

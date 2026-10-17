@@ -6,6 +6,10 @@ export type IPatientConsultApptRoot = IRootResponse<IMyAppointmentDoc[]>;
 export type TMyAppointmentStats = IRootResponse<IMyApptStatus>;
 export type TGetApptTokenRoot = IRootResponse<IGetApptTokenDoc>;
 export type TMyAppointmentInfoRoot = IRootResponse<IApptInfoDoc>;
+export type TBookAppointmentRoot = IRootResponse<{
+  requires_payment: boolean;
+  appointment: IAppointmentDoc;
+}>;
 
 export interface IAppointmentInfoRoot {
   success: boolean;
@@ -77,7 +81,13 @@ export interface ILeaveReason {
 
 export interface IChangeAppointmentStatusPayload {
   appointmentId: number | string;
-  appointment_status: 'completed' | 'in_progress' | 'cancelled' | 'pending' | 'confirmed' | string;
+  appointment_status:
+    | 'completed'
+    | 'in_progress'
+    | 'cancelled'
+    | 'pending'
+    | 'confirmed'
+    | string;
 }
 
 // New Response

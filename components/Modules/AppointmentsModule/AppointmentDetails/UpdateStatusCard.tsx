@@ -47,7 +47,7 @@ function UpdateStatusCard({ status, appointmentId }: UpdateStatusCardProps) {
     showLoader('Updating appointment status...');
     const payload = {
       appointmentId: appointmentId,
-      status: nextStatus,
+      status: nextStatus?.toLowerCase(),
       call_end_reason: 'Call ended and Booking Completed by Doctor',
     };
     changeStatus(payload, {
