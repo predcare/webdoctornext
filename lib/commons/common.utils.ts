@@ -9,7 +9,7 @@ export const getCookieVal = (key: string, fallback = ''): string => {
 
 export const formatDate = (
   date: Date | string | null | undefined,
-  format = 'DD/MM/YYYY',
+  format = 'DD MMM YYYY',
 ): string => {
   if (!date) return '';
   return dayjs(date).format(format);
@@ -159,6 +159,45 @@ export const getPayStatus = (statusStr: string) => {
   return { bg: '#FEF3C7', txt: '#B45309', label: 'PENDING' };
 };
 
+export const getAppointmentTypeColors = (
+  type?: string,
+): { bg: string; txt: string } => {
+  switch (type?.toLowerCase().trim()) {
+    case 'video':
+    case 'telehealth':
+      return { bg: '#DBEAFE', txt: '#2563EB' };
+    case 'in-person':
+    case 'in_person':
+    case 'inperson':
+      return { bg: '#D1FAE5', txt: '#16A34A' };
+    case 'instant':
+      return { bg: '#FEF3C7', txt: '#D97706' };
+    case 'both':
+      return { bg: '#E0F2FE', txt: '#0284C7' };
+    default:
+      return { bg: '#F1F5F9', txt: '#64748B' };
+  }
+};
+
+export const getAppointmentStatusColors = (
+  status?: string,
+): { bg: string; txt: string } => {
+  switch (status?.toLowerCase().trim()) {
+    case 'completed':
+      return { bg: '#D1FAE5', txt: '#16A34A' };
+    case 'cancelled':
+      return { bg: '#FEE2E2', txt: '#DC2626' };
+    case 'pending':
+      return { bg: '#FEF3C7', txt: '#D97706' };
+    case 'in-progress':
+    case 'in_progress':
+    case 'inprogress':
+      return { bg: '#E0F2FE', txt: '#0284C7' };
+    default:
+      return { bg: '#DBEAFE', txt: '#64748B' };
+  }
+};
+
 export const _toTitleCase = (value: string): string => {
   if (!value?.trim()) return '';
   return value
@@ -191,4 +230,24 @@ export const formatSpecialization = ({
     })
     .filter(Boolean)
     .join(', ');
+};
+
+export const formatTimeSlot = (startTime?: string, endTime?: string) => {
+  if (!startTime) return 'Flexible';
+
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(':').map(Number);
+
+    if (isNaN(hours) || isNaN(minutes)) return time;
+
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const hour12 = hours % 12 || 12;
+
+    return `${hour12}:${minutes.toString().padStart(2, '0')} ${period}`;
+  };
+
+  const start = formatTime(startTime);
+  const end = endTime ? formatTime(endTime) : '';
+
+  return end ? `${start} - ${end}` : start;
 };

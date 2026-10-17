@@ -15,9 +15,9 @@ export const AppointmentListWrapper = styled(Box)`
     &:hover {
       --variant-containedColor: ${({ theme }) => theme.palette.common.white};
       --variant-containedBg: ${({ theme }) =>
-        theme.palette.customColors.brandTealDark};
+    theme.palette.customColors.brandTealDark};
       background-color: ${({ theme }) =>
-        theme.palette.customColors.brandTealDark};
+    theme.palette.customColors.brandTealDark};
       color: ${({ theme }) => theme.palette.common.white};
     }
   }
@@ -109,6 +109,14 @@ export const AppointmentListWrapper = styled(Box)`
     color: ${({ theme }) => theme.palette.customColors.heading};
   }
 
+  .patient-name {
+    display: block;
+    max-width: 160px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
   .patient-meta,
   .cell-note {
     font-size: 12px;
@@ -139,16 +147,17 @@ export const AppointmentListWrapper = styled(Box)`
     font-size: 12px;
     font-weight: 600;
     white-space: nowrap;
+  }
 
-    &.video {
-      color: ${({ theme }) => theme.palette.customColors.info};
-      background: ${({ theme }) => theme.palette.customColors.infoBg};
-    }
-
-    &.in-person {
-      color: ${({ theme }) => theme.palette.customColors.success};
-      background: ${({ theme }) => theme.palette.customColors.successBg};
-    }
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
   }
 
   .row-actions {

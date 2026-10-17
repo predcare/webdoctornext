@@ -10,6 +10,8 @@ import AppointmentFilters, {
 import AppointmentRow from '@/components/Modules/AppointmentsModule/AppointmentRow';
 import AppointmentSummaryCards from '@/components/Modules/AppointmentsModule/AppointmentSummaryCards';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
+import { useMyAppointments } from '@/hooks/react-query/appointments/appointments.hooks';
+import { _toTitleCase, formatDate, formatTimeSlot, getAge } from '@/lib/commons/common.utils';
 import { dashboardAppointments } from '@/resources/mock';
 import { projectRoutes } from '@/routes';
 import { AppointmentListWrapper } from '@/styles/CustomStyled/AppointmentListWrapper';
@@ -20,9 +22,10 @@ import { useCallback, useMemo, useState } from 'react';
 
 const headList = [
   'Patient details',
-  'Modality',
-  'Schedule',
-  'Specialist',
+  'Consult Type',
+  'Appointment ID',
+  'Date',
+  'Time',
   'Status',
   'Actions',
 ];
@@ -72,6 +75,18 @@ export default function AppointmentListPage() {
     </Button>
   );
 
+  const {
+    data: appointmentList,
+    isPending: isLoadingAppointments,
+    error: appointmentsError,
+  } = useMyAppointments({
+    page: 1,
+    limit: 10,
+    search: '',
+  });
+
+  console.log('appointmentList', appointmentList)
+
   return (
     <AppointmentListWrapper>
       <PageBreadcrumb items={breadcrumbItems} action={addAppointmentAction} />
@@ -89,15 +104,31 @@ export default function AppointmentListPage() {
         totalPages={1}
         isEmpty={appointments.length === 0}
         emptyText="No appointments found"
+        isLoading={isLoadingAppointments}
         emptyDescription={
           filtersActive
             ? 'Change the filters or clear them to see appointments.'
             : undefined
         }
       >
-        {appointments.map((row) => (
-          <AppointmentRow key={row.id} row={row} onOpenMenu={handleOpenMenu} />
-        ))}
+        {appointmentList?.data?.map((apptInfo) => {
+          return (
+            <AppointmentRow
+              key={apptInfo.id}
+              onOpenMenu={(anchor) => handleOpenMenu(anchor, String(apptInfo.id))}
+              patientName={apptInfo.patientInfo?.name || ''}
+              patientImage={apptInfo.patientInfo?.profileImage || ''}
+              patientCode={apptInfo.patientInfo?.displayPatientId || ''}
+              gender={_toTitleCase(apptInfo.patientInfo?.gender || '')}
+              age={getAge(apptInfo.patientInfo?.dateOfBirth || '')}
+              appointmentId={apptInfo.appointment_id}
+              appointmentDate={formatDate(apptInfo.appointment_date)}
+              appointmentTime={formatTimeSlot(apptInfo.start_time, apptInfo.end_time)}
+              appointmentStatus={apptInfo.appointment_status}
+              appointmentType={apptInfo.consultation_type}
+            />
+          )
+        })}
       </CustomTable>
 
       <Menu

@@ -7,13 +7,13 @@ import {
   InProgressIcon,
   NoShowIcon,
 } from '@/components/ui/Icons/appointments';
-import type { AppointmentStatus } from '@/resources/mock';
+import { _toTitleCase } from '@/lib/commons/common.utils';
 import { styled } from '@mui/material';
 import type { ComponentType } from 'react';
 
 type StatusIcon = ComponentType<{ size?: number }>;
 
-const statusMeta: Record<AppointmentStatus, { className: string; Icon: StatusIcon }> = {
+const statusMeta: Record<string, { className: string; Icon: StatusIcon }> = {
   Scheduled: { className: 'scheduled', Icon: ConfirmedIcon },
   Confirmed: { className: 'confirmed', Icon: ConfirmedIcon },
   'In Progress': { className: 'in-progress', Icon: InProgressIcon },
@@ -62,17 +62,17 @@ const StatusPill = styled('span')`
 `;
 
 type AppointmentStatusBadgeProps = {
-  status: AppointmentStatus;
+  status: string;
 };
 
 export default function AppointmentStatusBadge({ status }: AppointmentStatusBadgeProps) {
   const meta = statusMeta[status];
-  const Icon = meta.Icon;
+  const Icon = meta?.Icon ?? null;
 
   return (
-    <StatusPill className={meta.className}>
-      <Icon size={14} />
-      {status}
+    <StatusPill className={meta?.className}>
+      {Icon ? <Icon size={14} /> : null}
+      {_toTitleCase(status || '')}
     </StatusPill>
   );
 }

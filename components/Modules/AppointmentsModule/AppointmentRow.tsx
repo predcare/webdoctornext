@@ -1,87 +1,146 @@
 'use client';
 
-import AppointmentStatusBadge from '@/components/commons/AppointmentStatusBadge/AppointmentStatusBadge';
 import { InPersonIcon, VideoIcon } from '@/components/ui/Icons/appointments';
-import { appointmentToday, type DashboardAppointment } from '@/resources/mock';
+import {
+  _toTitleCase,
+  getAppointmentStatusColors,
+  getAppointmentTypeColors,
+  getInitials,
+} from '@/lib/commons/common.utils';
 import { avatarTone } from '@/utils/avatarTone';
-import { formatClock } from '@/utils/formatClock';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Box, Button, IconButton, TableCell, TableRow, Typography } from '@mui/material';
-import { memo, type MouseEvent } from 'react';
-
-const scheduleLabel = (row: DashboardAppointment) => {
-  const day = row.dateValue === appointmentToday ? 'Today' : row.date;
-  return `${day}, ${formatClock(row.startTime)}`;
-};
+import {
+  Avatar,
+  Box,
+  Button,
+  IconButton,
+  TableCell,
+  TableRow,
+  Typography,
+} from '@mui/material';
+import { memo, useMemo, type MouseEvent } from 'react';
 
 type AppointmentRowProps = {
-  row: DashboardAppointment;
-  onOpenMenu: (anchor: HTMLElement, id: string) => void;
+  onOpenMenu: (anchor: HTMLElement) => void;
+  patientName: string;
+  patientImage?: string;
+  patientCode: string;
+  gender: string;
+  age: string;
+  appointmentId: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  appointmentStatus: string;
+  appointmentType: string;
 };
 
-function AppointmentRow({ row, onOpenMenu }: AppointmentRowProps) {
-  const isVideo = row.visitType === 'video';
+function AppointmentRow({
+  onOpenMenu,
+  patientName,
+  patientImage,
+  patientCode,
+  gender,
+  age,
+  appointmentId,
+  appointmentDate,
+  appointmentTime,
+  appointmentStatus,
+  appointmentType,
+}: AppointmentRowProps) {
+  const { isVideo, patientInitial } = useMemo(() => {
+    const isVideo = appointmentType?.toLowerCase().trim() === 'video';
+    const patientInitial = getInitials(patientName);
+    return {
+      isVideo,
+      patientInitial,
+    };
+  }, [appointmentDate, appointmentTime]);
+  const typeColors = getAppointmentTypeColors(appointmentType);
+  const statusColors = getAppointmentStatusColors(appointmentStatus);
 
   return (
     <TableRow>
       <TableCell className="col-fit">
         <Box className="patient-cell">
-          <Box className={`patient-avatar ${avatarTone(row.initial)}`}>{row.initial}</Box>
+          <Avatar
+            src={patientImage || undefined}
+            alt={patientName}
+            className={`patient-avatar ${avatarTone(patientInitial)}`}
+          >
+            {patientInitial}
+          </Avatar>
           <Box className="patient-copy">
             <Box className="patient-name-row">
-              <Typography component="p" className="patient-name">
-                {row.name}
+              <Typography
+                component="p"
+                className="patient-name"
+                title={patientName}
+              >
+                {patientName}
               </Typography>
-              {row.instant ? (
-                <Typography component="span" className="instant-chip">
-                  Instant
-                </Typography>
-              ) : null}
             </Box>
             <Typography component="p" className="patient-meta">
-              {row.gender}, {row.age} · #{row.patientCode}
+              {gender}, {age} · #{patientCode}
             </Typography>
           </Box>
         </Box>
       </TableCell>
       <TableCell className="col-fit">
-        <Box className={`modality-pill ${isVideo ? 'video' : 'in-person'}`}>
+        <Box
+          className="modality-pill"
+          style={{ color: typeColors.txt, backgroundColor: typeColors.bg }}
+        >
           {isVideo ? <VideoIcon size={14} /> : <InPersonIcon size={14} />}
-          {isVideo ? 'Telehealth' : 'In-Person'}
+          {_toTitleCase(appointmentType || '')}
         </Box>
       </TableCell>
       <TableCell>
         <Box className="stack-cell">
           <Typography component="p" className="cell-title">
-            {scheduleLabel(row)}
-          </Typography>
-          <Typography component="p" className="cell-note">
-            {row.scheduleNote}
+            {appointmentId}
           </Typography>
         </Box>
       </TableCell>
       <TableCell>
         <Box className="stack-cell">
           <Typography component="p" className="cell-title">
-            {row.specialist}
-          </Typography>
-          <Typography component="p" className="cell-note">
-            {row.specialty}
+            {appointmentDate}
           </Typography>
         </Box>
       </TableCell>
       <TableCell>
-        <AppointmentStatusBadge status={row.status} />
+        <Box className="stack-cell">
+          <Typography component="p" className="cell-title">
+            {appointmentTime}
+          </Typography>
+        </Box>
+      </TableCell>
+      <TableCell>
+        <Box
+          className="status-pill"
+          style={{ color: statusColors.txt, backgroundColor: statusColors.bg }}
+        >
+          {_toTitleCase(appointmentStatus || '')}
+        </Box>
       </TableCell>
       <TableCell>
         <Box className="row-actions">
-          <Button className="row-action join" size="small" variant="contained" disableElevation>
-            Join Now
-          </Button>
+          {isVideo && (
+            <Button
+              className="row-action join"
+              size="small"
+              variant="contained"
+              disableElevation
+            >
+              Join Now
+            </Button>
+          )}
           <IconButton
             size="small"
-            aria-label={`Actions for ${row.name}`}
-            onClick={(event: MouseEvent<HTMLButtonElement>) => onOpenMenu(event.currentTarget, row.id)}
+            aria-label={`Actions for ${patientName}`}
+            onClick={(event: MouseEvent<HTMLButtonElement>) =>
+              onOpenMenu(event.currentTarget)
+            }
           >
             <MoreVertIcon fontSize="small" />
           </IconButton>
