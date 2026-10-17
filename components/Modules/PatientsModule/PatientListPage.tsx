@@ -1,10 +1,6 @@
 'use client';
 
 import PageBreadcrumb from '@/components/commons/PageBreadcrumb/PageBreadcrumb';
-import {
-  defaultPatientFilters,
-  type PatientFilterState,
-} from '@/components/Modules/PatientsModule/patientFilters';
 import PatientListToolbar from '@/components/Modules/PatientsModule/PatientListToolbar';
 import PatientRow from '@/components/Modules/PatientsModule/PatientRow';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
@@ -29,9 +25,6 @@ const breadcrumbItems = [
 ];
 
 export default function PatientListPage() {
-  const [filters, setFilters] = useState<PatientFilterState>(
-    defaultPatientFilters,
-  );
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -53,26 +46,9 @@ export default function PatientListPage() {
     setPagination((current) => ({ ...current, ...patch }));
   }, []);
 
-  const handleFilterChange = useCallback(
-    (patch: Partial<PatientFilterState>) => {
-      setFilters((current) => ({ ...current, ...patch }));
-      if (patch.search !== undefined) {
-        updatePagination({ search: patch.search, page: 1 });
-      }
-    },
-    [updatePagination],
-  );
-
-  const handleClear = useCallback(() => {
-    setFilters(defaultPatientFilters);
-    updatePagination({ search: '', page: 1 });
-  }, [updatePagination]);
-
   const handleOpenMenu = useCallback((anchor: HTMLElement) => {
     setMenuAnchor(anchor);
   }, []);
-
-  const closeMenu = () => setMenuAnchor(null);
 
   return (
     <PatientListWrapper>
@@ -82,16 +58,15 @@ export default function PatientListPage() {
         headList={headList}
         customHeader={
           <PatientListToolbar
-            filters={filters}
-            onChange={handleFilterChange}
-            onClear={handleClear}
+            searchValue={pagination.search}
+            onSearchChange={(value) => {
+              updatePagination({ search: value, page: 1 });
+            }}
           />
         }
         page={pagination.page}
         totalPages={myPatients?.meta?.totalPages ?? 1}
         totalResults={myPatients?.meta?.total || 0}
-        searchValue={pagination.search}
-        onSearchChange={(value) => updatePagination({ search: value, page: 1 })}
         onPageChange={(nextPage) => updatePagination({ page: nextPage })}
         isLoading={myPatientPending}
         isEmpty={!myPatientPending && myPatients?.meta?.total === 0}
@@ -125,13 +100,13 @@ export default function PatientListPage() {
       <Menu
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
-        onClose={closeMenu}
+        onClose={() => setMenuAnchor(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MenuItem onClick={closeMenu}>View</MenuItem>
-        <MenuItem onClick={closeMenu}>Edit</MenuItem>
-        <MenuItem onClick={closeMenu}>Deactivate</MenuItem>
+        <MenuItem onClick={() => setMenuAnchor(null)}>View</MenuItem>
+        <MenuItem onClick={() => setMenuAnchor(null)}>Edit</MenuItem>
+        <MenuItem onClick={() => setMenuAnchor(null)}>Deactivate</MenuItem>
       </Menu>
     </PatientListWrapper>
   );

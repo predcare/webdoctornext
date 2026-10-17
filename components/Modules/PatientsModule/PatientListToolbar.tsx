@@ -8,6 +8,7 @@ import {
   type PatientFilterState,
   type PatientSort,
 } from '@/components/Modules/PatientsModule/patientFilters';
+import { useDebounce } from '@/hooks/commons/useDebounce';
 import { projectRoutes } from '@/routes';
 import { PatientFilterPopover } from '@/styles/CustomStyled/PatientListWrapper';
 import AddIcon from '@mui/icons-material/Add';
@@ -32,23 +33,46 @@ type DraftFilters = Pick<PatientFilterState, 'gender' | 'clinicStatus'>;
 const optionLabel = (value: string) => (value === 'all' ? 'All' : value);
 
 type PatientListToolbarProps = {
-  filters: PatientFilterState;
-  onChange: (patch: Partial<PatientFilterState>) => void;
-  onClear: () => void;
+  filters?: PatientFilterState;
+  onChange?: (patch: Partial<PatientFilterState>) => void;
+  onClear?: () => void;
+  searchDebounce?: number;
+  searchValue: string;
+  onSearchChange: (value: string) => void;
 };
 
-function PatientListToolbar({ filters, onChange, onClear }: PatientListToolbarProps) {
+function PatientListToolbar({
+  filters,
+  onChange,
+  onClear,
+  searchValue,
+  onSearchChange,
+  searchDebounce = 500,
+}: PatientListToolbarProps) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const [draft, setDraft] = useState<DraftFilters>({ gender: 'all', clinicStatus: 'all' });
-  const activeCount = activePatientFilterCount(filters);
+  const activeCount = filters ? activePatientFilterCount(filters) : 0;
 
+  const [localSearchValue, setLocalSearchValue] = useState(searchValue);
+
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalSearchValue(event.target.value);
+  };
+  useDebounce(localSearchValue, searchDebounce, () => {
+    if (onSearchChange) {
+      onSearchChange(localSearchValue);
+    }
+  });
   const openFilters = (event: MouseEvent<HTMLButtonElement>) => {
-    setDraft({ gender: filters.gender, clinicStatus: filters.clinicStatus });
-    setAnchor(event.currentTarget);
+    if (filters) {
+      setDraft({ gender: filters.gender, clinicStatus: filters.clinicStatus });
+      setAnchor(event.currentTarget);
+    }
   };
 
   const applyFilters = () => {
-    onChange(draft);
+    onChange?.(draft);
     setAnchor(null);
   };
 
@@ -59,8 +83,8 @@ function PatientListToolbar({ filters, onChange, onClear }: PatientListToolbarPr
           className="patient-search"
           size="small"
           placeholder="Search patients..."
-          value={filters.search}
-          onChange={(event) => onChange({ search: event.target.value })}
+          value={localSearchValue}
+          onChange={handleSearchChange}
           slotProps={{
             input: {
               startAdornment: (
@@ -73,30 +97,34 @@ function PatientListToolbar({ filters, onChange, onClear }: PatientListToolbarPr
         />
 
         <Box className="toolbar-actions">
-          <Badge className="filter-badge" badgeContent={activeCount} color="primary" invisible={activeCount === 0}>
-            <Button
-              className={`toolbar-btn filter-btn${activeCount ? ' active' : ''}`}
-              variant="outlined"
-              startIcon={<FilterListIcon fontSize="small" />}
-              onClick={openFilters}
-            >
-              Filters
-            </Button>
-          </Badge>
+          {filters && onChange && (
+            <>
+              <Badge className="filter-badge" badgeContent={activeCount} color="primary" invisible={activeCount === 0}>
+                <Button
+                  className={`toolbar-btn filter-btn${activeCount ? ' active' : ''}`}
+                  variant="outlined"
+                  startIcon={<FilterListIcon fontSize="small" />}
+                  onClick={openFilters}
+                >
+                  Filters
+                </Button>
+              </Badge>
 
-          <Select
-            className="toolbar-btn sort-select"
-            size="small"
-            value={filters.sort}
-            onChange={(event) => onChange({ sort: event.target.value as PatientSort })}
-            renderValue={(value) => `Sort By : ${sortOptions.find((option) => option.value === value)?.label}`}
-          >
-            {sortOptions.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </Select>
+              <Select
+                className="toolbar-btn sort-select"
+                size="small"
+                value={filters.sort}
+                onChange={(event) => onChange({ sort: event.target.value as PatientSort })}
+                renderValue={(value) => `Sort By : ${sortOptions.find((option) => option.value === value)?.label}`}
+              >
+                {sortOptions.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </>
+          )}
 
           <Button
             component={Link}
@@ -111,7 +139,7 @@ function PatientListToolbar({ filters, onChange, onClear }: PatientListToolbarPr
         </Box>
       </Box>
 
-      {activeCount > 0 ? (
+      {filters && onChange && onClear && activeCount > 0 ? (
         <Box className="active-filters">
           {filters.gender !== 'all' ? (
             <Chip
