@@ -5,7 +5,12 @@ import {
   CustomAutocompletePaper,
   CustomAutocompleteWrapper,
 } from '@/styles/CustomStyled/CustomAutocompleteWrapper';
-import { Autocomplete, Box, InputAdornment } from '@mui/material';
+import {
+  Autocomplete,
+  Box,
+  InputAdornment,
+  type AutocompleteInputChangeReason,
+} from '@mui/material';
 import { memo, type ReactNode } from 'react';
 
 type CustomAutocompleteProps<T> = {
@@ -25,7 +30,13 @@ type CustomAutocompleteProps<T> = {
   name?: string;
   className?: string;
   inputSize?: 'medium' | 'large';
+  onInputChange?: (
+    value: string,
+    reason: AutocompleteInputChangeReason,
+  ) => void;
 };
+
+const keepServerOptions = <T,>(options: T[]) => options;
 
 function CustomAutocomplete<T>({
   options,
@@ -44,6 +55,7 @@ function CustomAutocomplete<T>({
   name,
   className,
   inputSize = 'medium',
+  onInputChange,
 }: CustomAutocompleteProps<T>) {
   return (
     <CustomAutocompleteWrapper className={className} $inputSize={inputSize}>
@@ -56,6 +68,13 @@ function CustomAutocomplete<T>({
         onChange={(_event, next) => {
           onChange?.(next);
         }}
+        {...(onInputChange
+          ? {
+              onInputChange: (_event, next, reason) =>
+                onInputChange(next, reason),
+              filterOptions: keepServerOptions<T>,
+            }
+          : {})}
         getOptionLabel={getOptionLabel}
         isOptionEqualToValue={isOptionEqualToValue}
         disabled={disabled}

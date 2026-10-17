@@ -44,7 +44,6 @@ export default function RootLayout({
                 position="top-right"
                 richColors
                 expand={false}
-                closeButton
                 duration={2500}
                 toastOptions={{
                   style: {

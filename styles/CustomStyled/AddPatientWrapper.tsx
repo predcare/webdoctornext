@@ -136,6 +136,55 @@ export const AddPatientWrapper = styled(Box)`
     }
   }
 
+  .photo-preview {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .phone-hint {
+    &.is-valid {
+      color: ${({ theme }) => theme.palette.customColors.success};
+    }
+
+    &.is-invalid {
+      color: ${({ theme }) => theme.palette.customColors.error};
+    }
+  }
+
+  .summary-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid ${({ theme }) => theme.palette.customColors.border};
+
+    &:last-of-type {
+      border-bottom: none;
+    }
+  }
+
+  .summary-label {
+    font-size: 13px;
+    color: ${({ theme }) => theme.palette.customColors.textMuted};
+  }
+
+  .summary-value {
+    min-width: 0;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: right;
+    word-break: break-word;
+    color: ${({ theme }) => theme.palette.customColors.heading};
+  }
+
   .photo-copy {
     display: flex;
     flex-direction: column;
@@ -153,12 +202,6 @@ export const AddPatientWrapper = styled(Box)`
     margin: 0;
     font-size: 12px;
     color: ${({ theme }) => theme.palette.customColors.textMuted};
-  }
-
-  .existing-only.MuiGrid-root {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
   }
 
   .selected-user {

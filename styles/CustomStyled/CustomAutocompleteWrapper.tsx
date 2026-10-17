@@ -84,12 +84,46 @@ export const CustomAutocompletePaper = styled(Paper)`
     }
   }
 
+  .option-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .option-avatar {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    color: ${({ theme }) => theme.palette.common.white};
+    background: ${({ theme }) => theme.palette.customColors.brandTeal};
+  }
+
   .option-copy {
     display: flex;
     flex-direction: column;
     gap: 2px;
     min-width: 0;
     padding: 2px 0;
+  }
+
+  .option-tag {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 16px;
+    text-transform: capitalize;
+    vertical-align: middle;
+    color: ${({ theme }) => theme.palette.customColors.textMuted};
+    background: ${({ theme }) => theme.palette.customColors.pageBg};
   }
 
   .option-title {

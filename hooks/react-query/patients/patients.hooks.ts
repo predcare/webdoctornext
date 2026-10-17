@@ -28,7 +28,9 @@ export const useMyPatientList = (params?: IGetMyPatientsParams) =>
     queryFn: () => getMyPatientsList(params),
   });
 
-export const useMyPatientInfiniteList = (params?: Omit<IGetMyPatientsParams, 'page'>) =>
+export const useMyPatientInfiniteList = (
+  params?: Omit<IGetMyPatientsParams, 'page'>,
+) =>
   useInfiniteQuery({
     queryKey: [PatientsQueryKeys.PatientsList, 'infinite', params],
     queryFn: ({ pageParam = 1 }) =>
@@ -38,7 +40,7 @@ export const useMyPatientInfiniteList = (params?: Omit<IGetMyPatientsParams, 'pa
         limit: params?.limit ?? 15,
       }),
     initialPageParam: 1,
-    getNextPageParam: lastPage => {
+    getNextPageParam: (lastPage) => {
       if (lastPage?.meta?.hasNextPage) {
         return (lastPage?.meta?.page || 1) + 1;
       }
@@ -55,7 +57,8 @@ export const useDeletePatient = () => {
 export const useLinkExistingPatient = () => {
   return useMutation({
     mutationKey: [PatientsQueryKeys.LinkExisting],
-    mutationFn: (payload: ILinkExistingPatientPayload) => linkExistingPatient(payload),
+    mutationFn: (payload: ILinkExistingPatientPayload) =>
+      linkExistingPatient(payload),
   });
 };
 
@@ -71,7 +74,7 @@ export const useMyPatientInfo = (params?: { patientId?: number | string }) =>
     queryKey: [PatientsQueryKeys.PatientInfo, params],
     queryFn: () => getMyPatientsInfo(params?.patientId!),
     enabled: !!params?.patientId,
-    select: v => (!v?.data ? null : v.data),
+    select: (v) => (!v?.data ? null : v.data),
   });
 
 export const useMyPatientEmrs = (params?: { patientId?: number | string }) =>
@@ -79,18 +82,20 @@ export const useMyPatientEmrs = (params?: { patientId?: number | string }) =>
     queryKey: [PatientsQueryKeys.EmrRecords, params],
     queryFn: () => getMyPatientsEmrs(params?.patientId!),
     enabled: !!params?.patientId,
-    select: v => {
+    select: (v) => {
       if (Array.isArray(v?.data)) return v.data;
       return [];
     },
   });
 
-export const useMyPatientPrescriptions = (params?: { patientId?: number | string }) =>
+export const useMyPatientPrescriptions = (params?: {
+  patientId?: number | string;
+}) =>
   useQuery({
     queryKey: [PatientsQueryKeys.Prescriptions, params],
     queryFn: () => getMyPatientsPrescriptions(params?.patientId!),
     enabled: !!params?.patientId,
-    select: v => {
+    select: (v) => {
       if (Array.isArray(v)) return v;
       if (Array.isArray(v?.data)) return v.data;
       return [];
@@ -139,7 +144,9 @@ export const useMyPatientConsults = (params: {
     enabled: !!params?.patientId,
   });
 
-export const useMyPatientInfiniteConsults = (params: IGetMyPatientConsultsInfiniteParams) =>
+export const useMyPatientInfiniteConsults = (
+  params: IGetMyPatientConsultsInfiniteParams,
+) =>
   useInfiniteQuery({
     queryKey: [PatientsQueryKeys.MyConsults, 'infinite', params],
     queryFn: ({ pageParam = 1 }) =>
@@ -149,7 +156,7 @@ export const useMyPatientInfiniteConsults = (params: IGetMyPatientConsultsInfini
         limit: params?.limit ?? 10,
       }),
     initialPageParam: 1,
-    getNextPageParam: lastPage => {
+    getNextPageParam: (lastPage) => {
       if (lastPage?.meta?.hasNextPage) {
         return (lastPage?.meta?.page || 1) + 1;
       }
@@ -157,12 +164,14 @@ export const useMyPatientInfiniteConsults = (params: IGetMyPatientConsultsInfini
     },
     enabled: !!params?.patientId,
   });
-export const useMyPatientFamilyMembers = (params?: { patientId?: number | string }) =>
+export const useMyPatientFamilyMembers = (params?: {
+  patientId?: number | string;
+}) =>
   useQuery({
     queryKey: [PatientsQueryKeys.FamilyMembers, params],
     queryFn: () => getPatientsFamilyMembers(params?.patientId!),
     enabled: !!params?.patientId,
-    select: v => {
+    select: (v) => {
       if (Array.isArray(v)) return v;
       if (Array.isArray(v?.data)) return v.data;
       return [];
@@ -184,5 +193,6 @@ export const useGetAllPatients = (params?: {
   useQuery({
     queryKey: [PatientsQueryKeys.ALL_PATIENTS, params],
     queryFn: () => getAllPatients(params),
-    enabled: !!params?.user_type && Boolean(params?.search && params?.search?.length >= 3),
+    enabled:
+      !!params?.user_type && !!params?.search && params?.search?.length >= 3,
   });
