@@ -1,6 +1,9 @@
 'use client';
 
 import AppointmentStatusBadge from '@/components/commons/AppointmentStatusBadge/AppointmentStatusBadge';
+import CustomActionMenu, {
+    CustomActionMenuTrigger,
+} from '@/components/ui/CustomActionMenu/CustomActionMenu';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
 import { AppointmentsIcon } from '@/components/ui/Icons/dashboard';
 import StatCard from '@/components/ui/StatCard/StatCard';
@@ -10,18 +13,10 @@ import {
     dashboardStats,
 } from '@/resources/mock';
 import { projectRoutes } from '@/routes';
+import { useActionMenu } from '@/hooks/commons/useActionMenu';
 import { DashboardStatsGrid } from '@/styles/CustomStyled/StatCardWrapper';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import {
-    Box,
-    Button,
-    IconButton,
-    Menu,
-    MenuItem,
-    TableCell,
-    TableRow,
-    Typography,
-} from '@mui/material';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { Box, Button, TableCell, TableRow, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
@@ -36,7 +31,7 @@ const headList = [
 
 export default function DashboardModulePage() {
     const statIcons = useStatIcons();
-    const [actionAnchor, setActionAnchor] = useState<HTMLElement | null>(null);
+    const actionMenu = useActionMenu();
     const [search, setSearch] = useState('');
     const appointments = useMemo(() => {
         const query = search.trim().toLowerCase();
@@ -259,28 +254,23 @@ export default function DashboardModulePage() {
                                 >
                                     Start Consultation
                                 </Button>
-                                <IconButton
-                                    size="small"
+                                <CustomActionMenuTrigger
                                     aria-label={`Actions for ${row.name}`}
-                                    onClick={(event) => setActionAnchor(event.currentTarget)}
-                                >
-                                    <MoreVertIcon fontSize="small" />
-                                </IconButton>
+                                    onClick={(event) => actionMenu.open(event.currentTarget)}
+                                />
                             </Box>
                         </TableCell>
                     </TableRow>
                 ))}
             </CustomTable>
 
-            <Menu
-                anchorEl={actionAnchor}
-                open={Boolean(actionAnchor)}
-                onClose={() => setActionAnchor(null)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
-                <MenuItem onClick={() => setActionAnchor(null)}>View</MenuItem>
-            </Menu>
+            <CustomActionMenu
+                anchorEl={actionMenu.anchorEl}
+                onClose={actionMenu.close}
+                items={[
+                    { key: 'view', label: 'View', icon: <VisibilityOutlinedIcon /> },
+                ]}
+            />
         </Box>
     );
 }

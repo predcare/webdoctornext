@@ -29,7 +29,7 @@ export const useMyInfiniteAppointments = (params: IMyApptQueryParams) =>
         limit: params?.limit ?? 15,
       }),
     initialPageParam: 1,
-    getNextPageParam: lastPage => {
+    getNextPageParam: (lastPage) => {
       if (lastPage?.meta?.hasNextPage) {
         return (lastPage?.meta?.page || 1) + 1;
       }
@@ -41,7 +41,7 @@ export const useMyAppointmentStats = (params?: { date?: string }) =>
   useQuery({
     queryKey: [MyAppointmentsQueryKeys.MyAppointmentsStats, params],
     queryFn: () => getMyAppointmentStats(params),
-    select: v => v.data,
+    select: (v) => v.data,
   });
 
 export const useApptToken = (params?: { appointmentId?: number | string }) =>
@@ -76,7 +76,7 @@ export const useMyAppointmentInfo = (params?: { id?: number | string }) =>
     queryKey: [MyAppointmentsQueryKeys.MyAppointmentsInfo, params],
     queryFn: () => getMyAppointmentInfo(params?.id!),
     enabled: !!params?.id,
-    select: v => {
+    select: (v) => {
       if (v) return v?.data;
       return null;
     },
@@ -97,5 +97,6 @@ export const useSaveCall = () =>
 
 export const useSaveCalled = () =>
   useMutation({
-    mutationFn: (params?: { body?: ISaveCallPayload }) => saveCall(params?.body!),
+    mutationFn: (params?: { body?: ISaveCallPayload }) =>
+      saveCall(params?.body!),
   });

@@ -12,15 +12,21 @@ import { memo } from 'react';
 
 type PatientSummaryCardProps = {
   details: AppointmentDetails;
+  patientName: string;
+  patientCode: string;
+  gender: string;
+  age: string;
+  phone: string;
+  email: string;
+  city: string;
+  bloodType: string;
+  onProfileView?: () => void;
 };
 
-function PatientSummaryCard({ details }: PatientSummaryCardProps) {
-  const gender = details.gender === 'F' ? 'Female' : 'Male';
+function PatientSummaryCard({ details, patientName, patientCode, gender, age, phone, email, bloodType, city, onProfileView }: PatientSummaryCardProps) {
   const metaFields = [
-    { label: 'Blood Type', value: details.bloodType },
-    { label: 'Last Visit', value: details.lastVisit },
-    { label: 'Registered', value: details.registered },
-    { label: 'City', value: details.city },
+    { label: 'Blood Type', value: bloodType },
+    { label: 'City', value: city },
   ];
 
   return (
@@ -31,24 +37,24 @@ function PatientSummaryCard({ details }: PatientSummaryCardProps) {
           <Box className="patient-head-copy">
             <Box className="patient-title-row">
               <Typography component="h2" className="patient-title">
-                {details.name}
+                {patientName}
               </Typography>
               <Typography component="span" className="code-chip">
-                #{details.patientCode}
+                #{patientCode}
               </Typography>
             </Box>
             <Box className="patient-contact">
               <Typography component="span" className="contact-pill">
                 <PersonOutlinedIcon fontSize="inherit" />
-                {gender}, {details.age}y
+                {gender}, {age}
               </Typography>
               <Typography component="span" className="contact-pill">
                 <PhoneOutlinedIcon fontSize="inherit" />
-                {details.phone}
+                {phone}
               </Typography>
               <Typography component="span" className="contact-pill">
                 <MailOutlinedIcon fontSize="inherit" />
-                {details.email}
+                {email}
               </Typography>
             </Box>
           </Box>
@@ -57,6 +63,8 @@ function PatientSummaryCard({ details }: PatientSummaryCardProps) {
             variant="outlined"
             size="small"
             startIcon={<OpenInNewIcon fontSize="inherit" />}
+            onClick={onProfileView}
+            type='button'
           >
             View Profile
           </Button>

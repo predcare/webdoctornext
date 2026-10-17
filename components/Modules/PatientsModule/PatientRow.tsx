@@ -1,20 +1,13 @@
 'use client';
 
 import StatusChip from '@/components/commons/StatusChip/StatusChip';
+import { CustomActionMenuTrigger } from '@/components/ui/CustomActionMenu/CustomActionMenu';
 import { getInitials } from '@/lib/commons/common.utils';
 import { projectRoutes } from '@/routes';
 import { avatarTone } from '@/utils/avatarTone';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import {
-  Avatar,
-  Box,
-  IconButton,
-  TableCell,
-  TableRow,
-  Typography,
-} from '@mui/material';
+import { Avatar, Box, TableCell, TableRow, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { memo, type MouseEvent } from 'react';
+import { memo } from 'react';
 
 type PatientRowProps = {
   name: string;
@@ -80,16 +73,13 @@ function PatientRow({
         <StatusChip status={userStatus as 'Active' | 'Inactive'} />
       </TableCell>
       <TableCell align="center">
-        <IconButton
-          className="row-menu"
-          size="small"
+        <CustomActionMenuTrigger
           aria-label={`Actions for ${name}`}
-          onClick={(event: MouseEvent<HTMLButtonElement>) =>
-            onOpenMenu(event.currentTarget, patientCode)
-          }
-        >
-          <MoreVertIcon fontSize="small" />
-        </IconButton>
+          onClick={(event) => {
+            event.stopPropagation();
+            onOpenMenu(event.currentTarget, patientCode);
+          }}
+        />
       </TableCell>
     </TableRow>
   );

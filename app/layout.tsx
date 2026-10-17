@@ -1,5 +1,6 @@
 import GlobalBackdropLoader from '@/components/commons/BackdropLoader/GlobalBackdropLoader';
 import EventListener from '@/components/commons/EventListener/EventListener';
+import GlobalPopupAlert from '@/components/commons/PopupAlert/GlobalPopupAlert';
 import ReactQueryProvider from '@/components/Providers/ReactQueryProvider';
 import ProjectThemeProvider from '@/themes/ProjectThemeProvider';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
@@ -39,6 +40,7 @@ export default function RootLayout({
             <ReactQueryProvider>
               {children}
               <GlobalBackdropLoader />
+              <GlobalPopupAlert />
               <EventListener />
               <Toaster
                 position="top-right"

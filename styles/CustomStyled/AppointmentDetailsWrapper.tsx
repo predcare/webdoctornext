@@ -99,6 +99,33 @@ export const AppointmentDetailsWrapper = styled(Box)`
     padding: 24px;
   }
 
+  .skeleton-stack {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .skeleton-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .skeleton-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 10px;
+    background: ${({ theme }) => theme.palette.customColors.pageBg};
+  }
+
+  .MuiSkeleton-root {
+    background-color: ${({ theme }) => theme.palette.customColors.border};
+  }
+
   .card-foot {
     padding: 12px 24px;
     border-top: 1px solid ${({ theme }) => theme.palette.customColors.border};
@@ -238,6 +265,31 @@ export const AppointmentDetailsWrapper = styled(Box)`
   }
 
   /* Pills */
+  .info-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 26px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &.neutral {
+      color: ${({ theme }) => theme.palette.customColors.textSecondary};
+      background: ${({ theme }) => theme.palette.customColors.pageBg};
+      border: 1px solid ${({ theme }) => theme.palette.customColors.border};
+    }
+
+    &.fee-type {
+      height: 22px;
+      margin-left: 8px;
+      padding: 0 8px;
+      font-size: 11px;
+    }
+  }
+
   .time-pill,
   .payment-pill,
   .frequency-pill {

@@ -1,5 +1,6 @@
 'use client';
 
+import { CustomActionMenuTrigger } from '@/components/ui/CustomActionMenu/CustomActionMenu';
 import {
   CalendarIcon,
   InPersonIcon,
@@ -9,9 +10,8 @@ import {
   AvailabilityRecord,
   formatAvailabilityDate,
 } from '@/resources/mock/availability';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Box, IconButton, TableCell, TableRow } from '@mui/material';
-import { memo, type MouseEvent } from 'react';
+import { Box, TableCell, TableRow } from '@mui/material';
+import { memo } from 'react';
 
 const modeLabel = {
   specific: 'Specific Dates',
@@ -83,16 +83,10 @@ function AvailabilityRow({ row, onOpenMenu }: AvailabilityRowProps) {
         </Box>
       </TableCell>
       <TableCell align="right">
-        <IconButton
-          className="row-menu"
-          size="small"
+        <CustomActionMenuTrigger
           aria-label="Availability actions"
-          onClick={(event: MouseEvent<HTMLButtonElement>) =>
-            onOpenMenu(event.currentTarget, row.id)
-          }
-        >
-          <MoreVertIcon fontSize="small" />
-        </IconButton>
+          onClick={(event) => onOpenMenu(event.currentTarget, row.id)}
+        />
       </TableCell>
     </TableRow>
   );

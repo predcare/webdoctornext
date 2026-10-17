@@ -11,11 +11,13 @@ import AvailabilityRow from '@/components/Modules/AvailabilityModule/Availabilit
 import AvailabilityToolbar, {
   AvailabilityActiveFilters,
 } from '@/components/Modules/AvailabilityModule/AvailabilityToolbar';
+import CustomActionMenu from '@/components/ui/CustomActionMenu/CustomActionMenu';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
+import { useActionMenu } from '@/hooks/commons/useActionMenu';
 import { availabilitySlots } from '@/resources/mock/availability';
 import { projectRoutes } from '@/routes';
 import { AvailabilityListWrapper } from '@/styles/CustomStyled/AvailabilityListWrapper';
-import { Menu, MenuItem } from '@mui/material';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { useCallback, useMemo, useState } from 'react';
 
 const headList = [
@@ -37,8 +39,7 @@ export default function AvailabilityListPage() {
   const [filters, setFilters] = useState<AvailabilityFilterState>(
     defaultAvailabilityFilters,
   );
-  const [actionAnchor, setActionAnchor] = useState<HTMLElement | null>(null);
-  const [actionRowId, setActionRowId] = useState<string | null>(null);
+  const actionMenu = useActionMenu();
 
   const visibleRows = useMemo(
     () => filterAvailability(rows, filters),
@@ -63,17 +64,11 @@ export default function AvailabilityListPage() {
     }));
   }, []);
 
-  const handleOpenMenu = useCallback((anchor: HTMLElement, id: string) => {
-    setActionAnchor(anchor);
-    setActionRowId(id);
-  }, []);
-
   const handleDelete = () => {
-    if (actionRowId) {
-      setRows((current) => current.filter((row) => row.id !== actionRowId));
+    const rowId = actionMenu.activeId;
+    if (rowId) {
+      setRows((current) => current.filter((row) => row.id !== rowId));
     }
-    setActionAnchor(null);
-    setActionRowId(null);
   };
 
   return (
@@ -111,19 +106,23 @@ export default function AvailabilityListPage() {
         }
       >
         {visibleRows.map((row) => (
-          <AvailabilityRow key={row.id} row={row} onOpenMenu={handleOpenMenu} />
+          <AvailabilityRow key={row.id} row={row} onOpenMenu={actionMenu.open} />
         ))}
       </CustomTable>
 
-      <Menu
-        anchorEl={actionAnchor}
-        open={Boolean(actionAnchor)}
-        onClose={() => setActionAnchor(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <MenuItem onClick={handleDelete}>Delete</MenuItem>
-      </Menu>
+      <CustomActionMenu
+        anchorEl={actionMenu.anchorEl}
+        onClose={actionMenu.close}
+        items={[
+          {
+            key: 'delete',
+            label: 'Delete',
+            icon: <DeleteOutlineIcon />,
+            tone: 'danger',
+            onClick: handleDelete,
+          },
+        ]}
+      />
     </AvailabilityListWrapper>
   );
 }

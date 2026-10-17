@@ -1,6 +1,8 @@
 'use client';
 
+import { CustomActionMenuTrigger } from '@/components/ui/CustomActionMenu/CustomActionMenu';
 import { InPersonIcon, VideoIcon } from '@/components/ui/Icons/appointments';
+import InfoTooltip from '@/components/ui/InfoTooltip/InfoTooltip';
 import {
   _toTitleCase,
   getAppointmentStatusColors,
@@ -8,20 +10,17 @@ import {
   getInitials,
 } from '@/lib/commons/common.utils';
 import { avatarTone } from '@/utils/avatarTone';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import {
-  Avatar,
-  Box,
-  Button,
-  IconButton,
-  TableCell,
-  TableRow,
-  Typography,
-} from '@mui/material';
-import { memo, useMemo, type MouseEvent } from 'react';
+import MedicalServicesOutlinedIcon from '@mui/icons-material/MedicalServicesOutlined';
+import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
+import { Avatar, Box, TableCell, TableRow, Typography } from '@mui/material';
+import { memo, useMemo } from 'react';
+
+const IN_PROGRESS_STATUSES = ['in_progress', 'in-progress', 'inprogress'];
 
 type AppointmentRowProps = {
   onOpenMenu: (anchor: HTMLElement) => void;
+  onJoinCall?: () => void;
+  onStartConsultation?: () => void;
   patientName: string;
   patientImage?: string;
   patientCode: string;
@@ -36,6 +35,8 @@ type AppointmentRowProps = {
 
 function AppointmentRow({
   onOpenMenu,
+  onJoinCall,
+  onStartConsultation,
   patientName,
   patientImage,
   patientCode,
@@ -54,9 +55,12 @@ function AppointmentRow({
       isVideo,
       patientInitial,
     };
-  }, [appointmentDate, appointmentTime]);
+  }, [appointmentType, patientName]);
   const typeColors = getAppointmentTypeColors(appointmentType);
   const statusColors = getAppointmentStatusColors(appointmentStatus);
+  const normalizedStatus = appointmentStatus?.toLowerCase().trim() ?? '';
+  const isInProgress = IN_PROGRESS_STATUSES.includes(normalizedStatus);
+  const canStart = isInProgress || normalizedStatus === 'confirmed';
 
   return (
     <TableRow>
@@ -123,27 +127,32 @@ function AppointmentRow({
           {_toTitleCase(appointmentStatus || '')}
         </Box>
       </TableCell>
-      <TableCell>
+      <TableCell className="col-fit">
         <Box className="row-actions">
-          {isVideo && (
-            <Button
-              className="row-action join"
-              size="small"
-              variant="contained"
-              disableElevation
-            >
-              Join Now
-            </Button>
+          {canStart && isVideo && (
+            <InfoTooltip
+              content={isInProgress ? 'Rejoin Call' : 'Join Video Call'}
+              ariaLabel={`${isInProgress ? 'Rejoin call' : 'Join video call'} with ${patientName}`}
+              className={`action-icon ${isInProgress ? 'rejoin' : 'join'}`}
+              onClick={onJoinCall}
+              icon={<VideocamOutlinedIcon />}
+            />
           )}
-          <IconButton
-            size="small"
-            aria-label={`Actions for ${patientName}`}
-            onClick={(event: MouseEvent<HTMLButtonElement>) =>
-              onOpenMenu(event.currentTarget)
-            }
-          >
-            <MoreVertIcon fontSize="small" />
-          </IconButton>
+          {canStart && !isVideo && (
+            <InfoTooltip
+              content={
+                isInProgress ? 'Continue Consultation' : 'Start Consultation'
+              }
+              ariaLabel={`${isInProgress ? 'Continue' : 'Start'} consultation with ${patientName}`}
+              className={`action-icon consult ${isInProgress ? 'live' : ''}`}
+              onClick={onStartConsultation}
+              icon={<MedicalServicesOutlinedIcon />}
+            />
+          )}
+          <CustomActionMenuTrigger
+            aria-label={`More actions for ${patientName}`}
+            onClick={(event) => onOpenMenu(event.currentTarget)}
+          />
         </Box>
       </TableCell>
     </TableRow>

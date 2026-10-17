@@ -1,66 +1,83 @@
 'use client';
 
 import {
-  CancelledIcon,
   CompletedIcon,
   ConfirmedIcon,
+  InProgressIcon,
 } from '@/components/ui/Icons/appointments';
 import { AppointmentsIcon } from '@/components/ui/Icons/dashboard';
-import StatCard from '@/components/ui/StatCard/StatCard';
-import { appointmentToday, type DashboardAppointment } from '@/resources/mock';
+import StatCard, { type StatCardTone } from '@/components/ui/StatCard/StatCard';
+import { useMyAppointmentStats } from '@/hooks/react-query/appointments/appointments.hooks';
 import { DashboardStatsGrid } from '@/styles/CustomStyled/StatCardWrapper';
-import { memo, useMemo } from 'react';
+import type { IMyApptStatus } from '@/typescripts/interfaces/appointments.interfaces';
+import { memo, type ReactNode } from 'react';
 
-type AppointmentSummaryCardsProps = {
-  appointments: DashboardAppointment[];
-};
+type TStatKey = Exclude<keyof IMyApptStatus, 'date'>;
 
-const countSummary = (appointments: DashboardAppointment[]) => {
-  const upcoming = appointments.filter(
-    (row) =>
-      (row.status === 'Confirmed' || row.status === 'In Progress') &&
-      row.dateValue >= appointmentToday,
-  ).length;
+const statCards: {
+  key: TStatKey;
+  title: string;
+  period?: string;
+  tone: StatCardTone;
+  icon: ReactNode;
+}[] = [
+    {
+      key: 'today_count',
+      title: 'Today',
+      period: 'Appointments',
+      tone: 'teal',
+      icon: <AppointmentsIcon size={20} />,
+    },
+    {
+      key: 'total_appointments',
+      title: 'Total',
+      tone: 'info',
+      icon: <AppointmentsIcon size={20} />,
+    },
+    {
+      key: 'confirmed_count',
+      title: 'Confirmed',
+      tone: 'teal',
+      icon: <ConfirmedIcon size={20} />,
+    },
+    {
+      key: 'in_progress_count',
+      title: 'In Progress',
+      tone: 'info',
+      icon: <InProgressIcon size={20} />,
+    },
+    {
+      key: 'completed_count',
+      title: 'Completed',
+      tone: 'success',
+      icon: <CompletedIcon size={20} />,
+    },
+  ];
 
-  return {
-    today: appointments.filter((row) => row.dateValue === appointmentToday)
-      .length,
-    total: appointments.length,
-    upcoming,
-    completed: appointments.filter((row) => row.status === 'Completed').length,
-    cancelled: appointments.filter((row) => row.status === 'Cancelled').length,
-  };
-};
+function AppointmentSummaryCards() {
+  const { data: apptStats } = useMyAppointmentStats();
 
-function AppointmentSummaryCards({
-  appointments,
-}: AppointmentSummaryCardsProps) {
-  const summary = useMemo(() => countSummary(appointments), [appointments]);
-  const icons = useMemo(
-    () => ({
-      today: <AppointmentsIcon size={20} />,
-      total: <AppointmentsIcon size={20} />,
-      upcoming: <ConfirmedIcon size={20} />,
-      completed: <CompletedIcon size={20} />,
-      cancelled: <CancelledIcon size={20} />,
-    }),
-    [],
+  if (!apptStats) return null;
+
+  const visibleCards = statCards.filter(
+    (card) => typeof apptStats[card.key] === 'number',
   );
+
+  if (visibleCards.length === 0) return null;
 
   return (
     <DashboardStatsGrid className="fit-row">
-      <StatCard
-        compact
-        title="Today"
-        value={String(summary.today)}
-        period="Appointments"
-        tone="teal"
-        icon={icons.today}
-      />
-      <StatCard compact title="Total" value={String(summary.total)} tone="info" icon={icons.total} />
-      <StatCard compact title="Upcoming" value={String(summary.upcoming)} tone="teal" icon={icons.upcoming} />
-      <StatCard compact title="Completed" value={String(summary.completed)} tone="success" icon={icons.completed} />
-      <StatCard compact title="Cancelled" value={String(summary.cancelled)} tone="warning" icon={icons.cancelled} />
+      {visibleCards.map((card) => (
+        <StatCard
+          key={card.key}
+          compact
+          title={card.title}
+          value={String(apptStats[card.key])}
+          period={card.period}
+          tone={card.tone}
+          icon={card.icon}
+        />
+      ))}
     </DashboardStatsGrid>
   );
 }

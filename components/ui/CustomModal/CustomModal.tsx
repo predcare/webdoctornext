@@ -526,6 +526,36 @@ export const MuiModalWrapperStyled = styled(Dialog)`
     }
   }
 
+  /* ─── Popup Alert (global confirm / alerts) ──────────── */
+  &.popupAlertModal {
+    .MuiBackdrop-root {
+      background-color: rgba(15, 23, 42, 0.55);
+    }
+
+    .MuiDialog-paper {
+      width: 100%;
+      max-width: 400px;
+      height: initial;
+      margin: 20px auto;
+      border: none;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 16px 28px rgba(15, 23, 42, 0.2);
+    }
+
+    .MuiDialogContent-root {
+      padding: 0;
+    }
+
+    @media (max-width: 599px) {
+      .MuiDialog-paper {
+        max-width: calc(100% - 32px);
+        margin: 16px;
+        border-radius: 20px;
+      }
+    }
+  }
+
   /* ─── Policy Viewer Modal ────────────────────────────── */
   &.policyViewerModal {
     .MuiDialog-paper {

@@ -223,14 +223,6 @@ export const PatientListWrapper = styled(Box)`
     color: ${({ theme }) => theme.palette.customColors.textMuted};
   }
 
-  .row-menu.MuiIconButton-root {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    border: 1px solid ${({ theme }) => theme.palette.customColors.border};
-    color: ${({ theme }) => theme.palette.customColors.textSecondary};
-  }
-
   ${({ theme }) => theme.breakpoints.down('md')} {
     .patient-search {
       width: 100%;

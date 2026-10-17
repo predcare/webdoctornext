@@ -235,10 +235,6 @@ export const AvailabilityListWrapper = styled(Box)`
     white-space: nowrap;
   }
 
-  .row-menu.MuiIconButton-root {
-    color: ${({ theme }) => theme.palette.customColors.textMuted};
-  }
-
   ${({ theme }) => theme.breakpoints.down('sm')} {
     .list-actions {
       width: 100%;

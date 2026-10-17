@@ -448,7 +448,7 @@ const PredDatePickerWrapper = styled(Box)(({ theme }) => ({
         alignItems: 'center',
         padding: '0 4px',
         cursor: 'pointer',
-        scrollSnapAlign: 'start',
+        scrollSnapAlign: 'center',
         userSelect: 'none',
     },
 

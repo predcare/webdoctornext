@@ -1,22 +1,31 @@
 'use client';
 
 import PageBreadcrumb from '@/components/commons/PageBreadcrumb/PageBreadcrumb';
-import AppointmentFilters, {
-  defaultAppointmentFilters,
-  filterAppointments,
+import AppointmentFilters from '@/components/Modules/AppointmentsModule/AppointmentFilters';
+import {
+  buildAppointmentQueryParams,
+  defaultAppointmentFilterStates,
   hasActiveAppointmentFilters,
-  type AppointmentFilterState,
-} from '@/components/Modules/AppointmentsModule/AppointmentFilters';
+  type FilterStates,
+} from '@/components/Modules/AppointmentsModule/appointmentFilterStates';
 import AppointmentRow from '@/components/Modules/AppointmentsModule/AppointmentRow';
 import AppointmentSummaryCards from '@/components/Modules/AppointmentsModule/AppointmentSummaryCards';
+import CustomActionMenu from '@/components/ui/CustomActionMenu/CustomActionMenu';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
+import { useActionMenu } from '@/hooks/commons/useActionMenu';
+import { useDebounce } from '@/hooks/commons/useDebounce';
 import { useMyAppointments } from '@/hooks/react-query/appointments/appointments.hooks';
-import { _toTitleCase, formatDate, formatTimeSlot, getAge } from '@/lib/commons/common.utils';
-import { dashboardAppointments } from '@/resources/mock';
+import {
+  _toTitleCase,
+  formatDate,
+  formatTimeSlot,
+  getAge,
+} from '@/lib/commons/common.utils';
+import { showInDevelopment } from '@/lib/commons/toast';
 import { projectRoutes } from '@/routes';
 import { AppointmentListWrapper } from '@/styles/CustomStyled/AppointmentListWrapper';
-import { Button, Menu, MenuItem } from '@mui/material';
-import Link from 'next/link';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -37,32 +46,35 @@ const breadcrumbItems = [
 
 export default function AppointmentListPage() {
   const router = useRouter();
-  const [actionAnchor, setActionAnchor] = useState<HTMLElement | null>(null);
-  const [actionRowId, setActionRowId] = useState<string | null>(null);
-  const [filters, setFilters] = useState<AppointmentFilterState>(
-    defaultAppointmentFilters,
+  const actionMenu = useActionMenu();
+  const [filterStates, setFilterStates] = useState<FilterStates>(
+    defaultAppointmentFilterStates,
   );
-  const appointments = useMemo(
-    () => filterAppointments(dashboardAppointments, filters),
-    [filters],
+  const [page, setPage] = useState(1);
+  const debounceSearch = useDebounce(filterStates.search.trim(), 500);
+
+  const updateFilterState = useCallback((updates: Partial<FilterStates>) => {
+    setFilterStates((prev) => ({
+      ...prev,
+      ...updates,
+    }));
+    setPage(1);
+  }, []);
+
+  const handleResetFilters = useCallback(() => {
+    setFilterStates(defaultAppointmentFilterStates);
+    setPage(1);
+  }, []);
+
+  const queryParams = useMemo(
+    () => buildAppointmentQueryParams(filterStates, debounceSearch, page),
+    [filterStates, debounceSearch, page],
   );
+
   const filtersActive = useMemo(
-    () => hasActiveAppointmentFilters(filters),
-    [filters],
+    () => hasActiveAppointmentFilters(filterStates),
+    [filterStates],
   );
-  const handleFilterChange = useCallback(
-    (patch: Partial<AppointmentFilterState>) => {
-      setFilters((current) => ({ ...current, ...patch }));
-    },
-    [],
-  );
-  const handleClearFilters = useCallback(() => {
-    setFilters(defaultAppointmentFilters);
-  }, []);
-  const handleOpenMenu = useCallback((anchor: HTMLElement, id: string) => {
-    setActionAnchor(anchor);
-    setActionRowId(id);
-  }, []);
 
   const addAppointmentAction = (
     <Button
@@ -78,33 +90,30 @@ export default function AppointmentListPage() {
   const {
     data: appointmentList,
     isPending: isLoadingAppointments,
-    error: appointmentsError,
-  } = useMyAppointments({
-    page: 1,
-    limit: 10,
-    search: '',
-  });
-
-  console.log('appointmentList', appointmentList)
+  } = useMyAppointments(queryParams);
 
   return (
     <AppointmentListWrapper>
       <PageBreadcrumb items={breadcrumbItems} action={addAppointmentAction} />
-      <AppointmentSummaryCards appointments={dashboardAppointments} />
+      <AppointmentSummaryCards />
       <AppointmentFilters
-        filters={filters}
-        onChange={handleFilterChange}
-        onClear={handleClearFilters}
+        filterStates={filterStates}
+        updateFilterState={updateFilterState}
+        onReset={handleResetFilters}
       />
 
       <CustomTable
         className="appointment-table"
         headList={headList}
-        page={1}
-        totalPages={1}
-        isEmpty={appointments.length === 0}
-        emptyText="No appointments found"
+        page={page}
+        totalPages={appointmentList?.meta?.totalPages ?? 1}
+        totalResults={appointmentList?.meta?.total ?? 0}
+        onPageChange={setPage}
         isLoading={isLoadingAppointments}
+        isEmpty={
+          !isLoadingAppointments && (appointmentList?.data?.length ?? 0) === 0
+        }
+        emptyText="No appointments found"
         emptyDescription={
           filtersActive
             ? 'Change the filters or clear them to see appointments.'
@@ -115,7 +124,9 @@ export default function AppointmentListPage() {
           return (
             <AppointmentRow
               key={apptInfo.id}
-              onOpenMenu={(anchor) => handleOpenMenu(anchor, String(apptInfo.id))}
+              onOpenMenu={(anchor) =>
+                actionMenu.open(anchor, String(apptInfo.id))
+              }
               patientName={apptInfo.patientInfo?.name || ''}
               patientImage={apptInfo.patientInfo?.profileImage || ''}
               patientCode={apptInfo.patientInfo?.displayPatientId || ''}
@@ -126,28 +137,28 @@ export default function AppointmentListPage() {
               appointmentTime={formatTimeSlot(apptInfo.start_time, apptInfo.end_time)}
               appointmentStatus={apptInfo.appointment_status}
               appointmentType={apptInfo.consultation_type}
+              onJoinCall={() => showInDevelopment()}
             />
           )
         })}
       </CustomTable>
 
-      <Menu
-        anchorEl={actionAnchor}
-        open={Boolean(actionAnchor)}
-        onClose={() => setActionAnchor(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        {actionRowId ? (
-          <MenuItem
-            component={Link}
-            href={projectRoutes.appointmentDetails(actionRowId)}
-            onClick={() => setActionAnchor(null)}
-          >
-            View
-          </MenuItem>
-        ) : null}
-      </Menu>
+      <CustomActionMenu
+        anchorEl={actionMenu.anchorEl}
+        onClose={actionMenu.close}
+        items={[
+          {
+            key: 'view',
+            label: 'View Details',
+            icon: <VisibilityOutlinedIcon />,
+            href: actionMenu.activeId
+              ? projectRoutes.appointmentDetails(actionMenu.activeId)
+              : undefined,
+            hidden: !actionMenu.activeId,
+            showChevron: true,
+          },
+        ]}
+      />
     </AppointmentListWrapper>
   );
 }

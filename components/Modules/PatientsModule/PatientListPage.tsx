@@ -3,11 +3,15 @@
 import PageBreadcrumb from '@/components/commons/PageBreadcrumb/PageBreadcrumb';
 import PatientListToolbar from '@/components/Modules/PatientsModule/PatientListToolbar';
 import PatientRow from '@/components/Modules/PatientsModule/PatientRow';
+import CustomActionMenu from '@/components/ui/CustomActionMenu/CustomActionMenu';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
+import { useActionMenu } from '@/hooks/commons/useActionMenu';
 import { useMyPatientList } from '@/hooks/react-query/patients/patients.hooks';
 import { projectRoutes } from '@/routes';
 import { PatientListWrapper } from '@/styles/CustomStyled/PatientListWrapper';
-import { Menu, MenuItem } from '@mui/material';
+import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { useCallback, useState } from 'react';
 
 const headList = [
@@ -25,7 +29,7 @@ const breadcrumbItems = [
 ];
 
 export default function PatientListPage() {
-  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const actionMenu = useActionMenu();
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -44,10 +48,6 @@ export default function PatientListPage() {
 
   const updatePagination = useCallback((patch: Partial<typeof pagination>) => {
     setPagination((current) => ({ ...current, ...patch }));
-  }, []);
-
-  const handleOpenMenu = useCallback((anchor: HTMLElement) => {
-    setMenuAnchor(anchor);
   }, []);
 
   return (
@@ -92,22 +92,26 @@ export default function PatientListPage() {
             lastVisit={row.last_appointment_date}
             userStatus={row.status}
             profileImage={row.profile_image}
-            onOpenMenu={handleOpenMenu}
+            onOpenMenu={actionMenu.open}
           />
         ))}
       </CustomTable>
 
-      <Menu
-        anchorEl={menuAnchor}
-        open={Boolean(menuAnchor)}
-        onClose={() => setMenuAnchor(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <MenuItem onClick={() => setMenuAnchor(null)}>View</MenuItem>
-        <MenuItem onClick={() => setMenuAnchor(null)}>Edit</MenuItem>
-        <MenuItem onClick={() => setMenuAnchor(null)}>Deactivate</MenuItem>
-      </Menu>
+      <CustomActionMenu
+        anchorEl={actionMenu.anchorEl}
+        onClose={actionMenu.close}
+        items={[
+          { key: 'view', label: 'View', icon: <VisibilityOutlinedIcon /> },
+          { key: 'edit', label: 'Edit', icon: <EditOutlinedIcon /> },
+          {
+            key: 'deactivate',
+            label: 'Deactivate',
+            icon: <BlockOutlinedIcon />,
+            tone: 'danger',
+            dividerBefore: true,
+          },
+        ]}
+      />
     </PatientListWrapper>
   );
 }

@@ -1,21 +1,86 @@
 'use client';
 
-import AppointmentStatusBadge from '@/components/commons/AppointmentStatusBadge/AppointmentStatusBadge';
+import { queryClient } from '@/components/Providers/ReactQueryProvider';
+import { useChangeAppointmentStatus } from '@/hooks/react-query/appointments/appointments.hooks';
+import { MyAppointmentsQueryKeys } from '@/hooks/react-query/query.keys';
+import {
+  _toTitleCase,
+  getAppointmentStatusColors,
+} from '@/lib/commons/common.utils';
+import { showSuccessToast } from '@/lib/commons/toast';
 import type { AppointmentStatus } from '@/resources/mock';
+import { useAlertStore } from '@/zustand/stores/useAlertStore';
+import { useLoadingStore } from '@/zustand/stores/useLoadingStore';
 import CheckIcon from '@mui/icons-material/Check';
 import EditNoteIcon from '@mui/icons-material/EditNote';
-import { Box, Button, FormControl, MenuItem, Select, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  FormControl,
+  MenuItem,
+  Select,
+  Typography,
+} from '@mui/material';
 import { memo, useState } from 'react';
 
-const statusOptions: AppointmentStatus[] = ['Confirmed', 'In Progress', 'Completed', 'No Show', 'Cancelled'];
+const statusOptions: AppointmentStatus[] = [
+  'Confirmed',
+  'In Progress',
+  'Completed',
+  'No Show',
+  'Cancelled',
+];
 
 type UpdateStatusCardProps = {
-  status: AppointmentStatus;
+  status: string | null;
+  appointmentId: string;
 };
 
-function UpdateStatusCard({ status }: UpdateStatusCardProps) {
+function UpdateStatusCard({ status, appointmentId }: UpdateStatusCardProps) {
   const [nextStatus, setNextStatus] = useState<AppointmentStatus | ''>('');
+  const { showLoader, hideLoader } = useLoadingStore((state) => state);
+  const showConfirm = useAlertStore((state) => state.showConfirm);
+  const statusColors = getAppointmentStatusColors(status || '');
+  const { mutate: changeStatus } = useChangeAppointmentStatus();
 
+  const updateStatus = () => {
+    showLoader('Updating appointment status...');
+    const payload = {
+      appointmentId: appointmentId,
+      status: nextStatus,
+      call_end_reason: 'Call ended and Booking Completed by Doctor',
+    };
+    changeStatus(payload, {
+      onSuccess: async (res) => {
+        hideLoader();
+        if (!res?.success) return;
+        showSuccessToast('Appointment status updated successfully');
+        setNextStatus('');
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: [MyAppointmentsQueryKeys.MyAppointments],
+          }),
+          queryClient.invalidateQueries({
+            queryKey: [MyAppointmentsQueryKeys.MyAppointmentsInfo],
+          }),
+        ]);
+      },
+      onError: () => {
+        hideLoader();
+      },
+    });
+  };
+
+  const handleSubmit = () => {
+    if (!nextStatus) return;
+    showConfirm({
+      title: 'Update Appointment Status',
+      message: `Change the status${status ? ` from "${_toTitleCase(status)}"` : ''} to "${nextStatus}"?\nThe patient will be notified of this change.`,
+      buttonText: 'Yes, Update',
+      cancelText: 'Cancel',
+      onConfirm: updateStatus,
+    });
+  };
   return (
     <Box className="detail-card fill">
       <Box className="card-head">
@@ -38,11 +103,21 @@ function UpdateStatusCard({ status }: UpdateStatusCardProps) {
           <Typography component="span" className="current-status-label">
             Current Status:
           </Typography>
-          <AppointmentStatusBadge status={status} />
+          <Typography
+            component="span"
+            className="info-pill"
+            style={{ color: statusColors.txt, backgroundColor: statusColors.bg }}
+          >
+            {_toTitleCase(status || '') || 'N/A'}
+          </Typography>
         </Box>
 
         <Box className="status-field">
-          <Typography component="label" htmlFor="change-status" className="field-label">
+          <Typography
+            component="label"
+            htmlFor="change-status"
+            className="field-label"
+          >
             Change Status To
           </Typography>
           <FormControl fullWidth size="small">
@@ -51,11 +126,17 @@ function UpdateStatusCard({ status }: UpdateStatusCardProps) {
               className="status-select"
               displayEmpty
               value={nextStatus}
-              onChange={(event) => setNextStatus(event.target.value as AppointmentStatus | '')}
+              onChange={(event) =>
+                setNextStatus(event.target.value as AppointmentStatus | '')
+              }
               renderValue={(value) => (value ? value : 'Select status')}
             >
               {statusOptions.map((option) => (
-                <MenuItem key={option} value={option} disabled={option === status}>
+                <MenuItem
+                  key={option}
+                  value={option}
+                  disabled={option === status}
+                >
                   {option}
                 </MenuItem>
               ))}
@@ -72,6 +153,8 @@ function UpdateStatusCard({ status }: UpdateStatusCardProps) {
           disableElevation
           fullWidth
           disabled={!nextStatus}
+          type="button"
+          onClick={handleSubmit}
           startIcon={<CheckIcon fontSize="small" />}
         >
           Update Status

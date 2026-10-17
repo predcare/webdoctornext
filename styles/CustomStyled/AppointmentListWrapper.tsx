@@ -163,25 +163,90 @@ export const AppointmentListWrapper = styled(Box)`
   .row-actions {
     flex-wrap: nowrap;
     gap: 8px;
+    justify-content: flex-end;
     white-space: nowrap;
   }
 
-  .row-action.MuiButton-root {
+  .action-icon.MuiIconButton-root {
+    position: relative;
     flex-shrink: 0;
-    text-transform: none;
-    white-space: nowrap;
-    font-size: 12px;
-    font-weight: 600;
-    height: 32px;
-    min-width: 108px;
-    padding-left: 12px;
-    padding-right: 12px;
-    border-radius: 8px;
-    box-shadow: none;
-    color: ${({ theme }) => theme.palette.common.white};
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease,
+      border-color 0.15s ease,
+      transform 0.15s ease;
+
+    .MuiSvgIcon-root {
+      font-size: 18px;
+    }
+
+    &:hover {
+      transform: translateY(-1px);
+    }
 
     &.join {
-      background: ${({ theme }) => theme.palette.customColors.brandTeal};
+      color: ${({ theme }) => theme.palette.customColors.brandTeal};
+      background: ${({ theme }) => theme.palette.customColors.brandTealLight};
+      border-color: ${({ theme }) => theme.palette.customColors.brandTeal}33;
+
+      &:hover {
+        color: ${({ theme }) => theme.palette.common.white};
+        background: ${({ theme }) => theme.palette.customColors.brandTeal};
+      }
+    }
+
+    &.rejoin {
+      color: ${({ theme }) => theme.palette.customColors.warning};
+      background: ${({ theme }) => theme.palette.customColors.warningBg};
+      border-color: ${({ theme }) => theme.palette.customColors.warning}33;
+
+      &:hover {
+        color: ${({ theme }) => theme.palette.common.white};
+        background: ${({ theme }) => theme.palette.customColors.warning};
+      }
+    }
+
+    &.consult {
+      color: ${({ theme }) => theme.palette.customColors.info};
+      background: ${({ theme }) => theme.palette.customColors.infoBg};
+      border-color: ${({ theme }) => theme.palette.customColors.info}33;
+
+      &:hover {
+        color: ${({ theme }) => theme.palette.common.white};
+        background: ${({ theme }) => theme.palette.customColors.info};
+      }
+    }
+
+    &.rejoin::after,
+    &.live::after {
+      content: '';
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      border: 2px solid ${({ theme }) => theme.palette.customColors.cardBg};
+      background: ${({ theme }) => theme.palette.customColors.success};
+      animation: actionLivePulse 1.6s ease-in-out infinite;
+    }
+
+  }
+
+  @keyframes actionLivePulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0
+        ${({ theme }) => theme.palette.customColors.success}66;
+    }
+    50% {
+      box-shadow: 0 0 0 4px
+        ${({ theme }) => theme.palette.customColors.success}00;
     }
   }
 
