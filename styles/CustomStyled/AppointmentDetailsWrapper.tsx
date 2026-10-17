@@ -387,7 +387,6 @@ export const AppointmentDetailsWrapper = styled(Box)`
 
   .update-status.MuiButton-root {
     height: 42px;
-    margin-top: auto;
     border-radius: 8px;
     text-transform: none;
     font-size: 13px;
