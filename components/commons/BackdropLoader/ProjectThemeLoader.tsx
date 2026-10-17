@@ -47,7 +47,7 @@ const ProjectThemeLoader = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: alpha(pageBg, 0.92),
+          bgcolor: alpha(pageBg, 0.52),
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
           pointerEvents: isOpen ? 'auto' : 'none',

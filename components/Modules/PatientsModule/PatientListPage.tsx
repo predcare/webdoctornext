@@ -1,24 +1,27 @@
 'use client';
 
 import PageBreadcrumb from '@/components/commons/PageBreadcrumb/PageBreadcrumb';
-import PatientListToolbar from '@/components/Modules/PatientsModule/PatientListToolbar';
-import PatientRow from '@/components/Modules/PatientsModule/PatientRow';
 import {
   defaultPatientFilters,
-  filterPatients,
-  hasActivePatientFilters,
   type PatientFilterState,
 } from '@/components/Modules/PatientsModule/patientFilters';
+import PatientListToolbar from '@/components/Modules/PatientsModule/PatientListToolbar';
+import PatientRow from '@/components/Modules/PatientsModule/PatientRow';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
-import { patients } from '@/resources/mock';
+import { useMyPatientList } from '@/hooks/react-query/patients/patients.hooks';
 import { projectRoutes } from '@/routes';
-import { Menu, MenuItem } from '@mui/material';
-import { useCallback, useMemo, useState } from 'react';
 import { PatientListWrapper } from '@/styles/CustomStyled/PatientListWrapper';
+import { Menu, MenuItem } from '@mui/material';
+import { useCallback, useState } from 'react';
 
-const PAGE_SIZE = 8;
-
-const headList = ['Patient', 'Phone / Email', 'City', 'Last Visit', 'User Status', 'Clinic Status', ''];
+const headList = [
+  'Patient',
+  'Phone / Email',
+  'City',
+  'Last Visit',
+  'User Status',
+  'Actions',
+];
 
 const breadcrumbItems = [
   { label: 'Dashboard', href: projectRoutes.dashboard },
@@ -26,53 +29,96 @@ const breadcrumbItems = [
 ];
 
 export default function PatientListPage() {
-  const [filters, setFilters] = useState<PatientFilterState>(defaultPatientFilters);
-  const [page, setPage] = useState(1);
+  const [filters, setFilters] = useState<PatientFilterState>(
+    defaultPatientFilters,
+  );
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    search: '',
+  });
 
-  const rows = useMemo(() => filterPatients(patients, filters), [filters]);
-  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
-  const pageRows = useMemo(
-    () => rows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
-    [rows, currentPage],
+  const {
+    data: myPatients,
+    isPending: myPatientPending,
+    isError: isPatientError,
+  } = useMyPatientList({
+    limit: pagination.limit,
+    search: pagination.search,
+    page: pagination.page,
+  });
+
+  const updatePagination = useCallback((patch: Partial<typeof pagination>) => {
+    setPagination((current) => ({ ...current, ...patch }));
+  }, []);
+
+  const handleFilterChange = useCallback(
+    (patch: Partial<PatientFilterState>) => {
+      setFilters((current) => ({ ...current, ...patch }));
+      if (patch.search !== undefined) {
+        updatePagination({ search: patch.search, page: 1 });
+      }
+    },
+    [updatePagination],
   );
 
-  const handleFilterChange = useCallback((patch: Partial<PatientFilterState>) => {
-    setFilters((current) => ({ ...current, ...patch }));
-    setPage(1);
-  }, []);
   const handleClear = useCallback(() => {
     setFilters(defaultPatientFilters);
-    setPage(1);
-  }, []);
+    updatePagination({ search: '', page: 1 });
+  }, [updatePagination]);
+
   const handleOpenMenu = useCallback((anchor: HTMLElement) => {
     setMenuAnchor(anchor);
   }, []);
+
   const closeMenu = () => setMenuAnchor(null);
 
   return (
     <PatientListWrapper>
       <PageBreadcrumb items={breadcrumbItems} />
-
       <CustomTable
         className="patient-table"
         headList={headList}
         customHeader={
-          <PatientListToolbar filters={filters} onChange={handleFilterChange} onClear={handleClear} />
+          <PatientListToolbar
+            filters={filters}
+            onChange={handleFilterChange}
+            onClear={handleClear}
+          />
         }
-        page={currentPage}
-        totalPages={totalPages}
-        onPageChange={setPage}
-        zebraStriping={false}
-        isEmpty={rows.length === 0}
-        emptyText="No patients found"
+        page={pagination.page}
+        totalPages={myPatients?.meta?.totalPages ?? 1}
+        totalResults={myPatients?.meta?.total || 0}
+        searchValue={pagination.search}
+        onSearchChange={(value) => updatePagination({ search: value, page: 1 })}
+        onPageChange={(nextPage) => updatePagination({ page: nextPage })}
+        isLoading={myPatientPending}
+        isEmpty={!myPatientPending && myPatients?.meta?.total === 0}
+        emptyText={
+          isPatientError ? 'Could not load patients' : 'No patients found'
+        }
         emptyDescription={
-          hasActivePatientFilters(filters) ? 'Change the search or filters to see patients.' : undefined
+          isPatientError
+            ? 'Something went wrong while fetching the patient list. Please try again.'
+            : pagination.search
+              ? `No patients match "${pagination.search}". Try another search term.`
+              : 'Your patient list is empty. Patients will appear here once they are added.'
         }
       >
-        {pageRows.map((row) => (
-          <PatientRow key={row.id} row={row} onOpenMenu={handleOpenMenu} />
+        {myPatients?.data?.map((row) => (
+          <PatientRow
+            key={row.patient_id}
+            name={row.name}
+            patientCode={row.patient_id}
+            phone={row.phone_number}
+            email={row.email}
+            city={row.city}
+            lastVisit={row.last_appointment_date}
+            userStatus={row.status}
+            profileImage={row.profile_image}
+            onOpenMenu={handleOpenMenu}
+          />
         ))}
       </CustomTable>
 

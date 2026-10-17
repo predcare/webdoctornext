@@ -151,9 +151,16 @@ export const PatientListWrapper = styled(Box)`
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    overflow: hidden;
     color: ${({ theme }) => theme.palette.common.white};
     font-size: 14px;
     font-weight: 700;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
     &.tone-teal {
       background: ${({ theme }) => theme.palette.customColors.brandTeal};

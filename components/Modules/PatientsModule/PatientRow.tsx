@@ -1,68 +1,92 @@
 'use client';
 
 import StatusChip from '@/components/commons/StatusChip/StatusChip';
-import type { Patient } from '@/resources/mock';
+import { getInitials } from '@/lib/commons/common.utils';
 import { projectRoutes } from '@/routes';
 import { avatarTone } from '@/utils/avatarTone';
-import DoneAllIcon from '@mui/icons-material/DoneAll';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { Box, IconButton, TableCell, TableRow, Typography } from '@mui/material';
+import {
+  Avatar,
+  Box,
+  IconButton,
+  TableCell,
+  TableRow,
+  Typography,
+} from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { memo, type MouseEvent } from 'react';
 
 type PatientRowProps = {
-  row: Patient;
+  name: string;
+  profileImage?: string;
+  patientCode: string;
+  phone: string;
+  email: string;
+  city: string;
+  lastVisit: string;
+  userStatus: string;
   onOpenMenu: (anchor: HTMLElement, id: string) => void;
 };
 
-function PatientRow({ row, onOpenMenu }: PatientRowProps) {
+function PatientRow({
+  name,
+  profileImage,
+  patientCode,
+  phone,
+  email,
+  city,
+  lastVisit,
+  userStatus,
+  onOpenMenu,
+}: PatientRowProps) {
   const navigate = useRouter();
   const handleView = () => {
-    navigate.push(projectRoutes.patientDetails(row.id));
+    navigate.push(projectRoutes.patientDetails(patientCode));
   };
   return (
     <TableRow onClick={handleView}>
       <TableCell>
         <Box className="patient-cell">
-          <Box className={`patient-avatar ${avatarTone(row.initial)}`}>{row.initial}</Box>
+          <Avatar
+            className={`patient-avatar ${avatarTone(getInitials(name))}`}
+            src={profileImage || undefined}
+            alt={name}
+          >
+            {getInitials(name)}
+          </Avatar>
           <Box className="patient-copy">
             <Box className="patient-name-row">
               <Typography component="p" className="patient-name">
-                {row.name}
+                {name || "Unknown Name"}
               </Typography>
-              {row.verified ? <DoneAllIcon className="verified-icon" aria-label="Verified" /> : null}
             </Box>
-            <Typography component="p" className="patient-meta">
-              {row.gender} · {row.age} yrs
-            </Typography>
             <Typography component="p" className="patient-code">
-              {row.patientCode}
+              {patientCode}
             </Typography>
           </Box>
         </Box>
       </TableCell>
       <TableCell>
         <Typography component="p" className="cell-title">
-          {row.phone}
+          {phone}
         </Typography>
         <Typography component="p" className="cell-note">
-          {row.email}
+          {email}
         </Typography>
       </TableCell>
-      <TableCell>{row.city}</TableCell>
-      <TableCell>{row.lastVisit}</TableCell>
-      <TableCell>
-        <StatusChip status={row.userStatus} />
+      <TableCell>{city || "-"}</TableCell>
+      <TableCell align="center">{lastVisit || "-"}</TableCell>
+      <TableCell align="center">
+        <StatusChip status={userStatus as 'Active' | 'Inactive'} />
       </TableCell>
-      <TableCell>
-        <StatusChip status={row.clinicStatus} />
-      </TableCell>
-      <TableCell align="right">
+      <TableCell align="center">
         <IconButton
           className="row-menu"
           size="small"
-          aria-label={`Actions for ${row.name}`}
-          onClick={(event: MouseEvent<HTMLButtonElement>) => onOpenMenu(event.currentTarget, row.id)}
+          aria-label={`Actions for ${name}`}
+          onClick={(event: MouseEvent<HTMLButtonElement>) =>
+            onOpenMenu(event.currentTarget, patientCode)
+          }
         >
           <MoreVertIcon fontSize="small" />
         </IconButton>

@@ -53,11 +53,16 @@ export interface IMyPatientDoc {
   height: any;
   bmi: any;
   drug_allergies: any;
-  total_appointments: number;
-  last_appointment_date: any;
   age_display?: string;
   gender_display?: string;
   blood_type?: any;
+  total_appointments: number;
+  last_appointment_date: string;
+  upcoming_appointments: {
+    appointment_date: string;
+    start_time: string;
+    end_time: string;
+  }[];
 }
 
 export interface IPatientBasicInfo {

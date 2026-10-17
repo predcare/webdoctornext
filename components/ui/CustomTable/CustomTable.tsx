@@ -358,7 +358,7 @@ const CustomTable = ({
         </Table>
       </TableContainer>
 
-      {totalPages > 1 && onPageChange && (
+      {onPageChange && totalPages >= 1 && (
         <Box className="paginationWrapper">
           <Typography className="paginationInfo">
             Page <span className="paginationInfoBold">{page}</span> of{' '}
