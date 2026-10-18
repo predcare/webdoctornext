@@ -1,4 +1,4 @@
-import { IRootResponse } from "./common.interfaces";
+import { IRootResponse } from './common.interfaces';
 
 export type DoctorAvailTimeSlotsRoot = IRootResponse<IDoctorAvailTimeSlots>;
 export interface IMyAvailabilityRoot {
@@ -6,6 +6,7 @@ export interface IMyAvailabilityRoot {
   count: number;
   data: IMyAvailabilityDoc[];
 }
+export type IMyAvailabilityDocRoot = IRootResponse<IMyAvailabilityDoc>;
 
 export interface IDocBookingAvailRoot {
   success: boolean;

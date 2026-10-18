@@ -66,6 +66,7 @@ export const endpoints = {
   },
   availablity: {
     get: '/doctor-availabilities',
+    getById: (id: string | number) => `/doctor-availabilities/${id}`,
     delete: '/doctor-availabilities/',
     create: '/doctor-availabilities',
     update: '/doctor-availabilities',

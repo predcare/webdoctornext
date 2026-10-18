@@ -1,6 +1,7 @@
 'use client';
 
 import CustomInput from '@/components/ui/CustomInput/CustomInput';
+import type { TimeValue } from '@/lib/commons/availability.utils';
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 import {
   Box,
@@ -14,7 +15,6 @@ import {
 } from '@mui/material';
 import { memo } from 'react';
 
-export type Meridiem = 'AM' | 'PM';
 export type ConsultationChoice = 'in-person' | 'video' | 'both';
 
 const hours = Array.from({ length: 12 }, (_, index) =>
@@ -23,39 +23,30 @@ const hours = Array.from({ length: 12 }, (_, index) =>
 const minutes = Array.from({ length: 12 }, (_, index) =>
   String(index * 5).padStart(2, '0'),
 );
-const meridiemOptions: Meridiem[] = ['AM', 'PM'];
+const periodOptions: TimeValue['period'][] = ['AM', 'PM'];
 
-const durationOptions = [
-  { value: '5', label: '5 minutes' },
-  { value: '10', label: '10 minutes' },
-  { value: '15', label: '15 minutes' },
-  { value: '20', label: '20 minutes' },
-  { value: '30', label: '30 minutes' },
-  { value: '60', label: '60 minutes' },
-];
+const durationOptions = [5, 10, 15, 20, 30, 60];
 
-type TimeParts = {
-  hour: string;
-  minute: string;
-  meridiem: Meridiem;
-};
+const withValue = (options: string[], value: string) =>
+  value && !options.includes(value) ? [...options, value].sort() : options;
 
 type AvailabilityFormFieldsProps = {
-  from: TimeParts;
-  to: TimeParts;
+  from: TimeValue;
+  to: TimeValue;
   consultationType: ConsultationChoice;
-  duration: string;
+  duration: number;
   inPersonFee: string;
   videoFee: string;
   hideFee: boolean;
   requirePayment: boolean;
   timeError?: string;
+  durationError?: string;
   inPersonFeeError?: string;
   videoFeeError?: string;
-  onFromChange: (patch: Partial<TimeParts>) => void;
-  onToChange: (patch: Partial<TimeParts>) => void;
+  onFromChange: (patch: Partial<TimeValue>) => void;
+  onToChange: (patch: Partial<TimeValue>) => void;
   onConsultationChange: (value: ConsultationChoice) => void;
-  onDurationChange: (value: string) => void;
+  onDurationChange: (value: number) => void;
   onInPersonFeeChange: (value: string) => void;
   onVideoFeeChange: (value: string) => void;
   onHideFeeChange: (value: boolean) => void;
@@ -66,8 +57,8 @@ function TimeSelects({
   value,
   onChange,
 }: {
-  value: TimeParts;
-  onChange: (patch: Partial<TimeParts>) => void;
+  value: TimeValue;
+  onChange: (patch: Partial<TimeValue>) => void;
 }) {
   return (
     <Box className="time-picks">
@@ -77,7 +68,7 @@ function TimeSelects({
         value={value.hour}
         onChange={(event) => onChange({ hour: event.target.value })}
       >
-        {hours.map((hour) => (
+        {withValue(hours, value.hour).map((hour) => (
           <MenuItem key={hour} value={hour}>
             {hour}
           </MenuItem>
@@ -89,7 +80,7 @@ function TimeSelects({
         value={value.minute}
         onChange={(event) => onChange({ minute: event.target.value })}
       >
-        {minutes.map((minute) => (
+        {withValue(minutes, value.minute).map((minute) => (
           <MenuItem key={minute} value={minute}>
             {minute}
           </MenuItem>
@@ -98,14 +89,14 @@ function TimeSelects({
       <Select
         className="time-select"
         size="small"
-        value={value.meridiem}
+        value={value.period}
         onChange={(event) =>
-          onChange({ meridiem: event.target.value as Meridiem })
+          onChange({ period: event.target.value as TimeValue['period'] })
         }
       >
-        {meridiemOptions.map((meridiem) => (
-          <MenuItem key={meridiem} value={meridiem}>
-            {meridiem}
+        {periodOptions.map((period) => (
+          <MenuItem key={period} value={period}>
+            {period}
           </MenuItem>
         ))}
       </Select>
@@ -123,6 +114,7 @@ function AvailabilityFormFields({
   hideFee,
   requirePayment,
   timeError,
+  durationError,
   inPersonFeeError,
   videoFeeError,
   onFromChange,
@@ -137,6 +129,9 @@ function AvailabilityFormFields({
   const showInPerson =
     consultationType === 'in-person' || consultationType === 'both';
   const showVideo = consultationType === 'video' || consultationType === 'both';
+  const durations = durationOptions.includes(duration)
+    ? durationOptions
+    : [...durationOptions, duration].sort((a, b) => a - b);
 
   return (
     <>
@@ -203,14 +198,19 @@ function AvailabilityFormFields({
             className="field-select"
             fullWidth
             value={duration}
-            onChange={(event) => onDurationChange(event.target.value)}
+            onChange={(event) => onDurationChange(Number(event.target.value))}
           >
-            {durationOptions.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
+            {durations.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option} minutes
               </MenuItem>
             ))}
           </Select>
+          {durationError ? (
+            <Typography component="p" className="field-error">
+              {durationError}
+            </Typography>
+          ) : null}
         </Box>
       </Box>
 

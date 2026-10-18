@@ -196,6 +196,16 @@ export const ManageAvailabilityWrapper = styled(Box)`
     &.is-selected.is-leave {
       border: 2px solid ${({ theme }) => theme.palette.customColors.brandTeal};
     }
+
+    &.is-past {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  .nav-btn.MuiIconButton-root.Mui-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 
   .legend {

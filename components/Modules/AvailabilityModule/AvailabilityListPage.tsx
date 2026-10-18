@@ -19,13 +19,14 @@ import {
   useDeleteAvailability,
 } from '@/hooks/react-query/availability/availablity.hooks';
 import { formatTimeSlot } from '@/lib/commons/common.utils';
-import { showInDevelopment, showSuccessToast } from '@/lib/commons/toast';
+import { showSuccessToast } from '@/lib/commons/toast';
 import { projectRoutes } from '@/routes';
 import { AvailabilityListWrapper } from '@/styles/CustomStyled/AvailabilityListWrapper';
 import { AvailabilityMode } from '@/typescripts/enums';
 import { useAlertStore } from '@/zustand/stores/useAlertStore';
 import { useLoadingStore } from '@/zustand/stores/useLoadingStore';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 
 const headList = [
@@ -47,6 +48,7 @@ export default function AvailabilityListPage() {
     defaultAvailabilityFilters,
   );
   const actionMenu = useActionMenu();
+  const router = useRouter();
 
   const {
     data: availablityList,
@@ -76,6 +78,11 @@ export default function AvailabilityListPage() {
       doctorId: current.doctorId,
     }));
   }, []);
+
+  const handleEdit = () => {
+    const rowId = actionMenu.activeId;
+    if (rowId) router.push(projectRoutes.editAvailability(rowId));
+  };
 
   const handleDelete = () => {
     const rowId = actionMenu.activeId;
@@ -177,7 +184,7 @@ export default function AvailabilityListPage() {
             label: 'Edit',
             icon: <EditIcon />,
             tone: 'default',
-            onClick: () => showInDevelopment(),
+            onClick: handleEdit,
           },
           {
             key: 'delete',

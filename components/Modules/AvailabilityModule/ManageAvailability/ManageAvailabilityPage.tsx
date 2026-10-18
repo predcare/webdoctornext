@@ -2,78 +2,41 @@
 
 import PageBreadcrumb from '@/components/commons/PageBreadcrumb/PageBreadcrumb';
 import AvailabilityCalendar from '@/components/Modules/AvailabilityModule/ManageAvailability/AvailabilityCalendar';
-import AvailabilityFormFields, {
-  type ConsultationChoice,
-  type Meridiem,
-} from '@/components/Modules/AvailabilityModule/ManageAvailability/AvailabilityFormFields';
+import AvailabilityFormFields from '@/components/Modules/AvailabilityModule/ManageAvailability/AvailabilityFormFields';
 import RecurringDaysFields from '@/components/Modules/AvailabilityModule/ManageAvailability/RecurringDaysFields';
-import { availabilityDoctors } from '@/resources/mock/availability';
+import ManageAvailabilitySkeleton from '@/components/Modules/AvailabilityModule/ManageAvailability/Skeletons/ManageAvailabilitySkeleton';
+import { queryClient } from '@/components/Providers/ReactQueryProvider';
+import {
+  useCreateAvailability,
+  useGetAvailabilityById,
+  useUpdateAvailability,
+} from '@/hooks/react-query/availability/availablity.hooks';
+import { AvailbilityQueryKeys } from '@/hooks/react-query/query.keys';
+import {
+  buildAvailabilityPayload,
+  defaultAvailabilityFormValues,
+  mapAvailabilityToFormValues,
+  type TimeValue,
+} from '@/lib/commons/availability.utils';
+import { showErrorToast, showSuccessToast } from '@/lib/commons/toast';
+import {
+  AvailabilityFormSchema,
+  type TAvailabilityFormValues,
+} from '@/lib/schemas/availability.schema';
 import { projectRoutes } from '@/routes';
 import { ManageAvailabilityWrapper } from '@/styles/CustomStyled/ManageAvailabilityWrapper';
+import type { ICommonRoot } from '@/typescripts/interfaces/common.interfaces';
+import { useAuthStore } from '@/zustand/stores/useAuthStore';
+import { useLoadingStore } from '@/zustand/stores/useLoadingStore';
+import { yupResolver } from '@hookform/resolvers/yup';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Box, Button, MenuItem, Select, Typography } from '@mui/material';
-import Link from 'next/link';
+import { Box, Button, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
+import { BreadcrumbItems } from '../constants/availability.constants';
 
-type SlotMode = 'specific' | 'recurring' | 'leave';
-
-type FormValues = {
-  doctorId: string;
-  mode: SlotMode;
-  selectedDates: string[];
-  leaveDates: string[];
-  weekdays: string[];
-  recurringStart: string;
-  recurringEnd: string;
-  fromHour: string;
-  fromMinute: string;
-  fromMeridiem: Meridiem;
-  toHour: string;
-  toMinute: string;
-  toMeridiem: Meridiem;
-  consultationType: ConsultationChoice;
-  duration: string;
-  inPersonFee: string;
-  videoFee: string;
-  hideFee: boolean;
-  requirePayment: boolean;
-};
-
-type FormErrors = Partial<
-  Record<
-    | 'doctorId'
-    | 'dates'
-    | 'weekdays'
-    | 'dateRange'
-    | 'time'
-    | 'inPersonFee'
-    | 'videoFee',
-    string
-  >
->;
-
-const initialValues: FormValues = {
-  doctorId: 'anusri',
-  mode: 'specific',
-  selectedDates: [],
-  leaveDates: [],
-  weekdays: [],
-  recurringStart: '',
-  recurringEnd: '',
-  fromHour: '09',
-  fromMinute: '00',
-  fromMeridiem: 'AM',
-  toHour: '05',
-  toMinute: '00',
-  toMeridiem: 'PM',
-  consultationType: 'in-person',
-  duration: '10',
-  inPersonFee: '',
-  videoFee: '',
-  hideFee: false,
-  requirePayment: false,
-};
+type SlotMode = TAvailabilityFormValues['editorTab'];
 
 const modes: { id: SlotMode; label: string }[] = [
   { id: 'specific', label: 'Specific Date' },
@@ -81,156 +44,173 @@ const modes: { id: SlotMode; label: string }[] = [
   { id: 'leave', label: 'Leave' },
 ];
 
-const breadcrumbItems = [
-  { label: 'Dashboard', href: projectRoutes.dashboard },
-  { label: 'Availability List', href: projectRoutes.availability },
-  { label: 'Add Availability' },
-];
-
-const backAction = (
-  <Button
-    className="page-action"
-    variant="outlined"
-    component={Link}
-    href={projectRoutes.availability}
-    startIcon={<ArrowBackIcon fontSize="small" />}
-  >
-    Back to List
-  </Button>
-);
-
-const toIsoDate = (date: Date) => {
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${date.getFullYear()}-${month}-${day}`;
-};
-
-const toMinutes = (hour: string, minute: string, meridiem: Meridiem) => {
-  let value = Number(hour) % 12;
-  if (meridiem === 'PM') value += 12;
-  return value * 60 + Number(minute);
-};
-
-const feeOk = (value: string) => {
-  const amount = Number(value.replace(/,/g, '').trim());
-  return value.trim() !== '' && Number.isFinite(amount) && amount > 0;
-};
-
-const validate = (values: FormValues): FormErrors => {
-  const errors: FormErrors = {};
-
-  if (!values.doctorId) errors.doctorId = 'Select a doctor.';
-  if (values.mode === 'specific' && values.selectedDates.length === 0) {
-    errors.dates = 'Select at least one date.';
-  }
-  if (values.mode === 'leave' && values.leaveDates.length === 0) {
-    errors.dates = 'Select at least one leave date.';
-  }
-  if (values.mode === 'recurring' && values.weekdays.length === 0) {
-    errors.weekdays = 'Select at least one day.';
-  }
-  if (
-    values.mode === 'recurring' &&
-    values.recurringStart &&
-    values.recurringEnd &&
-    values.recurringEnd < values.recurringStart
-  ) {
-    errors.dateRange = 'End date must be on or after the start date.';
-  }
-
-  const start = toMinutes(
-    values.fromHour,
-    values.fromMinute,
-    values.fromMeridiem,
-  );
-  const end = toMinutes(values.toHour, values.toMinute, values.toMeridiem);
-  if (end <= start) errors.time = 'End time must be after the start time.';
-
-  if (
-    (values.consultationType === 'in-person' ||
-      values.consultationType === 'both') &&
-    !feeOk(values.inPersonFee)
-  ) {
-    errors.inPersonFee = 'Enter the in-person consultation fee.';
-  }
-  if (
-    (values.consultationType === 'video' ||
-      values.consultationType === 'both') &&
-    !feeOk(values.videoFee)
-  ) {
-    errors.videoFee = 'Enter the video consultation fee.';
-  }
-
-  return errors;
-};
+const fieldOptions = { shouldValidate: true, shouldDirty: true };
 
 const toggleValue = (items: string[], value: string) =>
   items.includes(value)
     ? items.filter((item) => item !== value)
     : [...items, value];
 
-export default function ManageAvailabilityPage() {
+type ManageAvailabilityPageProps = {
+  availabilityId?: string;
+};
+
+export default function ManageAvailabilityPage({
+  availabilityId,
+}: ManageAvailabilityPageProps) {
   const router = useRouter();
-  const [values, setValues] = useState<FormValues>(initialValues);
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [visibleMonth, setVisibleMonth] = useState(() => new Date(2026, 9, 1));
-  const [todayIso, setTodayIso] = useState('');
+  const isEditing = Boolean(availabilityId);
+  const { userData } = useAuthStore((state) => state);
+  const { showLoader, hideLoader } = useLoadingStore((state) => state);
+  const prefilledId = useRef<string | null>(null);
 
-  useEffect(() => {
-    setTodayIso(toIsoDate(new Date()));
-  }, []);
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<TAvailabilityFormValues>({
+    resolver: yupResolver(AvailabilityFormSchema),
+    defaultValues: defaultAvailabilityFormValues,
+  });
 
-  const patch = (partial: Partial<FormValues>) => {
-    setValues((current) => ({ ...current, ...partial }));
-    setErrors({});
+  const { mutate: createAvailability, isPending: isCreatePending } =
+    useCreateAvailability();
+  const { mutate: updateAvailability, isPending: isUpdatePending } =
+    useUpdateAvailability();
+  const { data: availability, isPending: isLoadingAvailability } =
+    useGetAvailabilityById(availabilityId);
+  const isSubmitting = isCreatePending || isUpdatePending;
+  const editingSlot = isEditing ? (availability ?? null) : null;
+
+  const activeTab = useWatch({ control, name: 'editorTab' }) || 'specific';
+  const selectedDates = useWatch({ control, name: 'selectedDates' }) || [];
+  const recurringDays = useWatch({ control, name: 'recurringDays' }) || [];
+  const startDate = useWatch({ control, name: 'startDate' });
+  const endDate = useWatch({ control, name: 'endDate' });
+  const leaveDates = useWatch({ control, name: 'leaveDates' }) || [];
+  const fromTime =
+    useWatch({ control, name: 'fromTime' }) ||
+    defaultAvailabilityFormValues.fromTime;
+  const toTime =
+    useWatch({ control, name: 'toTime' }) ||
+    defaultAvailabilityFormValues.toTime;
+  const consultationType =
+    useWatch({ control, name: 'consultationType' }) || 'in-person';
+  const slotDuration = useWatch({ control, name: 'slotDuration' }) ?? 30;
+  const inPersonFee = useWatch({ control, name: 'inPersonFee' }) || '';
+  const videoFee = useWatch({ control, name: 'videoFee' }) || '';
+  const hideFee = useWatch({ control, name: 'hideFee' }) ?? false;
+  const requirePayment = useWatch({ control, name: 'requirePayment' }) ?? false;
+
+  const handleDone = async (res?: ICommonRoot) => {
+    if (!res?.success) {
+      hideLoader();
+      return;
+    }
+    showSuccessToast(
+      res.message ||
+      (isEditing
+        ? 'Availability updated successfully'
+        : 'Availability added successfully'),
+    );
+    await queryClient.invalidateQueries({
+      queryKey: [AvailbilityQueryKeys.GetAvailablity],
+    });
+    if (availabilityId) {
+      await queryClient.invalidateQueries({
+        queryKey: [AvailbilityQueryKeys.GetAvailabilityById, availabilityId],
+      });
+    }
+    hideLoader();
+    router.replace(projectRoutes.availability);
   };
 
-  const goBack = () => router.push(projectRoutes.availability);
+  const onSubmit = (data: TAvailabilityFormValues) => {
+    if (!userData?.id) {
+      showErrorToast('Doctor information not found. Please log in again.');
+      return;
+    }
 
-  const handleSave = () => {
-    const nextErrors = validate(values);
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0) return;
-    goBack();
+    const body = buildAvailabilityPayload(data, {
+      clinicId: userData?.clinic?.id,
+      editingSlot,
+    });
+
+    if (isEditing) {
+      if (!editingSlot?.id) return;
+      showLoader('Updating...');
+      updateAvailability(
+        { id: editingSlot.id, body },
+        { onSuccess: handleDone, onError: () => hideLoader() },
+      );
+      return;
+    }
+
+    showLoader('Adding...');
+    createAvailability(
+      { body },
+      { onSuccess: handleDone, onError: () => hideLoader() },
+    );
   };
 
   const handleToggleDate = (iso: string) => {
-    if (values.mode === 'leave') {
-      patch({ leaveDates: toggleValue(values.leaveDates, iso) });
+    if (activeTab === 'leave') {
+      setValue('leaveDates', toggleValue(leaveDates, iso), fieldOptions);
       return;
     }
-    patch({ selectedDates: toggleValue(values.selectedDates, iso) });
+    setValue('selectedDates', toggleValue(selectedDates, iso), fieldOptions);
   };
+
+  const handleTimeChange =
+    (field: 'fromTime' | 'toTime', current: TimeValue) =>
+      (patch: Partial<TimeValue>) =>
+        setValue(field, { ...current, ...patch }, fieldOptions);
+
+  useLayoutEffect(() => {
+    if (!editingSlot || prefilledId.current === String(editingSlot.id)) return;
+    prefilledId.current = String(editingSlot.id);
+    reset(mapAvailabilityToFormValues(editingSlot));
+  }, [editingSlot, reset]);
+
+  useEffect(() => {
+    if (!isEditing || isLoadingAvailability || editingSlot) return;
+    if (prefilledId.current === 'missing') return;
+    prefilledId.current = 'missing';
+    showErrorToast('Availability not found');
+    router.replace(projectRoutes.availability);
+  }, [isEditing, isLoadingAvailability, editingSlot, router]);
+
+  const breadcrumb = (
+    <PageBreadcrumb
+      items={BreadcrumbItems}
+      action={
+        <Button
+          className="page-action"
+          variant="outlined"
+          type="button"
+          onClick={() => router.replace(projectRoutes.availability)}
+          startIcon={<ArrowBackIcon fontSize="small" />}
+        >
+          Back to List
+        </Button>
+      }
+    />
+  );
+
+  if (!isEditing && editingSlot) {
+    return (
+      <ManageAvailabilityWrapper>
+        {breadcrumb}
+        <ManageAvailabilitySkeleton />
+      </ManageAvailabilityWrapper>
+    );
+  }
 
   return (
     <ManageAvailabilityWrapper>
-      <PageBreadcrumb items={breadcrumbItems} action={backAction} />
-
-      <Box className="form-card">
-        <Typography component="p" className="card-title">
-          Select Doctor
-        </Typography>
-        <Select
-          className="field-select"
-          fullWidth
-          displayEmpty
-          value={values.doctorId}
-          onChange={(event) => patch({ doctorId: event.target.value })}
-        >
-          <MenuItem value="">Select doctor</MenuItem>
-          {availabilityDoctors.map((doctor) => (
-            <MenuItem key={doctor.id} value={doctor.id}>
-              {doctor.name}
-            </MenuItem>
-          ))}
-        </Select>
-        {errors.doctorId ? (
-          <Typography component="p" className="field-error">
-            {errors.doctorId}
-          </Typography>
-        ) : null}
-      </Box>
-
+      {breadcrumb}
       <Box className="form-card">
         <Typography component="p" className="card-title">
           Availability Slot
@@ -246,95 +226,104 @@ export default function ManageAvailabilityPage() {
               component="button"
               type="button"
               role="tab"
-              aria-selected={values.mode === mode.id}
-              className={`mode-btn${values.mode === mode.id ? ' active' : ''}`}
-              onClick={() => patch({ mode: mode.id })}
+              aria-selected={activeTab === mode.id}
+              className={`mode-btn${activeTab === mode.id ? ' active' : ''}`}
+              onClick={() => setValue('editorTab', mode.id, fieldOptions)}
             >
               {mode.label}
             </Box>
           ))}
         </Box>
 
-        {values.mode === 'recurring' ? (
+        {activeTab === 'recurring' ? (
           <RecurringDaysFields
-            weekdays={values.weekdays}
-            startDate={values.recurringStart}
-            endDate={values.recurringEnd}
-            dayError={errors.weekdays}
-            rangeError={errors.dateRange}
+            weekdays={recurringDays}
+            startDate={startDate ?? ''}
+            endDate={endDate ?? ''}
+            dayError={errors.recurringDays?.message}
+            startDateError={errors.startDate?.message}
+            endDateError={errors.endDate?.message}
             onToggleDay={(day) =>
-              patch({ weekdays: toggleValue(values.weekdays, day) })
+              setValue(
+                'recurringDays',
+                toggleValue(recurringDays, day),
+                fieldOptions,
+              )
             }
-            onStartChange={(recurringStart) => patch({ recurringStart })}
-            onEndChange={(recurringEnd) => patch({ recurringEnd })}
+            onStartChange={(value) =>
+              setValue('startDate', value || null, fieldOptions)
+            }
+            onEndChange={(value) =>
+              setValue('endDate', value || null, fieldOptions)
+            }
           />
         ) : (
           <AvailabilityCalendar
-            mode={values.mode}
-            visibleMonth={visibleMonth}
-            selectedDates={values.selectedDates}
-            leaveDates={values.leaveDates}
-            todayIso={todayIso}
-            error={errors.dates}
-            onMonthChange={setVisibleMonth}
+            mode={activeTab}
+            selectedDates={selectedDates}
+            leaveDates={leaveDates}
+            error={
+              activeTab === 'leave'
+                ? errors.leaveDates?.message
+                : errors.selectedDates?.message
+            }
+            disablePastDates
             onToggleDate={handleToggleDate}
           />
         )}
       </Box>
 
       <AvailabilityFormFields
-        from={{
-          hour: values.fromHour,
-          minute: values.fromMinute,
-          meridiem: values.fromMeridiem,
-        }}
-        to={{
-          hour: values.toHour,
-          minute: values.toMinute,
-          meridiem: values.toMeridiem,
-        }}
-        consultationType={values.consultationType}
-        duration={values.duration}
-        inPersonFee={values.inPersonFee}
-        videoFee={values.videoFee}
-        hideFee={values.hideFee}
-        requirePayment={values.requirePayment}
-        timeError={errors.time}
-        inPersonFeeError={errors.inPersonFee}
-        videoFeeError={errors.videoFee}
-        onFromChange={(next) =>
-          patch({
-            fromHour: next.hour ?? values.fromHour,
-            fromMinute: next.minute ?? values.fromMinute,
-            fromMeridiem: next.meridiem ?? values.fromMeridiem,
-          })
+        from={fromTime}
+        to={toTime}
+        consultationType={consultationType}
+        duration={slotDuration}
+        inPersonFee={inPersonFee}
+        videoFee={videoFee}
+        hideFee={hideFee}
+        requirePayment={requirePayment}
+        timeError={errors.fromTime?.message || errors.toTime?.message}
+        durationError={errors.slotDuration?.message}
+        inPersonFeeError={errors.inPersonFee?.message}
+        videoFeeError={errors.videoFee?.message}
+        onFromChange={handleTimeChange('fromTime', fromTime)}
+        onToChange={handleTimeChange('toTime', toTime)}
+        onConsultationChange={(value) =>
+          setValue('consultationType', value, fieldOptions)
         }
-        onToChange={(next) =>
-          patch({
-            toHour: next.hour ?? values.toHour,
-            toMinute: next.minute ?? values.toMinute,
-            toMeridiem: next.meridiem ?? values.toMeridiem,
-          })
+        onDurationChange={(value) =>
+          setValue('slotDuration', value, fieldOptions)
         }
-        onConsultationChange={(consultationType) => patch({ consultationType })}
-        onDurationChange={(duration) => patch({ duration })}
-        onInPersonFeeChange={(inPersonFee) => patch({ inPersonFee })}
-        onVideoFeeChange={(videoFee) => patch({ videoFee })}
-        onHideFeeChange={(hideFee) => patch({ hideFee })}
-        onRequirePaymentChange={(requirePayment) => patch({ requirePayment })}
+        onInPersonFeeChange={(value) =>
+          setValue('inPersonFee', value, fieldOptions)
+        }
+        onVideoFeeChange={(value) => setValue('videoFee', value, fieldOptions)}
+        onHideFeeChange={(value) => {
+          setValue('hideFee', value, fieldOptions);
+          if (value) setValue('requirePayment', false, fieldOptions);
+        }}
+        onRequirePaymentChange={(value) => {
+          setValue('requirePayment', value, fieldOptions);
+          if (value) setValue('hideFee', false, fieldOptions);
+        }}
       />
 
       <Box className="form-footer">
-        <Button className="footer-btn" variant="outlined" onClick={goBack}>
+        <Button
+          className="footer-btn"
+          variant="outlined"
+          onClick={() => router.replace(projectRoutes.availability)}
+        >
           Cancel
         </Button>
         <Button
           className="footer-btn save-btn"
           variant="contained"
           disableElevation
-          onClick={handleSave}
+          disabled={isSubmitting}
+          onClick={handleSubmit(onSubmit)}
         >
-          Save
+          {isEditing ? 'Update' : 'Save'}
         </Button>
       </Box>
     </ManageAvailabilityWrapper>

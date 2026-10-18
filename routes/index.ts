@@ -24,6 +24,8 @@ export const projectRoutes = {
   patientDetails: (id: string) => `/dashboard/patients/${id}`,
   availability: '/dashboard/availability',
   manageAvailability: '/dashboard/availability/manage-availability',
+  editAvailability: (id: string | number) =>
+    `/dashboard/availability/manage-availability?availabilityId=${id}`,
   availabilityCalendar: '/dashboard/availability/calendar',
   meeting: '/dashboard/meeting',
   profile: '/dashboard/profile',

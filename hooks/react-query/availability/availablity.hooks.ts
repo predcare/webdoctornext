@@ -6,6 +6,7 @@ import {
 import {
   createAvailability,
   deleteAvailability,
+  getAvailabilityById,
   getAvailablity,
   getDocBookingAvails,
   getDoctorAvailDates,
@@ -89,4 +90,13 @@ export const useDoctorTimingsByDate = (params: {
       return v.data;
     },
     enabled: Boolean(params?.doctorId && params?.date),
+  });
+
+// get by id
+export const useGetAvailabilityById = (id?: number | string) =>
+  useQuery({
+    queryKey: [AvailbilityQueryKeys.GetAvailabilityById, id],
+    queryFn: () => getAvailabilityById(String(id)),
+    select: (v) => v.data,
+    enabled: Boolean(id),
   });

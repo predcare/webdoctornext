@@ -7,7 +7,7 @@ import {
   VideoIcon,
 } from '@/components/ui/Icons/appointments';
 import InfoTooltip from '@/components/ui/InfoTooltip/InfoTooltip';
-import { formatAvailabilityDate } from '@/resources/mock/availability';
+import { formatAvailabilityDate } from '@/lib/commons/availability.utils';
 import { Box, TableCell, TableRow } from '@mui/material';
 import { memo } from 'react';
 

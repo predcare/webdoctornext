@@ -1,17 +1,17 @@
 'use client';
 
 import CustomInput from '@/components/ui/CustomInput/CustomInput';
+import { DAYS_OF_WEEK } from '@/lib/commons/availability.utils';
 import { Box, Chip, Typography } from '@mui/material';
 import { memo } from 'react';
-
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 type RecurringDaysFieldsProps = {
   weekdays: string[];
   startDate: string;
   endDate: string;
   dayError?: string;
-  rangeError?: string;
+  startDateError?: string;
+  endDateError?: string;
   onToggleDay: (day: string) => void;
   onStartChange: (value: string) => void;
   onEndChange: (value: string) => void;
@@ -22,7 +22,8 @@ function RecurringDaysFields({
   startDate,
   endDate,
   dayError,
-  rangeError,
+  startDateError,
+  endDateError,
   onToggleDay,
   onStartChange,
   onEndChange,
@@ -33,16 +34,16 @@ function RecurringDaysFields({
         Repeat on
       </Typography>
       <Box className="weekday-row">
-        {WEEKDAYS.map((day) => (
+        {DAYS_OF_WEEK.map((day) => (
           <Box
-            key={day}
+            key={day.key}
             component="button"
             type="button"
-            className={`weekday-btn${weekdays.includes(day) ? ' active' : ''}`}
-            aria-pressed={weekdays.includes(day)}
-            onClick={() => onToggleDay(day)}
+            className={`weekday-btn${weekdays.includes(day.key) ? ' active' : ''}`}
+            aria-pressed={weekdays.includes(day.key)}
+            onClick={() => onToggleDay(day.key)}
           >
-            {day}
+            {day.label}
           </Box>
         ))}
       </Box>
@@ -58,14 +59,16 @@ function RecurringDaysFields({
           type="date"
           value={startDate}
           onChange={(event) => onStartChange(event.target.value)}
+          error={Boolean(startDateError)}
+          helperText={startDateError}
         />
         <CustomInput
           inputLabelName="End date"
           type="date"
           value={endDate}
           onChange={(event) => onEndChange(event.target.value)}
-          error={Boolean(rangeError)}
-          helperText={rangeError}
+          error={Boolean(endDateError)}
+          helperText={endDateError}
         />
       </Box>
 
@@ -79,14 +82,16 @@ function RecurringDaysFields({
               No days selected
             </Typography>
           ) : (
-            WEEKDAYS.filter((day) => weekdays.includes(day)).map((day) => (
-              <Chip
-                key={day}
-                className="date-chip"
-                label={day}
-                onDelete={() => onToggleDay(day)}
-              />
-            ))
+            DAYS_OF_WEEK.filter((day) => weekdays.includes(day.key)).map(
+              (day) => (
+                <Chip
+                  key={day.key}
+                  className="date-chip"
+                  label={day.label}
+                  onDelete={() => onToggleDay(day.key)}
+                />
+              ),
+            )
           )}
         </Box>
       </Box>

@@ -11,7 +11,7 @@ export enum ProfileQueryKeys {
   UpdateProfile = 'UpdateProfile',
   DoctorProfile = 'DoctorProfile',
   ALL_PATIENTS = 'ALL_PATIENTS',
-  DoctorClinics='DoctorClinics'
+  DoctorClinics = 'DoctorClinics',
 }
 
 export enum NotificationQueryKeys {
@@ -92,6 +92,7 @@ export enum AvailbilityQueryKeys {
   CreateAvailability = 'CreateAvailability',
   UpdateAvailability = 'UpdateAvailability',
   GetMyAvailablity = 'GetMyAvailablity',
+  GetAvailabilityById = 'GetAvailabilityById',
 }
 
 export enum MyInvoices {

@@ -1,10 +1,171 @@
 import dayjs from 'dayjs';
+import type { TAvailabilityFormValues } from '../schemas/availability.schema';
 import {
   IDocBookingAvailRoot,
   IDocBookingAvailSlot,
   IMyAvailabilityDoc,
   ITimeSlotsDoc,
 } from '../../typescripts/interfaces/availability.interfaces';
+
+export type TimeValue = {
+  hour: string;
+  minute: string;
+  period: 'AM' | 'PM';
+};
+
+export const DAYS_OF_WEEK = [
+  { key: 'monday', label: 'Mon' },
+  { key: 'tuesday', label: 'Tue' },
+  { key: 'wednesday', label: 'Wed' },
+  { key: 'thursday', label: 'Thu' },
+  { key: 'friday', label: 'Fri' },
+  { key: 'saturday', label: 'Sat' },
+  { key: 'sunday', label: 'Sun' },
+];
+
+const MONTH_LABELS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+export const formatAvailabilityDate = (iso: string) => {
+  const [, month, day] = iso.split('-');
+  const monthIndex = Number(month) - 1;
+  if (!day || monthIndex < 0 || monthIndex > 11) return iso;
+  return `${Number(day)} ${MONTH_LABELS[monthIndex]}`;
+};
+
+export const parseTimeStringToTimeValue = (timeStr?: string | null): TimeValue => {
+  if (!timeStr) return { hour: '09', minute: '00', period: 'AM' };
+  const trimmed = timeStr.trim();
+  const parts = trimmed.split(':');
+  let h = parseInt(parts[0], 10) || 9;
+  const m = parts[1] || '00';
+  const period: 'AM' | 'PM' = h >= 12 ? 'PM' : 'AM';
+  if (h === 0) h = 12;
+  else if (h > 12) h -= 12;
+  const hourStr = String(h).padStart(2, '0');
+  return { hour: hourStr, minute: m, period };
+};
+
+export const formatTimeValueToHHMM = (tv: TimeValue): string => {
+  if (!tv) return '09:00';
+  let h = parseInt(tv.hour, 10) || 9;
+  if (tv.period === 'PM' && h < 12) h += 12;
+  if (tv.period === 'AM' && h === 12) h = 0;
+  const hh = String(h).padStart(2, '0');
+  const mm = String(tv.minute || '00').padStart(2, '0');
+  return `${hh}:${mm}`;
+};
+
+export const defaultAvailabilityFormValues: TAvailabilityFormValues = {
+  editorTab: 'specific',
+  selectedDates: [],
+  recurringDays: [],
+  startDate: null,
+  endDate: null,
+  leaveDates: [],
+  fromTime: { hour: '09', minute: '00', period: 'AM' },
+  toTime: { hour: '05', minute: '00', period: 'PM' },
+  consultationType: 'in-person',
+  slotDuration: 30,
+  inPersonFee: '',
+  videoFee: '',
+  hideFee: false,
+  requirePayment: false,
+};
+
+export const mapAvailabilityToFormValues = (
+  doc: IMyAvailabilityDoc,
+): TAvailabilityFormValues => ({
+  editorTab:
+    doc.date_selection_mode === 'recurring' ||
+    doc.date_selection_mode === 'leave' ||
+    doc.date_selection_mode === 'specific'
+      ? doc.date_selection_mode
+      : 'specific',
+  selectedDates: doc.selected_dates || [],
+  recurringDays: doc.recurring_days || [],
+  startDate: doc.recurring_start_date
+    ? dayjs(doc.recurring_start_date).format('YYYY-MM-DD')
+    : null,
+  endDate: doc.recurring_end_date
+    ? dayjs(doc.recurring_end_date).format('YYYY-MM-DD')
+    : null,
+  leaveDates: doc.leave_dates || [],
+  fromTime: parseTimeStringToTimeValue(doc.from_time),
+  toTime: parseTimeStringToTimeValue(doc.to_time),
+  consultationType:
+    doc.consultation_type === 'video' ||
+    doc.consultation_type === 'both' ||
+    doc.consultation_type === 'in-person'
+      ? doc.consultation_type
+      : 'in-person',
+  slotDuration: doc.slot_duration || 30,
+  inPersonFee: doc.in_person_fee ? String(doc.in_person_fee) : '',
+  videoFee: doc.video_fee ? String(doc.video_fee) : '',
+  hideFee: Boolean(doc.hide_fee),
+  requirePayment: Boolean(doc.require_payment),
+});
+
+export const buildAvailabilityPayload = (
+  data: TAvailabilityFormValues,
+  {
+    clinicId,
+    editingSlot,
+  }: { clinicId?: number | string; editingSlot?: IMyAvailabilityDoc | null },
+) => {
+  let inPersonFee = 0;
+  let videoFee = 0;
+
+  if (data.consultationType === 'in-person') {
+    inPersonFee = parseFloat(data.inPersonFee) || 0;
+  } else if (data.consultationType === 'video') {
+    videoFee = parseFloat(data.videoFee) || 0;
+  } else if (data.consultationType === 'both') {
+    inPersonFee = parseFloat(data.inPersonFee) || 0;
+    videoFee = parseFloat(data.videoFee) || 0;
+  }
+
+  const targetMode =
+    data.editorTab === 'leave'
+      ? (editingSlot?.date_selection_mode as string) ||
+        (data.recurringDays && data.recurringDays.length > 0
+          ? 'recurring'
+          : 'specific')
+      : data.editorTab;
+
+  return {
+    clinic_id: clinicId || '',
+    date_selection_mode: targetMode,
+    selected_dates: data.selectedDates || [],
+    recurring_days: data.recurringDays || [],
+    recurring_start_date:
+      data.startDate && data.startDate.trim() !== '' ? data.startDate : null,
+    recurring_end_date:
+      data.endDate && data.endDate.trim() !== '' ? data.endDate : null,
+    leave_dates: data.leaveDates || [],
+    slot_duration: Number(data.slotDuration),
+    from_time: formatTimeValueToHHMM(data.fromTime),
+    to_time: formatTimeValueToHHMM(data.toTime),
+    consultation_type: data.consultationType,
+    in_person_fee: inPersonFee,
+    video_fee: videoFee,
+    hide_fee: Boolean(data.hideFee),
+    require_payment: Boolean(data.requirePayment),
+    status: true,
+  };
+};
 
 export interface ParsedAvailableDate {
   date: string;
