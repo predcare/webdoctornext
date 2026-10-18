@@ -83,7 +83,7 @@ function PatientProfileCard({ details }: PatientProfileCardProps) {
             className="profile-btn"
             variant="contained"
             component={Link}
-            href={projectRoutes.bookAppointment(details.id)}
+            href={projectRoutes.bookAppointment}
             startIcon={<AddIcon fontSize="small" />}
           >
             Book Appointment

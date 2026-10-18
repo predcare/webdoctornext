@@ -7,5 +7,6 @@ export interface IStatsInfo {
   week_appointments: number;
   month_appointments: number;
   earnings: number;
+  currency: string;
   total_patients: number;
 }

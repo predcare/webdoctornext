@@ -1,7 +1,7 @@
 "use client"
 
 import { StatCardWrapper } from '@/styles/CustomStyled/StatCardWrapper';
-import { Typography } from '@mui/material';
+import { Skeleton, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
 export type StatCardTone = 'info' | 'teal' | 'warning' | 'success';
@@ -13,9 +13,24 @@ type StatCardProps = {
   period?: string;
   tone?: StatCardTone;
   compact?: boolean;
+  loading?: boolean;
 };
 
-const StatCard = ({ title, value, icon, period, tone = 'teal', compact = false }: StatCardProps) => {
+const StatCard = ({
+  title,
+  value,
+  icon,
+  period,
+  tone = 'teal',
+  compact = false,
+  loading = false,
+}: StatCardProps) => {
+  const valueContent = loading ? (
+    <Skeleton variant="text" width={compact ? 48 : 72} sx={{ display: 'inline-block' }} />
+  ) : (
+    value
+  );
+
   return (
     <StatCardWrapper className={`tone-${tone}${compact ? ' compact' : ''}`}>
       {compact ? (
@@ -26,7 +41,7 @@ const StatCard = ({ title, value, icon, period, tone = 'teal', compact = false }
               {title}
             </Typography>
             <Typography className="stat-value" component="p">
-              {value}
+              {valueContent}
             </Typography>
             {period ? <span className="stat-period">{period}</span> : null}
           </div>
@@ -41,7 +56,7 @@ const StatCard = ({ title, value, icon, period, tone = 'teal', compact = false }
             {title}
           </Typography>
           <Typography className="stat-value" component="p">
-            {value}
+            {valueContent}
           </Typography>
         </>
       )}

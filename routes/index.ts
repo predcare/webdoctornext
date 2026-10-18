@@ -18,10 +18,7 @@ export const projectRoutes = {
   dashboard: '/dashboard',
   appointments: '/dashboard/appointments',
   appointmentDetails: (id: string) => `/dashboard/appointments/${id}`,
-  bookAppointment: (patientId?: string) =>
-    patientId
-      ? `/dashboard/appointments/book-appointment?patientId=${patientId}`
-      : '/dashboard/appointments/book-appointment',
+  bookAppointment: `/dashboard/appointments/book-appointment`,
   patients: '/dashboard/patients',
   addPatient: '/dashboard/patients/add-patient',
   patientDetails: (id: string) => `/dashboard/patients/${id}`,

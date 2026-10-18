@@ -1,56 +1,64 @@
 'use client';
 
-import AppointmentStatusBadge from '@/components/commons/AppointmentStatusBadge/AppointmentStatusBadge';
-import CustomActionMenu, {
-    CustomActionMenuTrigger,
-} from '@/components/ui/CustomActionMenu/CustomActionMenu';
-import CustomTable from '@/components/ui/CustomTable/CustomTable';
-import { AppointmentsIcon } from '@/components/ui/Icons/dashboard';
+import type { DashboardStat } from '@/components/Modules/DahsboardModule/constants/dashboardStats';
+import TodayAppointmentsTable from '@/components/Modules/DahsboardModule/TodayAppointments/TodayAppointmentsTable';
 import StatCard from '@/components/ui/StatCard/StatCard';
 import useStatIcons from '@/components/ui/StatCard/useStatIcons';
-import {
-    dashboardAppointments,
-    dashboardStats,
-} from '@/resources/mock';
-import { projectRoutes } from '@/routes';
-import { useActionMenu } from '@/hooks/commons/useActionMenu';
+import { useDoctorStats } from '@/hooks/react-query/stats/stats.hooks';
 import { DashboardStatsGrid } from '@/styles/CustomStyled/StatCardWrapper';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { Box, Button, TableCell, TableRow, Typography } from '@mui/material';
-import Link from 'next/link';
-import { useMemo, useState } from 'react';
-
-const headList = [
-    'Patient',
-    'Appointment ID',
-    'Date',
-    'Time',
-    'Status',
-    'Actions',
-];
+import { useAuthStore } from '@/zustand/stores/useAuthStore';
+import { Box } from '@mui/material';
+import { useMemo } from 'react';
 
 export default function DashboardModulePage() {
     const statIcons = useStatIcons();
-    const actionMenu = useActionMenu();
-    const [search, setSearch] = useState('');
-    const appointments = useMemo(() => {
-        const query = search.trim().toLowerCase();
-        if (!query) return dashboardAppointments;
 
-        return dashboardAppointments.filter((row) =>
-            [
-                row.name,
-                row.appointmentId,
-                row.date,
-                row.status,
-                `${row.startTime} to ${row.endTime}`,
-                `${row.age}`,
-            ]
-                .join(' ')
-                .toLowerCase()
-                .includes(query),
-        );
-    }, [search]);
+    const { userData } = useAuthStore((state) => state);
+
+    const { data: statsInfo, isPending: statsPending } = useDoctorStats({
+        clinic_id: Number(userData?.clinic?.id) || 0,
+    });
+
+    const dashboardStats = useMemo<DashboardStat[]>(
+        () => [
+            {
+                id: 'patients',
+                title: 'Total Patients',
+                value: `${statsInfo?.total_patients ?? 0}`,
+                icon: 'patients',
+                tone: 'info',
+            },
+            {
+                id: 'appointments',
+                title: 'Total Appointments',
+                value: `${statsInfo?.upcoming_appointments ?? 0}`,
+                period: 'Today',
+                icon: 'appointments',
+                tone: 'teal',
+            },
+            {
+                id: 'consultations',
+                title: 'Total Consultations',
+                value: `${statsInfo?.week_appointments ?? 0}`,
+                period: 'This month',
+                icon: 'consultations',
+                tone: 'warning',
+            },
+            {
+                id: 'billed',
+                title: 'Billed Amount',
+                value: new Intl.NumberFormat('en-IN', {
+                    style: 'currency',
+                    currency: statsInfo?.currency || 'INR',
+                    maximumFractionDigits: 0,
+                }).format(statsInfo?.earnings ?? 0),
+                period: 'Monthly',
+                icon: 'billing',
+                tone: 'success',
+            },
+        ],
+        [statsInfo],
+    );
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -63,214 +71,12 @@ export default function DashboardModulePage() {
                         period={stat.period}
                         tone={stat.tone}
                         icon={statIcons[stat.icon]}
+                        loading={statsPending}
                     />
                 ))}
             </DashboardStatsGrid>
 
-            <CustomTable
-                headList={headList}
-                customHeader={
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            gap: '12px',
-                            flexWrap: 'wrap',
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '10px',
-                                minWidth: 0,
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    display: 'inline-flex',
-                                    color: (theme) => theme.palette.customColors.brandTeal,
-                                }}
-                            >
-                                <AppointmentsIcon size={20} />
-                            </Box>
-                            <Typography
-                                component="h2"
-                                sx={{
-                                    margin: 0,
-                                    fontSize: 16,
-                                    fontWeight: 700,
-                                    lineHeight: '22px',
-                                    color: (theme) => theme.palette.customColors.heading,
-                                }}
-                            >
-                                Today&apos;s Appointments
-                            </Typography>
-                        </Box>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                flexShrink: 0,
-                            }}
-                        >
-                            <Button
-                                component={Link}
-                                href={projectRoutes.bookAppointment()}
-                                variant="contained"
-                                disableElevation
-                                sx={{
-                                    height: 36,
-                                    px: 1.75,
-                                    borderRadius: '8px',
-                                    textTransform: 'none',
-                                    fontSize: 13,
-                                    fontWeight: 600,
-                                    whiteSpace: 'nowrap',
-                                }}
-                            >
-                                + Add Appointment
-                            </Button>
-                            <Button
-                                component={Link}
-                                href={projectRoutes.appointments}
-                                variant="text"
-                                sx={{
-                                    minWidth: 0,
-                                    px: 1,
-                                    textTransform: 'none',
-                                    fontSize: 14,
-                                    fontWeight: 600,
-                                    whiteSpace: 'nowrap',
-                                    color: (theme) => theme.palette.customColors.brandTeal,
-                                }}
-                            >
-                                View All
-                            </Button>
-                        </Box>
-                    </Box>
-                }
-                page={1}
-                totalPages={2}
-                onPageChange={() => { }}
-                onClear={() => setSearch('')}
-                isEmpty={appointments.length === 0}
-                emptyText="No appointments found"
-                emptyDescription={
-                    search.trim()
-                        ? 'Change the search or clear it to see appointments.'
-                        : undefined
-                }
-            >
-                {appointments.map((row) => (
-                    <TableRow key={row.id}>
-                        <TableCell>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '10px',
-                                    minWidth: 0,
-                                }}
-                            >
-                                <Box
-                                    sx={{
-                                        width: 36,
-                                        height: 36,
-                                        borderRadius: '50%',
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        flexShrink: 0,
-                                        background: (theme) => theme.palette.customColors.brandTeal,
-                                        color: '#ffffff',
-                                        fontSize: 14,
-                                        fontWeight: 700,
-                                    }}
-                                >
-                                    {row.initial}
-                                </Box>
-                                <Box sx={{ minWidth: 0 }}>
-                                    <Typography
-                                        component="p"
-                                        sx={{
-                                            margin: 0,
-                                            fontSize: 13,
-                                            fontWeight: 600,
-                                            lineHeight: '18px',
-                                            color: (theme) => theme.palette.customColors.heading,
-                                        }}
-                                    >
-                                        {row.name}
-                                    </Typography>
-                                    <Typography
-                                        component="p"
-                                        sx={{
-                                            margin: 0,
-                                            fontSize: 12,
-                                            fontWeight: 400,
-                                            lineHeight: '16px',
-                                            color: (theme) => theme.palette.customColors.textMuted,
-                                        }}
-                                    >
-                                        {row.age} yrs
-                                    </Typography>
-                                </Box>
-                            </Box>
-                        </TableCell>
-                        <TableCell>{row.appointmentId}</TableCell>
-                        <TableCell>{row.date}</TableCell>
-                        <TableCell>
-                            {row.startTime} to {row.endTime}
-                        </TableCell>
-                        <TableCell>
-                            <AppointmentStatusBadge status={row.status} />
-                        </TableCell>
-                        <TableCell>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    flexWrap: 'nowrap',
-                                    gap: '8px',
-                                    whiteSpace: 'nowrap',
-                                }}
-                            >
-                                <Button
-                                    size="small"
-                                    variant="contained"
-                                    disableElevation
-                                    sx={{
-                                        flexShrink: 0,
-                                        textTransform: 'none',
-                                        whiteSpace: 'nowrap',
-                                        fontSize: 12,
-                                        fontWeight: 600,
-                                        height: 32,
-                                        px: 1.25,
-                                    }}
-                                >
-                                    Start Consultation
-                                </Button>
-                                <CustomActionMenuTrigger
-                                    aria-label={`Actions for ${row.name}`}
-                                    onClick={(event) => actionMenu.open(event.currentTarget)}
-                                />
-                            </Box>
-                        </TableCell>
-                    </TableRow>
-                ))}
-            </CustomTable>
-
-            <CustomActionMenu
-                anchorEl={actionMenu.anchorEl}
-                onClose={actionMenu.close}
-                items={[
-                    { key: 'view', label: 'View', icon: <VisibilityOutlinedIcon /> },
-                ]}
-            />
+            <TodayAppointmentsTable />
         </Box>
     );
 }

@@ -16,12 +16,11 @@ export { buildCalendarMonth } from './availabilityCalendar';
 export type { CalendarDay, CalendarSlot } from './availabilityCalendar';
 export { clinics } from './clinics';
 export type { Clinic } from './clinics';
-export { dashboardStats } from './dashboardStats';
 export type {
   DashboardStat,
   DashboardStatIcon,
   DashboardStatTone,
-} from './dashboardStats';
+} from '../../components/Modules/DahsboardModule/constants/dashboardStats';
 export {
   registerCities,
   registerMedicalCouncils,
