@@ -1,8 +1,8 @@
 import ManageAvailabilityPage from '@/components/Modules/AvailabilityModule/ManageAvailability/ManageAvailabilityPage';
+import DashboardInvalidParamView from '@/components/Modules/NotFoundModule/DashboardInvalidParamView';
 import { decodeUrlParam } from '@/lib/functions/_urlParams.lib';
 import { projectRoutes } from '@/routes';
 import type { Metadata } from 'next';
-import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
 type RouteProps = {
@@ -25,7 +25,7 @@ async function ManageAvailabilityContent({ searchParams }: RouteProps) {
   const id = decodeUrlParam(availabilityId);
 
   if (availabilityId && !id) {
-    redirect(projectRoutes.availability);
+    return <DashboardInvalidParamView fallbackHref={projectRoutes.availability} seconds={5} />;
   }
 
   return <ManageAvailabilityPage availabilityId={id ?? undefined} />;

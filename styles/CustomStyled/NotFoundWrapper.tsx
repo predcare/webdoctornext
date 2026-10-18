@@ -285,6 +285,25 @@ export const NotFoundWrapper = styled(Box)`
     border-top: 1px dashed ${({ theme }) => theme.palette.customColors.border};
   }
 
+  &.dashboard .countdown {
+    margin: 0 0 24px;
+    font-size: 0.9rem;
+    color: ${({ theme }) => theme.palette.text.secondary};
+  }
+
+  &.dashboard .countdown strong {
+    color: ${({ theme }) => theme.palette.customColors.brandTeal};
+  }
+
+  &.dashboard.error .status-chip {
+    color: ${({ theme }) => theme.palette.error.main};
+    background-color: color-mix(
+      in srgb,
+      ${({ theme }) => theme.palette.error.main} 10%,
+      transparent
+    );
+  }
+
   &.auth .not-found-card {
     padding: 24px;
     box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
