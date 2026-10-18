@@ -1,5 +1,8 @@
 import ManageAvailabilityPage from '@/components/Modules/AvailabilityModule/ManageAvailability/ManageAvailabilityPage';
+import { decodeUrlParam } from '@/lib/functions/_urlParams.lib';
+import { projectRoutes } from '@/routes';
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
 type RouteProps = {
@@ -19,8 +22,13 @@ export async function generateMetadata({
 
 async function ManageAvailabilityContent({ searchParams }: RouteProps) {
   const { availabilityId } = await searchParams;
+  const id = decodeUrlParam(availabilityId);
 
-  return <ManageAvailabilityPage availabilityId={availabilityId} />;
+  if (availabilityId && !id) {
+    redirect(projectRoutes.availability);
+  }
+
+  return <ManageAvailabilityPage availabilityId={id ?? undefined} />;
 }
 
 export default function ManageAvailabilityRoute({ searchParams }: RouteProps) {

@@ -1,3 +1,5 @@
+import { encodeUrlParam } from '@/lib/functions/_urlParams.lib';
+
 export const projectRoutes = {
   home: '/',
   aboutUs: '/about-us',
@@ -25,7 +27,7 @@ export const projectRoutes = {
   availability: '/dashboard/availability',
   manageAvailability: '/dashboard/availability/manage-availability',
   editAvailability: (id: string | number) =>
-    `/dashboard/availability/manage-availability?availabilityId=${id}`,
+    `/dashboard/availability/manage-availability?availabilityId=${encodeUrlParam(id)}`,
   availabilityCalendar: '/dashboard/availability/calendar',
   meeting: '/dashboard/meeting',
   profile: '/dashboard/profile',
