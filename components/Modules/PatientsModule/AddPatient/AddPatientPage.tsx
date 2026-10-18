@@ -131,8 +131,6 @@ export default function AddPatientPage() {
     },
   });
 
-  console.log('errors', errors);
-
   const selectionMode = useWatch({ control, name: 'selectionMode' });
   const profileImage = useWatch({ control, name: 'profile_image' });
   const phone = useWatch({ control, name: 'phone' }) || '';

@@ -42,7 +42,11 @@ export const sideNavItems: SideNavItem[] = [
     icon: 'appointments',
     section: 'main',
     children: [
-      { id: 'appointments-upcoming', name: 'Appointment List', href: projectRoutes.appointments },
+      {
+        id: 'appointments-upcoming',
+        name: 'Appointment List',
+        href: projectRoutes.appointments,
+      },
       { id: 'appointments-completed', name: 'Booked Appointment' },
     ],
   },
@@ -52,9 +56,16 @@ export const sideNavItems: SideNavItem[] = [
     icon: 'patients',
     section: 'main',
     children: [
-      { id: 'patients-all', name: 'Patients List', href: projectRoutes.patients },
-      { id: 'patients-records', name: 'Add Patient', href: projectRoutes.addPatient },
-      { id: 'patients-prescription', name: 'Manage Prescription', href: projectRoutes.managePrescription },
+      {
+        id: 'patients-all',
+        name: 'Patients List',
+        href: projectRoutes.patients,
+      },
+      {
+        id: 'patients-records',
+        name: 'Add Patient',
+        href: projectRoutes.addPatient,
+      },
     ],
   },
   {
@@ -63,9 +74,21 @@ export const sideNavItems: SideNavItem[] = [
     icon: 'availability',
     section: 'main',
     children: [
-      { id: 'availability-weekly', name: 'Availability List', href: projectRoutes.availability },
-      { id: 'availability-time-off', name: 'Add Availability', href: projectRoutes.manageAvailability },
-      { id: 'availability-calendar', name: 'Calendar View', href: projectRoutes.availabilityCalendar },
+      {
+        id: 'availability-weekly',
+        name: 'Availability List',
+        href: projectRoutes.availability,
+      },
+      {
+        id: 'availability-time-off',
+        name: 'Add Availability',
+        href: projectRoutes.manageAvailability,
+      },
+      {
+        id: 'availability-calendar',
+        name: 'Calendar View',
+        href: projectRoutes.availabilityCalendar,
+      },
     ],
   },
   {

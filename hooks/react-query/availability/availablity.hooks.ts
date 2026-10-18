@@ -1,5 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { AvailbilityQueryKeys, DoctorAvailabilityQueryKeys } from '../query.keys';
+import {
+  AvailbilityQueryKeys,
+  DoctorAvailabilityQueryKeys,
+} from '../query.keys';
 import {
   createAvailability,
   deleteAvailability,
@@ -14,8 +17,7 @@ export const useAvailablityList = () =>
   useQuery({
     queryKey: [AvailbilityQueryKeys.GetAvailablity],
     queryFn: () => getAvailablity(),
-    select: v => {
-      console.log('vvvvv', v);
+    select: (v) => {
       if (Array.isArray(v)) return v;
       if (Array.isArray(v?.data)) return v.data;
       return [];
@@ -37,10 +39,14 @@ export const useCreateAvailability = () =>
 // update
 export const useUpdateAvailability = () =>
   useMutation({
-    mutationFn: ({ id, body }: { id: number | string; body: any }) => updateAvailability(id, body),
+    mutationFn: ({ id, body }: { id: number | string; body: any }) =>
+      updateAvailability(id, body),
   });
 
-export const useBookingAvailablities = (params: { doctorId: number; clinicId: number }) =>
+export const useBookingAvailablities = (params: {
+  doctorId: number;
+  clinicId: number;
+}) =>
   useQuery({
     queryKey: [AvailbilityQueryKeys.GetMyAvailablity, params],
     queryFn: () => getDocBookingAvails(params?.doctorId, params?.clinicId),
@@ -60,7 +66,7 @@ export const useDoctorAvailDates = (params: {
         consultation_type: params?.consultation_type,
         clinic_id: params?.clinicId,
       }),
-    select: v => v.data,
+    select: (v) => v.data,
     enabled: Boolean(params?.doctorId),
   });
 
@@ -79,7 +85,7 @@ export const useDoctorTimingsByDate = (params: {
         consultation_type: params?.consultation_type,
         clinic_id: params?.clinicId,
       }),
-    select: v => {
+    select: (v) => {
       return v.data;
     },
     enabled: Boolean(params?.doctorId && params?.date),

@@ -71,9 +71,9 @@ export const AvailabilityListWrapper = styled(Box)`
     &:hover {
       --variant-containedColor: ${({ theme }) => theme.palette.common.white};
       --variant-containedBg: ${({ theme }) =>
-        theme.palette.customColors.brandTealDark};
+    theme.palette.customColors.brandTealDark};
       background-color: ${({ theme }) =>
-        theme.palette.customColors.brandTealDark};
+    theme.palette.customColors.brandTealDark};
       color: ${({ theme }) => theme.palette.common.white};
     }
   }
@@ -202,6 +202,12 @@ export const AvailabilityListWrapper = styled(Box)`
   .more-chip {
     color: ${({ theme }) => theme.palette.common.white};
     background: ${({ theme }) => theme.palette.customColors.brandTeal};
+    cursor: pointer;
+
+    &:hover {
+      background: ${({ theme }) => theme.palette.customColors.brandTeal};
+      opacity: 0.9;
+    }
   }
 
   .fee-chip {

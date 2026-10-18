@@ -26,7 +26,20 @@ export const availabilityDoctors: AvailabilityDoctor[] = [
   { id: 'mehra', name: 'Dr. Rahul Mehra' },
 ];
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
 
 export const formatAvailabilityDate = (iso: string) => {
   const [, month, day] = iso.split('-');

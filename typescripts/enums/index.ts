@@ -46,3 +46,9 @@ export enum ThemeMode {
 }
 
 export type TLoginMode = 'mobile' | 'email';
+
+export enum AvailabilityMode {
+  Specific = 'specific',
+  Recurring = 'recurring',
+  Leave = 'leave',
+}
