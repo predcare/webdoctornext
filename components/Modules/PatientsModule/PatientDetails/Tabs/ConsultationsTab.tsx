@@ -2,34 +2,64 @@
 
 import PatientAppointmentRow from '@/components/Modules/PatientsModule/PatientDetails/Appointments/PatientAppointmentRow';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
-import { getPatientAppointments, type PatientDetails } from '@/resources/mock';
+import { useMyPatientConsults } from '@/hooks/react-query/patients/patients.hooks';
+import { formatDate, formatTimeSlot } from '@/lib/commons/common.utils';
+import { type PatientDetails } from '@/resources/mock';
 import { PatientAppointmentsWrapper } from '@/styles/CustomStyled/PatientAppointmentsWrapper';
-import { memo, useMemo } from 'react';
+import { memo, useState } from 'react';
 
-const headList = ['Appointment', 'Modality', 'Schedule', 'Specialist', 'Status', ''];
+const headList = [
+  'Appointment',
+  'Modality',
+  'Appointment Date',
+  'Appointment Time',
+  'Status',
+  'Actions',
+];
 
 type ConsultationsTabProps = {
-  details: PatientDetails;
+  patientId: string;
 };
 
-function ConsultationsTab({ details }: ConsultationsTabProps) {
-  const appointments = useMemo(() => getPatientAppointments(details), [details]);
+function ConsultationsTab({ patientId }: ConsultationsTabProps) {
+  const [page, setPage] = useState(1);
+
+  const { data: ptConsults, isPending: ptConsultPending } =
+    useMyPatientConsults({
+      limit: 2,
+      page,
+      patientId,
+      status: 'completed,confirmed,in-progress',
+    });
 
   return (
     <PatientAppointmentsWrapper>
       <CustomTable
         className="patient-appointment-table"
         headList={headList}
-        showSearch
-        searchPlaceholder="Search consultations..."
-        totalResults={appointments.length}
-        page={1}
-        totalPages={1}
-        isEmpty={appointments.length === 0}
+        totalResults={ptConsults?.meta?.total ?? 0}
+        page={page}
+        totalPages={ptConsults?.meta?.totalPages ?? 1}
+        onPageChange={setPage}
+        isLoading={ptConsultPending}
+        isEmpty={!ptConsultPending && ptConsults?.meta?.total === 0}
         emptyText="No consultations found"
+        zebraStriping={false}
       >
-        {appointments.map((row) => (
-          <PatientAppointmentRow key={row.id} row={row} />
+        {ptConsults?.data.map((consult) => (
+          <PatientAppointmentRow
+            key={consult.id}
+            id={String(consult.id)}
+            appointmentId={consult.appointment_id}
+            consultationType={consult.consultation_type}
+            reason={consult.reason || ''}
+            appointmentDate={formatDate(consult.appointment_date)}
+            appointmentTime={formatTimeSlot(
+              consult.start_time,
+              consult.end_time,
+            )}
+            appointmentStatus={consult.appointment_status}
+          />
         ))}
       </CustomTable>
     </PatientAppointmentsWrapper>

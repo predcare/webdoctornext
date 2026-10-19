@@ -1,47 +1,109 @@
 'use client';
 
+import { EMR_RECORD_CATEGORIES } from '@/components/Modules/PatientsModule/constants/patients.constants';
 import TabSectionCard from '@/components/Modules/PatientsModule/PatientDetails/CardForms/TabSectionCard';
+import MedicalRecordRow from '@/components/Modules/PatientsModule/PatientDetails/MedicalRecords/MedicalRecordRow';
 import UploadMedicalRecordModal from '@/components/Modules/PatientsModule/PatientDetails/Modal/UploadMedicalRecordModal';
+import { queryClient } from '@/components/Providers/ReactQueryProvider';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
-import DeleteIcon from '@/components/ui/Icons/DeleteIcon';
-import type { PatientDetails } from '@/resources/mock';
+import {
+  useMyPatientEmrs,
+  useShareEmrDocument,
+} from '@/hooks/react-query/patients/patients.hooks';
+import { PatientsQueryKeys } from '@/hooks/react-query/query.keys';
+import {
+  _toTitleCase,
+  formatDate,
+  openInNewTab,
+} from '@/lib/commons/common.utils';
+import { showInDevelopment, showSuccessToast } from '@/lib/commons/toast';
 import { PatientTabContentWrapper } from '@/styles/CustomStyled/PatientTabContentWrapper';
-import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import { useAlertStore } from '@/zustand/stores/useAlertStore';
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
-import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import {
   Box,
   Button,
-  IconButton,
   MenuItem,
   Select,
-  TableCell,
-  TableRow,
   TextField,
   Typography,
 } from '@mui/material';
 import { memo, useState } from 'react';
 
-const headList = ['Document Title', 'Type', 'Uploaded By', 'Upload Date', 'Visibility', 'Actions'];
+const headList = [
+  'Document Title',
+  'Type',
+  'Uploaded By',
+  'Upload Date',
+  'Visibility',
+  'Actions',
+];
 
-type MedicalRecordsTabProps = {
-  details: PatientDetails;
-};
+interface IMedicalRecordProps {
+  patientId: string;
+}
 
-function MedicalRecordsTab({ details }: MedicalRecordsTabProps) {
-  const [uploadMedicalRecordModalOpen, setUploadMedicalRecordModalOpen] = useState(false);
+function MedicalRecordsTab({ patientId }: IMedicalRecordProps) {
+  const [uploadMedicalRecordModalOpen, setUploadMedicalRecordModalOpen] =
+    useState(false);
+
+  const [updatingDocId, setUpdatingDocId] = useState<number | null>(null);
+
+  const { data: medicalRecords, isPending: medicalRecordsPending } =
+    useMyPatientEmrs({
+      patientId,
+    });
+  const { mutate: shareEmrDocument } = useShareEmrDocument();
+  const showConfirm = useAlertStore((state) => state.showConfirm);
+
+  const handleToggleVisibility = (docId: number, visible: boolean) => {
+    setUpdatingDocId(docId);
+    showConfirm({
+      title: 'Toggle Visibility',
+      message: visible
+        ? 'Are you sure you want to make this document visible to the patient?'
+        : 'Are you sure you want to hide this document from the patient?',
+      onConfirm: () => {
+        shareEmrDocument(
+          { docId, body: { visible_to_patient: visible } },
+          {
+            onSuccess: async (res) => {
+              if (!res?.success) return;
+              showSuccessToast(
+                visible
+                  ? 'Document is now visible to patient'
+                  : 'Document hidden from patient',
+              );
+              await queryClient.invalidateQueries({
+                queryKey: [PatientsQueryKeys.EmrRecords],
+              });
+            },
+            onSettled: () => setUpdatingDocId(null),
+          },
+        );
+      },
+      onCancel: () => setUpdatingDocId(null),
+    });
+  };
+
   return (
     <PatientTabContentWrapper>
-      <TabSectionCard title="Medical Records" icon={<FolderOutlinedIcon />} actionLabel="Add Record" actionOnClick={() => setUploadMedicalRecordModalOpen(true)}>
+      <TabSectionCard
+        title="Medical Records"
+        icon={<FolderOutlinedIcon />}
+        actionLabel="Add Record"
+        actionOnClick={() => setUploadMedicalRecordModalOpen(true)}
+      >
         <Box className="record-filters">
           <Box className="filter-field">
             <Typography component="p" className="filter-label">
               Search by Title
             </Typography>
-            <TextField className="filter-input" placeholder="Search document title..." />
+            <TextField
+              className="filter-input"
+              placeholder="Search document title..."
+            />
           </Box>
           <Box className="filter-field">
             <Typography component="p" className="filter-label">
@@ -49,10 +111,11 @@ function MedicalRecordsTab({ details }: MedicalRecordsTabProps) {
             </Typography>
             <Select className="filter-select" defaultValue="all">
               <MenuItem value="all">All Categories</MenuItem>
-              <MenuItem value="ecg">ECG Report</MenuItem>
-              <MenuItem value="mri">MRI Scan</MenuItem>
-              <MenuItem value="ct">CT Scan</MenuItem>
-              <MenuItem value="lab">Lab Report</MenuItem>
+              {EMR_RECORD_CATEGORIES.map((category) => (
+                <MenuItem key={category} value={category}>
+                  {category}
+                </MenuItem>
+              ))}
             </Select>
           </Box>
           <Box className="filter-field">
@@ -67,77 +130,58 @@ function MedicalRecordsTab({ details }: MedicalRecordsTabProps) {
             </Typography>
             <TextField className="filter-input" type="date" />
           </Box>
-          <Button className="reset-btn" variant="contained" disableElevation aria-label="Reset filters">
+          <Button
+            className="reset-btn"
+            variant="contained"
+            disableElevation
+            aria-label="Reset filters"
+          >
             <RefreshIcon fontSize="small" />
           </Button>
         </Box>
 
-        <CustomTable className="tab-table wide" headList={headList} zebraStriping={false}>
-          <TableRow>
-            <TableCell>
-              <Box className="doc-cell">
-                <Box component="span" className="doc-icon">
-                  <ImageOutlinedIcon />
-                </Box>
-                <Box className="stack-cell">
-                  <Typography component="p" className="cell-title">
-                    ECG Report
-                  </Typography>
-                  <Typography component="p" className="cell-note">
-                    ecg-report-13-oct-2026.jpg
-                  </Typography>
-                </Box>
-              </Box>
-            </TableCell>
-            <TableCell>
-              <Box component="span" className="tag info">
-                ECG Report
-              </Box>
-            </TableCell>
-            <TableCell>
-              <Box className="stack-cell">
-                <Typography component="p" className="cell-title">
-                  {details.name}
-                </Typography>
-                <Typography component="p" className="cell-note">
-                  Patient
-                </Typography>
-              </Box>
-            </TableCell>
-            <TableCell>
-              <Box className="stack-cell">
-                <Typography component="p" className="cell-title">
-                  13 Oct 2026
-                </Typography>
-                <Typography component="p" className="cell-note">
-                  10:48 AM
-                </Typography>
-              </Box>
-            </TableCell>
-            <TableCell>
-              <Box component="span" className="tag teal">
-                <ShareOutlinedIcon />
-                Shared with 1 doctor
-              </Box>
-            </TableCell>
-            <TableCell>
-              <Box className="row-icons">
-                <IconButton className="icon-action" aria-label="View record">
-                  <VisibilityOutlinedIcon />
-                </IconButton>
-                <IconButton className="icon-action" aria-label="Download record">
-                  <FileDownloadOutlinedIcon />
-                </IconButton>
-                <IconButton className="icon-action danger" aria-label="Delete record">
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-            </TableCell>
-          </TableRow>
+        <CustomTable
+          className="tab-table wide records-table"
+          headList={headList}
+          zebraStriping={false}
+          isLoading={medicalRecordsPending}
+          isEmpty={!medicalRecordsPending && !medicalRecords?.length}
+          emptyText="No medical records found"
+        >
+          {medicalRecords?.map((record) => (
+            <MedicalRecordRow
+              key={record.id}
+              title={record.title || record.document_type}
+              fileName={record.document_path?.split('/').pop() || ''}
+              fileSize={record.file_size}
+              description={record.description}
+              documentType={record.document_type}
+              uploadedBy={
+                record.owner_type === 'doctor'
+                  ? record.doctor_name || 'Doctor'
+                  : _toTitleCase(record.owner_type || '')
+              }
+              uploadedFrom={_toTitleCase(record.created_from || '')}
+              uploadDate={formatDate(record.created_at)}
+              uploadTime={formatDate(record.created_at, 'hh:mm A')}
+              isVisible={!!record.visible_to_patient}
+              isVisibilityUpdating={updatingDocId === record.id}
+              onToggleVisibility={(visible) =>
+                handleToggleVisibility(record.id, visible)
+              }
+              onView={() => openInNewTab(record.document_url)}
+              onDownload={() => openInNewTab(record.document_url)}
+              onDelete={showInDevelopment}
+            />
+          ))}
         </CustomTable>
       </TabSectionCard>
 
-      <UploadMedicalRecordModal open={uploadMedicalRecordModalOpen} onClose={() => setUploadMedicalRecordModalOpen(false)} />
+      <UploadMedicalRecordModal
+        open={uploadMedicalRecordModalOpen}
+        patientId={patientId}
+        onClose={() => setUploadMedicalRecordModalOpen(false)}
+      />
     </PatientTabContentWrapper>
   );
 }

@@ -4,7 +4,7 @@ import { StatusChipWrapper } from '@/styles/CustomStyled/StatusChipWrapper';
 import { memo } from 'react';
 
 type StatusChipProps = {
-  status: 'Active' | 'Inactive';
+  status: "active" | "inactive" | "pending" | "rejected" | "suspended" | "unverified" | string;
 };
 
 function StatusChip({ status }: StatusChipProps) {

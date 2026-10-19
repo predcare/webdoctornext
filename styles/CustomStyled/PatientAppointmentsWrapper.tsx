@@ -18,7 +18,14 @@ export const PatientAppointmentsWrapper = styled(Box)`
     }
 
     .MuiTable-root {
-      min-width: 920px;
+      min-width: 760px;
+      table-layout: fixed;
+    }
+
+    .MuiTableHead-root .MuiTableCell-root,
+    .MuiTableBody-root .MuiTableCell-root,
+    .MuiTableBody-root .MuiTableCell-root:first-of-type {
+      padding: 12px 14px;
     }
   }
 
@@ -28,9 +35,13 @@ export const PatientAppointmentsWrapper = styled(Box)`
   }
 
   .stack-cell,
-  .title-row,
-  .modality-pill {
+  .title-row {
     display: flex;
+    align-items: center;
+  }
+
+  .modality-pill {
+    display: inline-flex;
     align-items: center;
   }
 
@@ -38,6 +49,14 @@ export const PatientAppointmentsWrapper = styled(Box)`
     min-width: 0;
     flex-direction: column;
     align-items: flex-start;
+
+    .cell-title,
+    .cell-note {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 
   .title-row {
@@ -94,6 +113,17 @@ export const PatientAppointmentsWrapper = styled(Box)`
       color: ${({ theme }) => theme.palette.customColors.success};
       background: ${({ theme }) => theme.palette.customColors.successBg};
     }
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
   }
 
   .row-view.MuiButton-root {

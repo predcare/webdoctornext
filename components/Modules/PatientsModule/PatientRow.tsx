@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { memo } from 'react';
 
 type PatientRowProps = {
+  patientId: string;
   name: string;
   profileImage?: string;
   patientCode: string;
@@ -30,6 +31,7 @@ function PatientRow({
   city,
   lastVisit,
   userStatus,
+  patientId,
   onOpenMenu,
 }: PatientRowProps) {
   const navigate = useRouter();
@@ -77,7 +79,7 @@ function PatientRow({
           aria-label={`Actions for ${name}`}
           onClick={(event) => {
             event.stopPropagation();
-            onOpenMenu(event.currentTarget, patientCode);
+            onOpenMenu(event.currentTarget, patientId);
           }}
         />
       </TableCell>

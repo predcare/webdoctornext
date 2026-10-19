@@ -1,82 +1,92 @@
 'use client';
 
-import AppointmentStatusBadge from '@/components/commons/AppointmentStatusBadge/AppointmentStatusBadge';
 import { InPersonIcon, VideoIcon } from '@/components/ui/Icons/appointments';
-import { appointmentToday, type DashboardAppointment } from '@/resources/mock';
+import {
+  _toTitleCase,
+  getAppointmentStatusColors,
+  getAppointmentTypeColors,
+} from '@/lib/commons/common.utils';
 import { projectRoutes } from '@/routes';
-import { formatClock } from '@/utils/formatClock';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, Button, TableCell, TableRow, Typography } from '@mui/material';
 import Link from 'next/link';
 import { memo } from 'react';
 
-const scheduleLabel = (row: DashboardAppointment) => {
-  const day = row.dateValue === appointmentToday ? 'Today' : row.date;
-  return `${day}, ${formatClock(row.startTime)}`;
-};
-
 type PatientAppointmentRowProps = {
-  row: DashboardAppointment;
+  id: string;
+  appointmentId: string;
+  consultationType: string;
+  reason: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  appointmentStatus: string;
 };
 
-function PatientAppointmentRow({ row }: PatientAppointmentRowProps) {
-  const isVideo = row.visitType === 'video';
+function PatientAppointmentRow({
+  id,
+  appointmentId,
+  consultationType,
+  reason,
+  appointmentDate,
+  appointmentTime,
+  appointmentStatus,
+}: PatientAppointmentRowProps) {
+  const isVideo = consultationType?.toLowerCase().trim() === 'video';
+  const typeColors = getAppointmentTypeColors(consultationType);
+  const statusColors = getAppointmentStatusColors(appointmentStatus);
 
   return (
     <TableRow>
-      <TableCell className="col-fit">
+      <TableCell>
         <Box className="stack-cell">
-          <Box className="title-row">
-            <Typography component="p" className="cell-title">
-              #{row.appointmentId}
+          <Typography component="p" className="cell-title" title={appointmentId}>
+            #{appointmentId}
+          </Typography>
+          {reason ? (
+            <Typography component="p" className="cell-note" title={reason}>
+              {reason}
             </Typography>
-            {row.instant ? (
-              <Typography component="span" className="instant-chip">
-                Instant
-              </Typography>
-            ) : null}
-          </Box>
-          <Typography component="p" className="cell-note">
-            {row.reason}
-          </Typography>
+          ) : null}
         </Box>
       </TableCell>
-      <TableCell className="col-fit">
-        <Box className={`modality-pill ${isVideo ? 'video' : 'in-person'}`}>
+      <TableCell>
+        <Box
+          className="modality-pill"
+          style={{ color: typeColors.txt, backgroundColor: typeColors.bg }}
+        >
           {isVideo ? <VideoIcon size={14} /> : <InPersonIcon size={14} />}
-          {isVideo ? 'Telehealth' : 'In-Person'}
+          {_toTitleCase(consultationType || '')}
         </Box>
       </TableCell>
       <TableCell>
         <Box className="stack-cell">
           <Typography component="p" className="cell-title">
-            {scheduleLabel(row)}
-          </Typography>
-          <Typography component="p" className="cell-note">
-            {row.scheduleNote}
+            {appointmentDate}
           </Typography>
         </Box>
       </TableCell>
       <TableCell>
         <Box className="stack-cell">
-          <Typography component="p" className="cell-title">
-            {row.specialist}
-          </Typography>
           <Typography component="p" className="cell-note">
-            {row.specialty}
+            {appointmentTime}
           </Typography>
         </Box>
       </TableCell>
       <TableCell>
-        <AppointmentStatusBadge status={row.status} />
+        <Box
+          className="status-pill"
+          style={{ color: statusColors.txt, backgroundColor: statusColors.bg }}
+        >
+          {_toTitleCase(appointmentStatus || '')}
+        </Box>
       </TableCell>
-      <TableCell align="right">
+      <TableCell>
         <Button
           className="row-view"
           size="small"
           variant="outlined"
           component={Link}
-          href={projectRoutes.appointmentDetails(row.id)}
+          href={projectRoutes.appointmentDetails(id)}
           startIcon={<VisibilityOutlinedIcon fontSize="inherit" />}
         >
           View

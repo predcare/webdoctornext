@@ -80,6 +80,10 @@ export interface IPatientFamilyMember {
   gender: string;
   date_of_birth: string;
   phone: string;
+  phone_number?: string;
+  alternate_phone?: string;
+  age_display?: string;
+  blood_type?: string;
   email: string;
   patient_record_id: number;
   patient_id: string;

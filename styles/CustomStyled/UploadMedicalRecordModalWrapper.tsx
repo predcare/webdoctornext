@@ -54,6 +54,85 @@ export const UploadMedicalRecordModalWrapper = styled(Box)`
     input {
       display: none;
     }
+
+    &.is-dragging {
+      border-color: ${({ theme }) => theme.palette.customColors.brandTeal};
+      background: ${({ theme }) => theme.palette.customColors.brandTealLight};
+    }
+
+    &.has-error {
+      border-color: ${({ theme }) => theme.palette.customColors.error};
+      background: ${({ theme }) => theme.palette.customColors.errorBg};
+    }
+  }
+
+  .field-error {
+    margin: 6px 0 0;
+    font-size: 11px;
+    line-height: 16px;
+    color: ${({ theme }) => theme.palette.customColors.error};
+  }
+
+  .selected-file {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid ${({ theme }) => theme.palette.customColors.brandTeal};
+    background: ${({ theme }) => theme.palette.customColors.brandTealLight};
+  }
+
+  .selected-file-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: ${({ theme }) => theme.palette.customColors.brandTeal};
+    background: ${({ theme }) => theme.palette.customColors.cardBg};
+
+    .MuiSvgIcon-root {
+      font-size: 20px;
+    }
+  }
+
+  .selected-file-copy {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .selected-file-name,
+  .selected-file-size {
+    margin: 0;
+  }
+
+  .selected-file-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 18px;
+    color: ${({ theme }) => theme.palette.customColors.heading};
+  }
+
+  .selected-file-size {
+    font-size: 12px;
+    line-height: 16px;
+    color: ${({ theme }) => theme.palette.customColors.textMuted};
+  }
+
+  .selected-file-remove.MuiIconButton-root {
+    flex-shrink: 0;
+    color: ${({ theme }) => theme.palette.customColors.textMuted};
+
+    &:hover {
+      color: ${({ theme }) => theme.palette.customColors.error};
+      background: ${({ theme }) => theme.palette.customColors.errorBg};
+    }
   }
 
   .upload-icon {
@@ -119,9 +198,8 @@ export const UploadMedicalRecordModalWrapper = styled(Box)`
     background: ${({ theme }) => theme.palette.customColors.pageBg};
     border: 1px solid ${({ theme }) => theme.palette.customColors.border};
 
-    .MuiSwitch-root {
-      margin-top: -6px;
-      margin-left: -8px;
+    .custom-switch {
+      margin-top: 1px;
     }
   }
 

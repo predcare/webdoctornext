@@ -251,3 +251,85 @@ export const formatTimeSlot = (startTime?: string, endTime?: string) => {
 
   return end ? `${start} - ${end}` : start;
 };
+
+export const stripHtmlTags = (html: string): string => {
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return div.textContent || div.innerText || '';
+};
+
+export const downloadFromUrl = (url: string) => {
+  return new Promise<void>((resolve) => {
+    if (typeof window !== 'undefined') {
+      window.open(url, '_blank');
+    }
+    resolve();
+  });
+};
+
+export function truncateText(
+  text: string | undefined | null,
+  maxChars: number,
+): string {
+  if (!text) return '';
+  return text.length > maxChars ? `${text.slice(0, maxChars)}...` : text;
+}
+
+export const openInNewTab = (url: string) => {
+  const origin = window.location.origin;
+  const validUrl = url.startsWith('http')
+    ? url
+    : `${origin}${url.startsWith('/') ? url : `/${url}`}`;
+  window.open(validUrl, '_blank', 'noopener,noreferrer');
+};
+
+export const formatReviewText = (items: number, text: string): string => {
+  if (items === 0) {
+    return `Not rated yet!`;
+  } else if (items === 1) {
+    return `1 ${text}`;
+  } else {
+    return `${items} ${text}s`;
+  }
+};
+
+export const formatNumberToShortForm = (num: number): string => {
+  if (num === null || num === undefined || isNaN(num)) return '0';
+
+  const absNum = Math.abs(num);
+
+  if (absNum >= 1_000_000_000_000) {
+    return (num / 1_000_000_000_000).toFixed(1).replace(/\.0$/, '') + 'T';
+  } else if (absNum >= 1_000_000_000) {
+    return (num / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + 'B';
+  } else if (absNum >= 1_000_000) {
+    return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+  } else if (absNum >= 1_000) {
+    return (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+  } else {
+    return num.toString();
+  }
+};
+
+export const isPastDate = (date: string | Date | dayjs.Dayjs): boolean => {
+  if (!date) return false;
+
+  const today = dayjs().startOf('day');
+  const selectedDate = dayjs(date, 'DD-MM-YYYY').startOf('day');
+
+  return selectedDate.isBefore(today);
+};
+
+export function getFullCurrentUrl(): string | null {
+  if (typeof window === 'undefined') return null;
+  return window.location.href;
+}
+
+export const _PromiseSettled = <T>(
+  result: PromiseSettledResult<T>,
+  fallback: T,
+): T => {
+  return result.status === 'fulfilled' && result.value != null
+    ? result.value
+    : fallback;
+};

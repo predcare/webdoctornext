@@ -141,6 +141,79 @@ export const PatientTabContentWrapper = styled(Box)`
     &.narrow .MuiTable-root {
       min-width: 560px;
     }
+
+    &.records-table {
+      .MuiTable-root {
+        min-width: 980px;
+        table-layout: fixed;
+      }
+
+      .MuiTableHead-root .MuiTableCell-root,
+      .MuiTableBody-root .MuiTableCell-root,
+      .MuiTableBody-root .MuiTableCell-root:first-of-type {
+        padding: 12px 14px;
+      }
+
+      .MuiTableHead-root .MuiTableCell-root:first-of-type {
+        width: 30%;
+      }
+
+      .MuiTableHead-root .MuiTableCell-root:last-of-type {
+        width: 140px;
+      }
+    }
+
+    &.family-table {
+      .MuiTable-root {
+        min-width: 900px;
+        table-layout: fixed;
+      }
+
+      .MuiTableHead-root .MuiTableCell-root,
+      .MuiTableBody-root .MuiTableCell-root,
+      .MuiTableBody-root .MuiTableCell-root:first-of-type {
+        padding: 12px;
+      }
+
+      .stack-cell {
+        flex: 1;
+        gap: 2px;
+      }
+    }
+
+    &.prescriptions-table {
+      .MuiTable-root {
+        min-width: 940px;
+        table-layout: fixed;
+      }
+
+      .MuiTableHead-root .MuiTableCell-root,
+      .MuiTableBody-root .MuiTableCell-root,
+      .MuiTableBody-root .MuiTableCell-root:first-of-type {
+        padding: 12px;
+      }
+
+      .stack-cell {
+        gap: 4px;
+      }
+    }
+  }
+
+  .ellipsis {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .doc-cell .stack-cell {
+    flex: 1;
+  }
+
+  .visibility-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .stack-cell {

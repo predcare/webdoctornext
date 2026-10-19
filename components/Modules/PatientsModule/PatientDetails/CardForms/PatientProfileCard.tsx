@@ -1,19 +1,16 @@
 'use client';
 
 import StatusChip from '@/components/commons/StatusChip/StatusChip';
-import type { PatientDetails } from '@/resources/mock';
-import { projectRoutes } from '@/routes';
+import { getInitials } from '@/lib/commons/common.utils';
 import { avatarTone } from '@/utils/avatarTone';
 import AddIcon from '@mui/icons-material/Add';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import MailOutlinedIcon from '@mui/icons-material/MailOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import { Box, Button, Grid, Typography } from '@mui/material';
-import Link from 'next/link';
-import { memo, type ReactNode } from 'react';
+import { memo, useMemo, type ReactNode } from 'react';
 
 type InfoRow = {
   label: string;
@@ -21,51 +18,85 @@ type InfoRow = {
 };
 
 type PatientProfileCardProps = {
-  details: PatientDetails;
+  gender: string;
+  age: string;
+  dateOfBirth: string;
+  bloodType: string;
+  patientCode: string;
+  ptStatus: string;
+  phone: string;
+  email: string;
+  city: string;
+  name: string;
+  onProfileEdit?: () => void;
+  onAppointmentBook?: () => void;
 };
 
-function PatientProfileCard({ details }: PatientProfileCardProps) {
+function PatientProfileCard({
+  gender,
+  age,
+  dateOfBirth,
+  bloodType,
+  patientCode,
+  ptStatus,
+  phone,
+  email,
+  city,
+  name,
+  onAppointmentBook,
+  onProfileEdit,
+}: PatientProfileCardProps) {
   const personalRows: InfoRow[] = [
-    { label: 'Gender', value: details.gender },
-    { label: 'Age', value: `${details.age} years` },
-    { label: 'Date of Birth', value: details.dateOfBirth },
-    { label: 'Blood Type', value: <Box component="span" className="blood-chip">{details.bloodType}</Box> },
+    { label: 'Gender', value: gender },
+    { label: 'Age', value: age },
+    { label: 'Date of Birth', value: dateOfBirth },
+    {
+      label: 'Blood Type',
+      value: (
+        <Box component="span" className="blood-chip">
+          {bloodType}
+        </Box>
+      ),
+    },
   ];
+  const isVerified = useMemo(() => {
+    return ptStatus === 'active' ? true : false;
+  }, [ptStatus]);
 
   return (
     <Box className="detail-card profile-card">
       <Box className="profile-head">
         <Box className="profile-identity">
-          <Box className={`profile-avatar ${avatarTone(details.initial)}`}>
-            {details.initial}
-            {details.verified ? (
+          <Box className={`profile-avatar ${avatarTone(getInitials(name))}`}>
+            {getInitials(name)}
+            {isVerified ? (
               <VerifiedIcon className="avatar-badge" aria-label="Verified" />
             ) : null}
           </Box>
           <Box className="profile-copy">
             <Box className="profile-title-row">
               <Typography component="h2" className="profile-title">
-                {details.name}
+                {name}
               </Typography>
               <Box className="profile-tags">
                 <Typography component="span" className="code-chip">
-                  #{details.patientCode}
+                  {patientCode}
                 </Typography>
-                <StatusChip status={details.userStatus} />
+                <StatusChip status={ptStatus} />
               </Box>
             </Box>
             <Box className="profile-quick">
               <Typography component="span" className="quick-item">
                 <PhoneOutlinedIcon fontSize="inherit" />
-                {details.phone}
+                {phone}
               </Typography>
               <Typography component="span" className="quick-item">
                 <MailOutlinedIcon fontSize="inherit" />
-                {details.email}
+                {email}
               </Typography>
               <Typography component="span" className="quick-item">
                 <LocationOnOutlinedIcon fontSize="inherit" />
-                {details.city}
+                {city}
               </Typography>
             </Box>
           </Box>
@@ -74,17 +105,10 @@ function PatientProfileCard({ details }: PatientProfileCardProps) {
         <Box className="profile-actions">
           <Button
             className="profile-btn"
-            variant="outlined"
-            startIcon={<EditOutlinedIcon fontSize="small" />}
-          >
-            Edit Profile
-          </Button>
-          <Button
-            className="profile-btn"
             variant="contained"
-            component={Link}
-            href={projectRoutes.bookAppointment}
+            type="button"
             startIcon={<AddIcon fontSize="small" />}
+            onClick={onAppointmentBook}
           >
             Book Appointment
           </Button>
@@ -103,7 +127,11 @@ function PatientProfileCard({ details }: PatientProfileCardProps) {
           </Box>
           <Grid component="dl" container className="info-grid" spacing={2}>
             {personalRows.map((row) => (
-              <Grid key={row.label} className="info-cell" size={{ xs: 6, sm: 6, md: 3 }}>
+              <Grid
+                key={row.label}
+                className="info-cell"
+                size={{ xs: 6, sm: 6, md: 3 }}
+              >
                 <Typography component="dt" className="info-label">
                   {row.label}
                 </Typography>

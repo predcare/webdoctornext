@@ -9,9 +9,8 @@ import { useActionMenu } from '@/hooks/commons/useActionMenu';
 import { useMyPatientList } from '@/hooks/react-query/patients/patients.hooks';
 import { projectRoutes } from '@/routes';
 import { PatientListWrapper } from '@/styles/CustomStyled/PatientListWrapper';
-import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 
 const headList = [
@@ -29,6 +28,7 @@ const breadcrumbItems = [
 ];
 
 export default function PatientListPage() {
+  const router = useRouter();
   const actionMenu = useActionMenu();
   const [pagination, setPagination] = useState({
     page: 1,
@@ -49,6 +49,11 @@ export default function PatientListPage() {
   const updatePagination = useCallback((patch: Partial<typeof pagination>) => {
     setPagination((current) => ({ ...current, ...patch }));
   }, []);
+
+  const handleViewPatient = useCallback((patientId: string) => {
+    if (!patientId) return;
+    router.push(projectRoutes.patientDetails(patientId));
+  }, [router]);
 
   return (
     <PatientListWrapper>
@@ -93,6 +98,7 @@ export default function PatientListPage() {
             userStatus={row.status}
             profileImage={row.profile_image}
             onOpenMenu={actionMenu.open}
+            patientId={row?.user_id}
           />
         ))}
       </CustomTable>
@@ -101,14 +107,11 @@ export default function PatientListPage() {
         anchorEl={actionMenu.anchorEl}
         onClose={actionMenu.close}
         items={[
-          { key: 'view', label: 'View', icon: <VisibilityOutlinedIcon /> },
-          { key: 'edit', label: 'Edit', icon: <EditOutlinedIcon /> },
           {
-            key: 'deactivate',
-            label: 'Deactivate',
-            icon: <BlockOutlinedIcon />,
-            tone: 'danger',
-            dividerBefore: true,
+            key: 'view',
+            label: 'View',
+            icon: <VisibilityOutlinedIcon />,
+            onClick: () => handleViewPatient(actionMenu?.activeId || ''),
           },
         ]}
       />

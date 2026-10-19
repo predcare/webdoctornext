@@ -23,7 +23,7 @@ export const projectRoutes = {
   bookAppointment: `/dashboard/appointments/book-appointment`,
   patients: '/dashboard/patients',
   addPatient: '/dashboard/patients/add-patient',
-  patientDetails: (id: string) => `/dashboard/patients/${id}`,
+  patientDetails: (id: string) => `/dashboard/patients/${encodeUrlParam(id)}`,
   availability: '/dashboard/availability',
   manageAvailability: '/dashboard/availability/manage-availability',
   editAvailability: (id: string | number) =>

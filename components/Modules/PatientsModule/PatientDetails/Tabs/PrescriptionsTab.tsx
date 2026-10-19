@@ -1,68 +1,88 @@
 'use client';
 
 import TabSectionCard from '@/components/Modules/PatientsModule/PatientDetails/CardForms/TabSectionCard';
+import PrescriptionRow from '@/components/Modules/PatientsModule/PatientDetails/Prescriptions/PrescriptionRow';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
+import { useMyPatientPrescriptions } from '@/hooks/react-query/patients/patients.hooks';
+import { formatDate, openInNewTab } from '@/lib/commons/common.utils';
+import { showInDevelopment } from '@/lib/commons/toast';
 import { PatientTabContentWrapper } from '@/styles/CustomStyled/PatientTabContentWrapper';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import type {
+  IPatientLabTest,
+  IPatientMedication,
+} from '@/typescripts/interfaces/prescriptions.interfaces';
 import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { Box, IconButton, TableCell, TableRow, Typography } from '@mui/material';
 import { memo } from 'react';
 
-const headList = ['Date', 'Diagnosis', 'Medications', 'Follow-up', 'Status', 'Actions'];
+const headList = [
+  'Date',
+  'Diagnosis',
+  'Medications',
+  'Lab Tests',
+  'Follow-up',
+  'Email Status',
+  'Actions',
+];
 
-function PrescriptionsTab() {
+interface IPrescriptionsTabProps {
+  patientId: string;
+}
+
+function PrescriptionsTab({ patientId }: IPrescriptionsTabProps) {
+  const { data: prescriptions, isPending: isPrescriptionsPending } =
+    useMyPatientPrescriptions({
+      patientId,
+    });
+
   return (
     <PatientTabContentWrapper>
-      <TabSectionCard title="Prescriptions" icon={<MedicationOutlinedIcon />} actionLabel="New Prescription">
-        <CustomTable className="tab-table" headList={headList} zebraStriping={false}>
-          <TableRow>
-            <TableCell>
-              <Box className="stack-cell">
-                <Typography component="p" className="cell-title">
-                  13 Oct 2026
-                </Typography>
-                <Typography component="p" className="cell-note">
-                  10:51 AM
-                </Typography>
-              </Box>
-            </TableCell>
-            <TableCell>
-              <Box className="stack-cell">
-                <Typography component="p" className="cell-title">
-                  Viral Fever
-                </Typography>
-                <Typography component="p" className="cell-note">
-                  Fever, body ache and mild headache
-                </Typography>
-              </Box>
-            </TableCell>
-            <TableCell>
-              <Box component="span" className="tag info">
-                2 meds
-              </Box>
-            </TableCell>
-            <TableCell>
-              <Typography component="p" className="cell-title">
-                18 Nov 2026
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Box component="span" className="tag success">
-                Completed
-              </Box>
-            </TableCell>
-            <TableCell>
-              <Box className="row-icons">
-                <IconButton className="icon-action" aria-label="View prescription">
-                  <VisibilityOutlinedIcon />
-                </IconButton>
-                <IconButton className="icon-action" aria-label="Edit prescription">
-                  <EditOutlinedIcon />
-                </IconButton>
-              </Box>
-            </TableCell>
-          </TableRow>
+      <TabSectionCard
+        title="Prescriptions"
+        icon={<MedicationOutlinedIcon />}
+        actionLabel="New Prescription"
+      >
+        <CustomTable
+          className="tab-table prescriptions-table"
+          headList={headList}
+          zebraStriping={false}
+          isLoading={isPrescriptionsPending}
+          isEmpty={!isPrescriptionsPending && !prescriptions?.length}
+          emptyText="No prescriptions found"
+          emptyDescription="Prescriptions created for this patient will appear here."
+        >
+          {prescriptions?.map((prescription) => {
+            const consultedAt =
+              prescription.consultation_date || prescription.created_at;
+            const followUp =
+              prescription.follow_up_date || prescription.follow_up;
+
+            return (
+              <PrescriptionRow
+                key={prescription.id}
+                prescriptionId={prescription.prescription_id}
+                date={formatDate(consultedAt)}
+                time={formatDate(prescription.created_at, 'hh:mm A')}
+                diagnosis={prescription.diagnosis}
+                complaints={
+                  prescription.chief_complaints || prescription.symptoms || ''
+                }
+                medicationNames={(prescription.medications ?? [])
+                  .map((medication: IPatientMedication) =>
+                    medication.name?.trim(),
+                  )
+                  .filter(Boolean)}
+                labTestNames={(prescription.lab_tests ?? [])
+                  .map((labTest: IPatientLabTest) =>
+                    (labTest.name || labTest.text || '').trim(),
+                  )
+                  .filter(Boolean)}
+                followUpDate={formatDate(followUp)}
+                emailSentAt={formatDate(prescription.email_sent_at, 'DD MMM, hh:mm A')}
+                onView={() => openInNewTab(prescription.pdf_url)}
+                onEdit={showInDevelopment}
+              />
+            );
+          })}
         </CustomTable>
       </TabSectionCard>
     </PatientTabContentWrapper>

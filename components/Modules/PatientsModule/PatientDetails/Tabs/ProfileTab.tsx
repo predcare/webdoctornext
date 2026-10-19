@@ -2,8 +2,9 @@
 
 import StatusChip from '@/components/commons/StatusChip/StatusChip';
 import TabSectionCard from '@/components/Modules/PatientsModule/PatientDetails/CardForms/TabSectionCard';
-import type { PatientDetails } from '@/resources/mock';
+import { _toTitleCase, formatDate, getAge } from '@/lib/commons/common.utils';
 import { PatientTabContentWrapper } from '@/styles/CustomStyled/PatientTabContentWrapper';
+import type { IMyPatientDoc } from '@/typescripts/interfaces/patients.interfaces';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import BloodtypeOutlinedIcon from '@mui/icons-material/BloodtypeOutlined';
 import CakeOutlinedIcon from '@mui/icons-material/CakeOutlined';
@@ -23,7 +24,7 @@ import ToggleOnOutlinedIcon from '@mui/icons-material/ToggleOnOutlined';
 import WcOutlinedIcon from '@mui/icons-material/WcOutlined';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { Box, Grid, Typography } from '@mui/material';
-import { memo, type ReactNode } from 'react';
+import { memo, useMemo, type ReactNode } from 'react';
 
 type ProfileField = {
   label: string;
@@ -55,57 +56,189 @@ function FieldTiles({ fields }: { fields: ProfileField[] }) {
 }
 
 type ProfileTabProps = {
-  details: PatientDetails;
+  patientInfo?: IMyPatientDoc | null;
 };
 
-function ProfileTab({ details }: ProfileTabProps) {
+function ProfileTab({ patientInfo }: ProfileTabProps) {
+  const formattedDob = useMemo(() => {
+    if (!patientInfo?.date_of_birth) return '-';
+    return formatDate(patientInfo.date_of_birth);
+  }, [patientInfo?.date_of_birth]);
+
+  const ageText = useMemo(() => {
+    if (!patientInfo?.date_of_birth) return '';
+    return getAge(patientInfo.date_of_birth) || '';
+  }, [patientInfo?.date_of_birth]);
+
+  const allergiesList = useMemo(() => {
+    if (!patientInfo?.drug_allergies) return [];
+    if (Array.isArray(patientInfo.drug_allergies)) {
+      return patientInfo.drug_allergies.map(String).filter(Boolean);
+    }
+    if (typeof patientInfo.drug_allergies === 'string') {
+      try {
+        const parsed = JSON.parse(patientInfo.drug_allergies);
+        if (Array.isArray(parsed)) return parsed.map(String).filter(Boolean);
+      } catch {
+        return patientInfo.drug_allergies
+          .split(',')
+          .map((item) => item.trim())
+          .filter(Boolean);
+      }
+      return [patientInfo.drug_allergies];
+    }
+    return [];
+  }, [patientInfo?.drug_allergies]);
+
   const personalFields: ProfileField[] = [
-    { label: 'Full Name', value: details.name, icon: <PersonOutlineOutlinedIcon />, full: true },
-    { label: 'Gender', value: details.gender, icon: <WcOutlinedIcon /> },
+    {
+      label: 'Full Name',
+      value: patientInfo?.name || '-',
+      icon: <PersonOutlineOutlinedIcon />,
+      full: true,
+    },
+    {
+      label: 'Gender',
+      value: _toTitleCase(patientInfo?.gender_display || patientInfo?.gender || '') || '-',
+      icon: <WcOutlinedIcon />,
+    },
     {
       label: 'Date of Birth',
       icon: <CakeOutlinedIcon />,
       value: (
         <>
-          {details.dateOfBirth}
-          <Box component="span" className="field-hint">
-            {details.age} yrs
-          </Box>
+          {formattedDob}
+          {ageText ? (
+            <Box component="span" className="field-hint">
+              {ageText}
+            </Box>
+          ) : null}
         </>
       ),
     },
     {
       label: 'Blood Type',
       icon: <BloodtypeOutlinedIcon />,
-      value: (
+      value: patientInfo?.blood_type ? (
         <Box component="span" className="tag danger">
-          {details.bloodType}
+          {patientInfo.blood_type}
+        </Box>
+      ) : (
+        <Box component="span" className="field-empty">
+          Not specified
         </Box>
       ),
     },
-    { label: 'Status', value: <StatusChip status={details.userStatus} />, icon: <ToggleOnOutlinedIcon /> },
-    { label: 'Patient ID', value: `#${details.patientCode}`, icon: <BadgeOutlinedIcon />, full: true },
+    {
+      label: 'Status',
+      value: patientInfo?.status ? (
+        <StatusChip status={patientInfo.status} />
+      ) : (
+        <Box component="span" className="field-empty">
+          -
+        </Box>
+      ),
+      icon: <ToggleOnOutlinedIcon />,
+    },
+    {
+      label: 'Patient ID',
+      value: patientInfo?.patient_id ? `#${patientInfo.patient_id}` : '-',
+      icon: <BadgeOutlinedIcon />,
+      full: true,
+    },
   ];
 
   const contactFields: ProfileField[] = [
-    { label: 'Primary Phone', value: details.phone, icon: <PhoneOutlinedIcon /> },
-    { label: 'Alternate Number', value: details.phone, icon: <PhoneAndroidOutlinedIcon /> },
+    {
+      label: 'Primary Phone',
+      value: patientInfo?.phone_number || (
+        <Box component="span" className="field-empty">
+          Not added
+        </Box>
+      ),
+      icon: <PhoneOutlinedIcon />,
+    },
+    {
+      label: 'Alternate Number',
+      value: patientInfo?.alternate_phone || (
+        <Box component="span" className="field-empty">
+          Not added
+        </Box>
+      ),
+      icon: <PhoneAndroidOutlinedIcon />,
+    },
     {
       label: 'WhatsApp',
-      value: <Box component="span" className="field-empty">Not added</Box>,
+      value: patientInfo?.whatsapp_number || (
+        <Box component="span" className="field-empty">
+          Not added
+        </Box>
+      ),
       icon: <WhatsAppIcon />,
     },
-    { label: 'Emergency Contact', value: details.emergencyContact, icon: <ContactPhoneOutlinedIcon /> },
-    { label: 'Email', value: details.email, icon: <MailOutlinedIcon />, full: true },
+    {
+      label: 'Emergency Contact',
+      value: patientInfo?.alternate_phone || patientInfo?.phone_number || (
+        <Box component="span" className="field-empty">
+          Not added
+        </Box>
+      ),
+      icon: <ContactPhoneOutlinedIcon />,
+    },
+    {
+      label: 'Email',
+      value: patientInfo?.email || (
+        <Box component="span" className="field-empty">
+          Not added
+        </Box>
+      ),
+      icon: <MailOutlinedIcon />,
+      full: true,
+    },
   ];
 
   const addressFields: ProfileField[] = [
-    { label: 'Address', value: 'MG Marg, Near Titanic Park', icon: <HomeOutlinedIcon />, full: true },
-    { label: 'City', value: details.city, icon: <LocationCityOutlinedIcon /> },
-    { label: 'State', value: 'Sikkim', icon: <MapOutlinedIcon /> },
-    { label: 'Postal Code', value: '737101', icon: <MarkunreadMailboxOutlinedIcon /> },
-    { label: 'Country', value: 'India', icon: <FlagOutlinedIcon /> },
+    {
+      label: 'Address',
+      value: patientInfo?.address || (
+        <Box component="span" className="field-empty">
+          Not provided
+        </Box>
+      ),
+      icon: <HomeOutlinedIcon />,
+      full: true,
+    },
+    {
+      label: 'City',
+      value: patientInfo?.city || '-',
+      icon: <LocationCityOutlinedIcon />,
+    },
+    {
+      label: 'State',
+      value: patientInfo?.state || '-',
+      icon: <MapOutlinedIcon />,
+    },
+    {
+      label: 'Postal Code',
+      value: patientInfo?.postal_code || '-',
+      icon: <MarkunreadMailboxOutlinedIcon />,
+    },
+    {
+      label: 'Country',
+      value: patientInfo?.country || 'India',
+      icon: <FlagOutlinedIcon />,
+    },
   ];
+
+  const hasVitals = Boolean(
+    patientInfo?.blood_pressure ||
+    patientInfo?.pulse ||
+    patientInfo?.temperature ||
+    patientInfo?.spo2 ||
+    patientInfo?.weight ||
+    patientInfo?.height ||
+    patientInfo?.bmi
+  );
 
   return (
     <PatientTabContentWrapper>
@@ -116,7 +249,6 @@ function ProfileTab({ details }: ProfileTabProps) {
             title="Personal Information"
             subtitle="Basic identity details"
             icon={<PersonOutlineOutlinedIcon />}
-            editable
           >
             <FieldTiles fields={personalFields} />
           </TabSectionCard>
@@ -128,7 +260,6 @@ function ProfileTab({ details }: ProfileTabProps) {
             title="Contact Information"
             subtitle="How to reach the patient"
             icon={<PhoneOutlinedIcon />}
-            editable
           >
             <FieldTiles fields={contactFields} />
           </TabSectionCard>
@@ -140,7 +271,6 @@ function ProfileTab({ details }: ProfileTabProps) {
             title="Address"
             subtitle="Residential address"
             icon={<LocationOnOutlinedIcon />}
-            editable
           >
             <FieldTiles fields={addressFields} />
           </TabSectionCard>
@@ -152,48 +282,72 @@ function ProfileTab({ details }: ProfileTabProps) {
             title="Medical Information"
             subtitle="Allergies, conditions and history"
             icon={<HealingOutlinedIcon />}
-            editable
           >
             <Box className="medical-block">
               <Typography component="p" className="field-label">
                 Known Allergies
               </Typography>
               <Box className="chip-row">
-                {details.allergies.length ? (
-                  details.allergies.map((item) => (
+                {allergiesList.length > 0 ? (
+                  allergiesList.map((item) => (
                     <Box key={item} component="span" className="tag danger">
                       {item}
                     </Box>
                   ))
                 ) : (
-                  <Box component="span" className="tag neutral">
-                    None reported
-                  </Box>
+                  <Typography
+                    component="span"
+                    className="field-hint"
+                    sx={{ fontStyle: 'italic', color: 'text.secondary', fontSize: '13px' }}
+                  >
+                    No known drug allergies reported
+                  </Typography>
                 )}
               </Box>
             </Box>
 
-            <Box className="medical-block">
-              <Typography component="p" className="field-label">
-                Chronic Conditions
-              </Typography>
-              <Box className="chip-row">
-                {details.conditions.map((item) => (
-                  <Box key={item} component="span" className="tag warning">
-                    {item}
-                  </Box>
-                ))}
+            {hasVitals ? (
+              <Box className="medical-block">
+                <Typography component="p" className="field-label">
+                  Latest Vitals
+                </Typography>
+                <Box className="chip-row" sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                  {patientInfo?.blood_pressure ? (
+                    <Box component="span" className="tag info">
+                      BP: {patientInfo.blood_pressure}
+                    </Box>
+                  ) : null}
+                  {patientInfo?.pulse ? (
+                    <Box component="span" className="tag info">
+                      Pulse: {patientInfo.pulse} bpm
+                    </Box>
+                  ) : null}
+                  {patientInfo?.temperature ? (
+                    <Box component="span" className="tag info">
+                      Temp: {patientInfo.temperature} °F
+                    </Box>
+                  ) : null}
+                  {patientInfo?.spo2 ? (
+                    <Box component="span" className="tag info">
+                      SpO2: {patientInfo.spo2}%
+                    </Box>
+                  ) : null}
+                  {patientInfo?.bmi ? (
+                    <Box component="span" className="tag warning">
+                      BMI: {patientInfo.bmi}
+                    </Box>
+                  ) : null}
+                </Box>
               </Box>
-            </Box>
+            ) : null}
 
             <Box className="medical-block">
               <Typography component="p" className="field-label">
                 Medical History
               </Typography>
               <Typography component="p" className="history-box">
-                Patient is lactose intolerant and has a history of mild asthma since childhood.
-                Currently managing anxiety with regular counselling sessions. No previous surgeries
-                reported.
+                {patientInfo?.medical_history ||
+                  'No past medical conditions or surgical history reported.'}
               </Typography>
             </Box>
           </TabSectionCard>
