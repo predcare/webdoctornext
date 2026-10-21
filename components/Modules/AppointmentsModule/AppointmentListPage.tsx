@@ -21,7 +21,6 @@ import {
   formatTimeSlot,
   getAge,
 } from '@/lib/commons/common.utils';
-import { showInDevelopment } from '@/lib/commons/toast';
 import { projectRoutes } from '@/routes';
 import { AppointmentListWrapper } from '@/styles/CustomStyled/AppointmentListWrapper';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
@@ -76,25 +75,24 @@ export default function AppointmentListPage() {
     [filterStates],
   );
 
-  const addAppointmentAction = (
-    <Button
-      className="page-action"
-      type="button"
-      variant="contained"
-      onClick={() => router.push(projectRoutes.bookAppointment())}
-    >
-      + Add Appointment
-    </Button>
-  );
-
-  const {
-    data: appointmentList,
-    isPending: isLoadingAppointments,
-  } = useMyAppointments(queryParams);
+  const { data: appointmentList, isPending: isLoadingAppointments } =
+    useMyAppointments(queryParams);
 
   return (
     <AppointmentListWrapper>
-      <PageBreadcrumb items={breadcrumbItems} action={addAppointmentAction} />
+      <PageBreadcrumb
+        items={breadcrumbItems}
+        action={
+          <Button
+            className="page-action"
+            type="button"
+            variant="contained"
+            onClick={() => router.push(projectRoutes.bookAppointment)}
+          >
+            + Add Appointment
+          </Button>
+        }
+      />
       <AppointmentSummaryCards />
       <AppointmentFilters
         filterStates={filterStates}
@@ -134,12 +132,15 @@ export default function AppointmentListPage() {
               age={getAge(apptInfo.patientInfo?.dateOfBirth || '')}
               appointmentId={apptInfo.appointment_id}
               appointmentDate={formatDate(apptInfo.appointment_date)}
-              appointmentTime={formatTimeSlot(apptInfo.start_time, apptInfo.end_time)}
+              appointmentTime={formatTimeSlot(
+                apptInfo.start_time,
+                apptInfo.end_time,
+              )}
               appointmentStatus={apptInfo.appointment_status}
               appointmentType={apptInfo.consultation_type}
-              onJoinCall={() => showInDevelopment()}
+              onJoinCall={() => router.push(projectRoutes.meeting)}
             />
-          )
+          );
         })}
       </CustomTable>
 
