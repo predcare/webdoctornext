@@ -56,6 +56,7 @@ export enum PrescriptionQueryKeys {
   Share = 'SharePrescription',
   GetPresciptionInfo = 'GetPresciptionInfo',
   GetAllPrescriptions = 'GetAllPrescriptions',
+  GetPrescriptionByApptID = 'GetPrescriptionByApptID',
 }
 
 export enum InvoiceQueryKeys {

@@ -20,7 +20,6 @@ import {
   getApiErrorMessage,
   getApiErrorStatus,
 } from '@/lib/functions/_helpers.lib';
-import { getAppointmentDetails } from '@/resources/mock';
 import { projectRoutes } from '@/routes';
 import { AppointmentDetailsWrapper } from '@/styles/CustomStyled/AppointmentDetailsWrapper';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -37,11 +36,6 @@ export default function AppointmentDetailsPage({
   appointmentId,
 }: AppointmentDetailsPageProps) {
   const router = useRouter();
-  const details = useMemo(
-    () => getAppointmentDetails(appointmentId),
-    [appointmentId],
-  );
-
   const {
     data: apptInfo,
     isPending: isApptInfoPending,
@@ -117,11 +111,10 @@ export default function AppointmentDetailsPage({
         <Grid container spacing={{ xs: 2, sm: 2.5, lg: 3 }}>
           <Grid size={12}>
             <PatientSummaryCard
-              details={details}
               patientName={apptInfo.patient?.name || 'N/A'}
               patientCode={apptInfo.patient?.patient_id || 'N/A'}
               gender={_toTitleCase(apptInfo.patient?.gender || '')}
-              age={getAge(apptInfo.patient?.date_of_birth || '')}
+              age={getAge(apptInfo.patient?.date_of_birth || '', { large: true })}
               phone={apptInfo.patient?.phone_number || 'N/A'}
               email={apptInfo.patient?.email || ''}
               bloodType={apptInfo.patient?.blood_type || 'N/A'}
@@ -158,10 +151,7 @@ export default function AppointmentDetailsPage({
             </Grid>
           )}
           <Grid size={12}>
-            <PrescriptionsCard
-              prescriptions={details.prescriptions}
-              prescribedBy={details.prescribedBy}
-            />
+            <PrescriptionsCard appointmentId={appointmentId} />
           </Grid>
           <Grid size={12}>
             <ClinicInfoCard

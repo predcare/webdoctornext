@@ -74,6 +74,7 @@ export interface IPaginateMeta {
   hasPrevPage: boolean;
   total_pages: number;
   limit: number;
+  count?: number;
 }
 
 export interface IIconProps {

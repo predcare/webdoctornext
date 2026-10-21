@@ -1,7 +1,7 @@
 'use client';
 
 import DetailField from '@/components/commons/DetailField/DetailField';
-import type { AppointmentDetails } from '@/resources/mock';
+import { getInitials } from '@/lib/commons/common.utils';
 import { avatarTone } from '@/utils/avatarTone';
 import MailOutlinedIcon from '@mui/icons-material/MailOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -11,7 +11,6 @@ import { Box, Button, Grid, Typography } from '@mui/material';
 import { memo } from 'react';
 
 type PatientSummaryCardProps = {
-  details: AppointmentDetails;
   patientName: string;
   patientCode: string;
   gender: string;
@@ -23,7 +22,7 @@ type PatientSummaryCardProps = {
   onProfileView?: () => void;
 };
 
-function PatientSummaryCard({ details, patientName, patientCode, gender, age, phone, email, bloodType, city, onProfileView }: PatientSummaryCardProps) {
+function PatientSummaryCard({ patientName, patientCode, gender, age, phone, email, bloodType, city, onProfileView }: PatientSummaryCardProps) {
   const metaFields = [
     { label: 'Blood Type', value: bloodType },
     { label: 'City', value: city },
@@ -33,7 +32,7 @@ function PatientSummaryCard({ details, patientName, patientCode, gender, age, ph
     <Box className="detail-card">
       <Box className="card-body">
         <Box className="patient-head">
-          <Box className={`patient-avatar ${avatarTone(details.initial)}`}>{details.initial}</Box>
+          <Box className={`patient-avatar ${avatarTone(getInitials(patientName))}`}>{getInitials(patientName)}</Box>
           <Box className="patient-head-copy">
             <Box className="patient-title-row">
               <Typography component="h2" className="patient-title">

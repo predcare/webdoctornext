@@ -1,23 +1,59 @@
 'use client';
 
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
+import InfoTooltip from '@/components/ui/InfoTooltip/InfoTooltip';
+import { useGetPrescriptionByApptID } from '@/hooks/react-query/prescriptions/prescriptions.hooks';
+import { _toTitleCase, formatDate, openInNewTab } from '@/lib/commons/common.utils';
 import type { AppointmentPrescription } from '@/resources/mock';
-import MedicalServicesOutlinedIcon from '@mui/icons-material/MedicalServicesOutlined';
-import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
+import { projectRoutes } from '@/routes';
+import type { IPatientPrescriptionDoc } from '@/typescripts/interfaces/prescriptions.interfaces';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import MarkEmailReadOutlinedIcon from '@mui/icons-material/MarkEmailReadOutlined';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-import { Box, Button, TableCell, TableRow, Typography } from '@mui/material';
-import { memo } from 'react';
+import UnsubscribeOutlinedIcon from '@mui/icons-material/UnsubscribeOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { Box, TableCell, TableRow, Typography } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import { memo, useCallback } from 'react';
 
-const headList = ['Medicine', 'Dosage', 'Frequency', 'Duration', 'Instructions', 'Sent On'];
+const headList = [
+  'Prescription ID',
+  'Doctor',
+  'Clinic',
+  'Diagnosis',
+  'Email Status',
+  'Date',
+  'Actions',
+];
 
 type PrescriptionsCardProps = {
-  prescriptions: AppointmentPrescription[];
-  prescribedBy: string;
+  appointmentId: string;
+  prescriptions?: AppointmentPrescription[];
+  prescribedBy?: string;
 };
 
-function PrescriptionsCard({ prescriptions, prescribedBy }: PrescriptionsCardProps) {
-  const count = prescriptions.length;
-  const sentOn = prescriptions[0]?.sentOn;
+function PrescriptionsCard({
+  appointmentId,
+}: PrescriptionsCardProps) {
+  const router = useRouter();
+
+  const {
+    data: prescriptionsData,
+    isPending: isPrescriptionsPending,
+  } = useGetPrescriptionByApptID({ appointmentId });
+
+  const handleEdit = useCallback(
+    (item: IPatientPrescriptionDoc) => {
+      if (!item.patient_id) return;
+      router.push(
+        projectRoutes.managePrescription({
+          patientId: String(item.patient_id),
+          prescriptionId: item.prescription_id,
+        }),
+      );
+    },
+    [router],
+  );
 
   return (
     <Box className="detail-card">
@@ -28,71 +64,131 @@ function PrescriptionsCard({ prescriptions, prescribedBy }: PrescriptionsCardPro
           </Box>
           <Box className="card-title-copy">
             <Typography component="h3" className="card-title">
-              Prescriptions sent to patient
-            </Typography>
-            <Typography component="p" className="card-subtitle">
-              {count} {count === 1 ? 'medicine' : 'medicines'} · Prescribed by {prescribedBy}
+              Prescriptions
             </Typography>
           </Box>
         </Box>
-        <Button
-          className="head-action"
-          variant="outlined"
-          size="small"
-          startIcon={<MedicalServicesOutlinedIcon fontSize="inherit" />}
-        >
-          Open Consultation
-        </Button>
       </Box>
 
       <CustomTable
         className="prescription-table"
         headList={headList}
-        page={1}
-        totalPages={1}
         zebraStriping={false}
-        isEmpty={count === 0}
+        isLoading={isPrescriptionsPending}
+        isEmpty={!isPrescriptionsPending && (!prescriptionsData || prescriptionsData.length === 0)}
         emptyText="No prescriptions yet"
         emptyDescription="No prescription has been sent to the patient for this appointment yet."
       >
-        {prescriptions.map((item) => (
+        {prescriptionsData?.map((item) => (
           <TableRow key={item.id}>
-            <TableCell>
-              <Box className="medicine-cell">
-                <Box component="span" className="medicine-icon">
-                  <MedicationOutlinedIcon />
-                </Box>
+            <TableCell className="col-prescription-id">
+              <Typography component="p" className="cell-title">
+                {item.prescription_id ? `#${item.prescription_id}` : '-'}
+              </Typography>
+              {item.type && (
+                <Typography component="p" className="cell-note">
+                  {_toTitleCase(item.type)}
+                </Typography>
+              )}
+            </TableCell>
+
+            <TableCell className="col-doctor">
+              <Typography component="p" className="cell-title">
+                {item.doctor_name || '-'}
+              </Typography>
+              {item.doctor_specialization && (
+                <Typography component="p" className="cell-note">
+                  {item.doctor_specialization}
+                </Typography>
+              )}
+            </TableCell>
+
+            <TableCell className="col-clinic">
+              <Typography component="p" className="cell-title">
+                {item.clinic_name || '-'}
+              </Typography>
+              {item.clinic_phone && (
+                <Typography component="p" className="cell-note">
+                  {item.clinic_phone}
+                </Typography>
+              )}
+            </TableCell>
+
+            <TableCell className="col-diagnosis">
+              <Typography
+                component="p"
+                className="cell-title ellipsis"
+                title={item.diagnosis || undefined}
+              >
+                {item.diagnosis || '-'}
+              </Typography>
+              {(item.symptoms || item.chief_complaints) && (
+                <Typography
+                  component="p"
+                  className="cell-note ellipsis"
+                  title={item.symptoms || item.chief_complaints || undefined}
+                >
+                  {item.symptoms || item.chief_complaints}
+                </Typography>
+              )}
+            </TableCell>
+
+            <TableCell className="col-email-status">
+              {item.email_sent_at ? (
                 <Box>
-                  <Typography component="p" className="cell-title">
-                    {item.medicine}
-                  </Typography>
+                  <Box component="span" className="email-status-pill sent">
+                    <MarkEmailReadOutlinedIcon />
+                    Sent
+                  </Box>
                   <Typography component="p" className="cell-note">
-                    {item.form}
+                    {formatDate(item.email_sent_at, 'DD MMM, hh:mm A')}
                   </Typography>
                 </Box>
+              ) : (
+                <Box component="span" className="email-status-pill not-sent">
+                  <UnsubscribeOutlinedIcon />
+                  Not Sent
+                </Box>
+              )}
+            </TableCell>
+
+            <TableCell className="col-date">
+              <Typography component="p" className="cell-title">
+                {item.consultation_date || item.created_at
+                  ? formatDate(item.consultation_date || item.created_at)
+                  : '-'}
+              </Typography>
+              {item.created_at && (
+                <Typography component="p" className="cell-note">
+                  {formatDate(item.created_at, 'hh:mm A')}
+                </Typography>
+              )}
+            </TableCell>
+
+            <TableCell className="col-actions">
+              <Box className="table-actions">
+                {item.pdf_url ? (
+                  <InfoTooltip
+                    content="View Prescription"
+                    ariaLabel={`View prescription ${item.prescription_id || ''}`}
+                    onClick={() => openInNewTab(item.pdf_url)}
+                    icon={<VisibilityOutlinedIcon fontSize="small" />}
+                  />
+                ) : null}
+                {item.patient_id ? (
+                  <InfoTooltip
+                    content="Edit Prescription"
+                    ariaLabel={`Edit prescription ${item.prescription_id || ''}`}
+                    onClick={() => handleEdit(item)}
+                    icon={<EditOutlinedIcon fontSize="small" />}
+                  />
+                ) : null}
+                {!item.pdf_url && !item.patient_id ? '-' : null}
               </Box>
             </TableCell>
-            <TableCell>
-              <Typography component="p" className="cell-title">
-                {item.dosage}
-              </Typography>
-              <Typography component="p" className="cell-note">
-                {item.timing}
-              </Typography>
-            </TableCell>
-            <TableCell>
-              <Typography component="span" className="frequency-pill">
-                {item.frequency}
-              </Typography>
-            </TableCell>
-            <TableCell>{item.duration}</TableCell>
-            <TableCell className="cell-muted">{item.instructions}</TableCell>
-            <TableCell>{item.sentOn}</TableCell>
           </TableRow>
         ))}
       </CustomTable>
-
-      {sentOn ? <Box className="card-foot">Sent to patient on {sentOn}</Box> : null}
     </Box>
   );
 }

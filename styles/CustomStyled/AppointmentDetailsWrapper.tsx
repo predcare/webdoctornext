@@ -416,6 +416,75 @@ export const AppointmentDetailsWrapper = styled(Box)`
     .MuiTableBody-root .MuiTableCell-root {
       padding: 14px 20px;
     }
+
+    .col-prescription-id {
+      min-width: 140px;
+    }
+
+    .col-doctor {
+      min-width: 160px;
+    }
+
+    .col-clinic {
+      min-width: 160px;
+    }
+
+    .col-diagnosis {
+      min-width: 180px;
+      max-width: 280px;
+    }
+
+    .col-email-status {
+      min-width: 130px;
+    }
+
+    .col-date {
+      min-width: 120px;
+    }
+
+    .col-actions {
+      min-width: 90px;
+    }
+  }
+
+  .email-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 16px;
+    white-space: nowrap;
+
+    .MuiSvgIcon-root {
+      font-size: 15px;
+    }
+
+    &.sent {
+      color: ${({ theme }) => theme.palette.customColors.success};
+      background: ${({ theme }) => theme.palette.customColors.successBg};
+    }
+
+    &.not-sent {
+      color: ${({ theme }) => theme.palette.customColors.textMuted};
+      background: ${({ theme }) => theme.palette.customColors.inputBg};
+      border: 1px solid ${({ theme }) => theme.palette.customColors.border};
+    }
+  }
+
+  .table-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .medicine-cell {

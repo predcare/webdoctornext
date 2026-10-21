@@ -99,3 +99,12 @@ export const getAllPrescriptionsForDoctor = async (
   );
   return res.data;
 };
+
+export const getPrescriptionByApptID = async (
+  appointmentId: string | number,
+) => {
+  const res = await axiosInstance.get<IRootResponse<IPatientPrescriptionDoc[]>>(
+    endpoints.prescritions.getPrescriptionsByAppointment(appointmentId),
+  );
+  return res.data;
+};

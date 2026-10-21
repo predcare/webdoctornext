@@ -105,6 +105,8 @@ export const endpoints = {
     sendAgain: (id: string | number) =>
       `/prescriptions/${id}/send-prescription`,
     downloadPrescription: (id: string | number) => `/prescriptions/${id}/pdf`,
+    getPrescriptionsByAppointment: (appointmentId: string | number) =>
+      `/prescriptions/appointment/${appointmentId}`,
   },
   notifications: {
     getAll: '/notifications',

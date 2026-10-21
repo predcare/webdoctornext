@@ -9,6 +9,7 @@ import {
   createPrescription,
   downloadPrescriptionPdf,
   getAllPrescriptionsForDoctor,
+  getPrescriptionByApptID,
   getPrescriptionDetails,
   resendPrescriptionEmail,
   updatePrescription,
@@ -17,15 +18,21 @@ import {
 export const useCreatePrescription = () => {
   return useMutation({
     mutationKey: [PrescriptionQueryKeys.Create],
-    mutationFn: (payload: ICreatePrescriptionPayload) => createPrescription(payload),
+    mutationFn: (payload: ICreatePrescriptionPayload) =>
+      createPrescription(payload),
   });
 };
 
 export const useUpdatePrescription = () => {
   return useMutation({
     mutationKey: [PrescriptionQueryKeys.Update],
-    mutationFn: ({ id, payload }: { id: number | string; payload: IUpdatePrescriptionPayload }) =>
-      updatePrescription({ id, payload }),
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: number | string;
+      payload: IUpdatePrescriptionPayload;
+    }) => updatePrescription({ id, payload }),
   });
 };
 
@@ -58,7 +65,9 @@ export const useDownloadPrescriptionPdf = () => {
     }) => downloadPrescriptionPdf({ id, action, onProgress }),
   });
 };
-export const useGetAllPrescriptions = (params?: IGetDoctorPrescriptionsParams) => {
+export const useGetAllPrescriptions = (
+  params?: IGetDoctorPrescriptionsParams,
+) => {
   return useQuery({
     queryKey: [PrescriptionQueryKeys.GetAllPrescriptions, params],
     queryFn: () => getAllPrescriptionsForDoctor(params),
@@ -66,7 +75,7 @@ export const useGetAllPrescriptions = (params?: IGetDoctorPrescriptionsParams) =
 };
 
 export const useGetInfinitePrescriptions = (
-  params?: Omit<IGetDoctorPrescriptionsParams, 'page'>
+  params?: Omit<IGetDoctorPrescriptionsParams, 'page'>,
 ) => {
   return useInfiniteQuery({
     queryKey: [PrescriptionQueryKeys.GetAllPrescriptions, 'infinite', params],
@@ -77,11 +86,22 @@ export const useGetInfinitePrescriptions = (
         limit: params?.limit ?? 15,
       }),
     initialPageParam: 1,
-    getNextPageParam: lastPage => {
+    getNextPageParam: (lastPage) => {
       if (lastPage?.meta?.hasNextPage) {
         return (lastPage?.meta?.page || 1) + 1;
       }
       return undefined;
     },
+  });
+};
+
+export const useGetPrescriptionByApptID = (params: {
+  appointmentId: string | number;
+}) => {
+  return useQuery({
+    queryKey: [PrescriptionQueryKeys.GetPrescriptionByApptID, params],
+    queryFn: () => getPrescriptionByApptID(params?.appointmentId),
+    enabled: !!params?.appointmentId,
+    select: (v) => v.data,
   });
 };
