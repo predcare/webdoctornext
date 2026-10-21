@@ -1,22 +1,25 @@
 ---
 name: Meeting screen share
-overview: "Add doctor screen share to the existing VideoSDK call: a control-bar toggle that starts and stops sharing, and a stage that shows whoever is presenting."
+overview: Add VideoSDK screen share, and stop the end-call handoff from flashing the no-session screen before the consultation summary.
 todos:
   - id: media-hook
     content: Add toggleScreenShare and isScreenShareOn to useMeetingMedia from VideoSDK localScreenShareOn
-    status: pending
+    status: completed
   - id: control-bar
     content: Add share/stop button and participant screen indicator in MeetingControlBar
-    status: pending
+    status: completed
   - id: stage
     content: Render VideoPlayer type=share from presenterId on MeetingStage and RemoteStage
-    status: pending
+    status: completed
   - id: mini-player
     content: Show the active share and share toggle in MeetingMiniPlayer
-    status: pending
+    status: completed
   - id: styles
     content: Add is-sharing control styles and a stage share label in MeetingWrapper
-    status: pending
+    status: completed
+  - id: end-call-handoff
+    content: Keep callState ENDED while the token is cleared so MeetingPage shows the skeleton until the summary route is ready
+    status: completed
 isProject: false
 ---
 
@@ -49,7 +52,7 @@ const handleToggleScreenShare = useCallback(async () => {
   try {
     await toggleScreenShare();
   } catch (error) {
-    console.warn("Screen share failed:", error);
+    console.warn('Screen share failed:', error);
   }
 }, [toggleScreenShare]);
 
@@ -69,11 +72,11 @@ In [components/Modules/MeetingModule/MeetingControlBar.tsx](components/Modules/M
 ```tsx
 const { isScreenShareOn, toggleScreenShare } = useMeetingMedia();
 
-<Tooltip title={isScreenShareOn ? "Stop sharing" : "Share screen"}>
+<Tooltip title={isScreenShareOn ? 'Stop sharing' : 'Share screen'}>
   <IconButton
-    className={`control-btn${isScreenShareOn ? " is-sharing" : ""}`}
+    className={`control-btn${isScreenShareOn ? ' is-sharing' : ''}`}
     onClick={toggleScreenShare}
-    aria-label={isScreenShareOn ? "Stop sharing" : "Share screen"}
+    aria-label={isScreenShareOn ? 'Stop sharing' : 'Share screen'}
   >
     {isScreenShareOn ? <StopScreenShareIcon /> : <ScreenShareIcon />}
   </IconButton>
@@ -120,6 +123,59 @@ In [components/Modules/MeetingModule/MeetingMiniPlayer.tsx](components/Modules/M
 
 In [styles/CustomStyled/MeetingWrapper.tsx](styles/CustomStyled/MeetingWrapper.tsx), add `.control-btn.is-sharing` and `.mini-btn.is-sharing` with `brandTeal` so an active share is distinct from the red muted state. Add a small `.share-label` on the stage (top-left, same pill family as the timer). `object-fit: contain` is already set on `.remote-player-video`, which is the right fit for a screen.
 
+## 6. End call goes straight to the summary
+
+Ending the call clears the VideoSDK token in the same tick as navigation. [MeetingPage.tsx](components/Modules/MeetingModule/MeetingPage.tsx) is still mounted on the meeting route for that moment, sees `!token || !meetingId`, and renders **No Active Video Call Session**. The summary route then replaces it.
+
+```mermaid
+flowchart TD
+  confirm[Confirm end call] --> ended[Set callState ENDED]
+  ended --> leave[leave]
+  leave --> reset["Clear token, keep ENDED"]
+  reset --> skeleton[MeetingPage keeps the call skeleton]
+  skeleton --> summary[Summary route]
+  summary --> idle[Reset store to IDLE]
+```
+
+`ENDED` already exists on `TCallState`. Use it as the in-between state. Do not add a new store field.
+
+In [hooks/commons/meeting/meetingSessionLeave.ts](hooks/commons/meeting/meetingSessionLeave.ts), clear the session and keep `ENDED` in one `set`, so a render cannot land on an empty token with `IDLE`:
+
+```ts
+export const resetMeetingAndGetSummaryPath = () => {
+  const appointmentId = useMeetingStore.getState().appointmentId;
+  useMeetingStore.setState({
+    ...initialState,
+    callState: 'ENDED',
+  });
+  return meetingSummaryPath(appointmentId);
+};
+```
+
+Export `initialState` from [zustand/stores/useMeetingStore.ts](zustand/stores/useMeetingStore.ts), or set `callState: 'ENDED'` inside `resetMeetingStore` through a `keepEnded` argument. The prescription path in [MeetingSessionHost.tsx](components/Modules/MeetingModule/MeetingSessionHost.tsx) still does a full reset to `IDLE`, because that screen is already off the meeting route.
+
+In [MeetingControlBar.tsx](components/Modules/MeetingModule/MeetingControlBar.tsx), set `ENDED` before `leave()` and ignore a second click while it is set. The stage unmounts to the skeleton, and `MeetingProvider` stays mounted until `onMeetingLeft` clears the token, so `leave()` can finish. The existing `leave()` catch uses the same helper, so a failed leave takes the same path.
+
+In [MeetingPage.tsx](components/Modules/MeetingModule/MeetingPage.tsx), treat `ENDED` like loading and keep [MeetingCallSkeleton.tsx](components/Modules/MeetingModule/MeetingCallSkeleton.tsx) on screen:
+
+```tsx
+const callState = useMeetingStore((state) => state.callState);
+
+if (callState === 'ENDED' || isCallDataLoading) {
+  return (
+    <MeetingWrapper>
+      <MeetingCallSkeleton />
+    </MeetingWrapper>
+  );
+}
+```
+
+The empty session block stays for a real visit with no token, such as opening the meeting URL directly.
+
+In [MeetingCallSummary.tsx](components/Modules/MeetingModule/MeetingCallSummary.tsx), reset the store to `IDLE` once on mount. The summary reads `appointmentId` from the query string, so it does not need the meeting token. A later direct open of a meeting URL can show the empty session again. Rejoin still goes through `joinVideoCall`, which sets a new session.
+
+[MeetingMiniPlayer.tsx](components/Modules/MeetingModule/MeetingMiniPlayer.tsx) and the time-up handler in [SocketListeners.tsx](components/commons/Sockets/SocketListeners.tsx) already call `resetMeetingAndGetSummaryPath()`, so they pick up the same handoff. On the mini player the meeting page is not mounted, so there is no empty-session flash there. The skeleton only covers the frame while the meeting route is still visible.
+
 ## Verification
 
 - Click Share screen, pick a display, confirm the stage shows it and the button switches to Stop sharing.
@@ -127,3 +183,6 @@ In [styles/CustomStyled/MeetingWrapper.tsx](styles/CustomStyled/MeetingWrapper.t
 - Stop from the button and from the browser's own "Stop sharing" control.
 - With a second participant, confirm their share replaces the main camera and the local camera tile stays.
 - Leave the meeting route and confirm the mini player shows the share and can stop it.
+- End the call from the stage and confirm the screen goes from the call, through the skeleton, to the consultation summary, with no "No Active Video Call Session" card.
+- End the call from the mini player and from a slot timeout, and confirm both land on the summary.
+- Open the meeting URL again with no active session and confirm the empty session card still appears.

@@ -1,5 +1,8 @@
 import { projectRoutes } from '@/routes';
-import { useMeetingStore } from '@/zustand/stores/useMeetingStore';
+import {
+  initialState,
+  useMeetingStore,
+} from '@/zustand/stores/useMeetingStore';
 
 type TLeaveHandler = () => Promise<void> | void;
 
@@ -25,6 +28,9 @@ export const meetingSummaryPath = (appointmentId: string | number | null) => {
 
 export const resetMeetingAndGetSummaryPath = () => {
   const appointmentId = useMeetingStore.getState().appointmentId;
-  useMeetingStore.getState().resetMeetingStore();
+  useMeetingStore.setState({
+    ...initialState,
+    callState: 'ENDED',
+  });
   return meetingSummaryPath(appointmentId);
 };

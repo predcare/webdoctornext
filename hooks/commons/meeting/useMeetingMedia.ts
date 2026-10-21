@@ -12,8 +12,10 @@ export const useMeetingMedia = () => {
   const {
     localMicOn,
     localWebcamOn,
+    localScreenShareOn,
     toggleMic,
     toggleWebcam,
+    toggleScreenShare,
     getWebcams,
     changeWebcam,
   } = useMeeting();
@@ -38,6 +40,14 @@ export const useMeetingMedia = () => {
     toggleWebcam();
     setCameraState(!localWebcamOn);
   }, [toggleWebcam, localWebcamOn, setCameraState]);
+
+  const handleToggleScreenShare = useCallback(async () => {
+    try {
+      await toggleScreenShare();
+    } catch (error) {
+      console.warn('Screen share failed:', error);
+    }
+  }, [toggleScreenShare]);
 
   const handleSwitchCamera = useCallback(
     async (deviceId: string) => {
@@ -88,8 +98,10 @@ export const useMeetingMedia = () => {
     webcams,
     hasMultipleCameras: webcams.length > 1,
     selectedVideoDeviceId,
+    isScreenShareOn: Boolean(localScreenShareOn),
     toggleMic: handleToggleMic,
     toggleCamera: handleToggleCamera,
+    toggleScreenShare: handleToggleScreenShare,
     switchCamera: handleSwitchCamera,
   };
 };

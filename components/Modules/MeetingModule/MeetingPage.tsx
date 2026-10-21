@@ -25,6 +25,7 @@ export default function MeetingPage({
   const router = useRouter();
   const token = useMeetingStore((state) => state.token);
   const meetingId = useMeetingStore((state) => state.meetingId);
+  const callState = useMeetingStore((state) => state.callState);
   const setPatientInfo = useMeetingStore((state) => state.setPatientInfo);
 
   const { data: patient, isFetching: pendingPatient } = useMyPatientInfo({
@@ -76,7 +77,7 @@ export default function MeetingPage({
     };
   }, [token]);
 
-  if (isCallDataLoading) {
+  if (callState === 'ENDED' || isCallDataLoading) {
     return (
       <MeetingWrapper>
         <MeetingCallSkeleton />

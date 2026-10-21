@@ -2,9 +2,15 @@
 
 import { useJoinVideoCall } from '@/hooks/commons/meeting/useJoinVideoCall';
 import { useMyAppointmentInfo } from '@/hooks/react-query/appointments/appointments.hooks';
-import { _toTitleCase, formatDate, formatTimeSlot, getAge } from '@/lib/commons/common.utils';
+import {
+  _toTitleCase,
+  formatDate,
+  formatTimeSlot,
+  getAge,
+} from '@/lib/commons/common.utils';
 import { projectRoutes } from '@/routes';
 import { MeetingWrapper } from '@/styles/CustomStyled/MeetingWrapper';
+import { useMeetingStore } from '@/zustand/stores/useMeetingStore';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ListAltIcon from '@mui/icons-material/ListAlt';
@@ -21,10 +27,9 @@ import {
   Typography,
 } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 export default function MeetingCallSummary() {
-
   const router = useRouter();
   const searchParams = useSearchParams();
   const appointmentId = searchParams.get('appointmentId') || '';
@@ -41,7 +46,11 @@ export default function MeetingCallSummary() {
     const status = apptInfo.appointment_status?.toLowerCase();
     const isSlotNotExpired =
       apptInfo.call_end_reason !== 'slot_duration_completed';
-    return isVideo && ['confirmed', 'in_progress'].includes(status) && isSlotNotExpired;
+    return (
+      isVideo &&
+      ['confirmed', 'in_progress'].includes(status) &&
+      isSlotNotExpired
+    );
   }, [apptInfo]);
 
   const handleRejoin = () => {
@@ -61,6 +70,10 @@ export default function MeetingCallSummary() {
   const handleWritePrescription = () => {
     router.push(projectRoutes.patients);
   };
+
+  useEffect(() => {
+    useMeetingStore.getState().resetMeetingStore();
+  }, []);
 
   if (isLoading) {
     return (
@@ -100,7 +113,9 @@ export default function MeetingCallSummary() {
 
           <CardContent className="summary-body">
             <Box className="summary-identity">
-              <Avatar className="summary-avatar">{patientName.charAt(0).toUpperCase()}</Avatar>
+              <Avatar className="summary-avatar">
+                {patientName.charAt(0).toUpperCase()}
+              </Avatar>
               <Box>
                 <Typography className="summary-name" component="h3">
                   {patientName}
@@ -115,7 +130,9 @@ export default function MeetingCallSummary() {
 
             <Grid container spacing={2}>
               <Grid size={{ xs: 6, sm: 4 }}>
-                <Typography className="summary-meta-label">APPOINTMENT ID</Typography>
+                <Typography className="summary-meta-label">
+                  APPOINTMENT ID
+                </Typography>
                 <Typography className="summary-meta-value">
                   {apptInfo?.appointment_id || appointmentId || 'N/A'}
                 </Typography>
@@ -123,13 +140,18 @@ export default function MeetingCallSummary() {
               <Grid size={{ xs: 6, sm: 4 }}>
                 <Typography className="summary-meta-label">DATE</Typography>
                 <Typography className="summary-meta-value">
-                  {apptInfo?.appointment_date ? formatDate(apptInfo.appointment_date) : 'N/A'}
+                  {apptInfo?.appointment_date
+                    ? formatDate(apptInfo.appointment_date)
+                    : 'N/A'}
                 </Typography>
               </Grid>
               <Grid size={{ xs: 12, sm: 4 }}>
-                <Typography className="summary-meta-label">TIME SLOT</Typography>
+                <Typography className="summary-meta-label">
+                  TIME SLOT
+                </Typography>
                 <Typography className="summary-meta-value">
-                  {formatTimeSlot(apptInfo?.start_time, apptInfo?.end_time) || 'N/A'}
+                  {formatTimeSlot(apptInfo?.start_time, apptInfo?.end_time) ||
+                    'N/A'}
                 </Typography>
               </Grid>
             </Grid>

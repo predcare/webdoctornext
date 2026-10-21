@@ -88,6 +88,10 @@ export const MeetingWrapper = styled(Box)`
     &.net.offline {
       background: ${({ theme }) => theme.palette.customColors.error};
     }
+
+    &.share-label {
+      background: ${({ theme }) => theme.palette.customColors.brandTeal};
+    }
   }
 
   .status-pill-id {
@@ -186,6 +190,17 @@ export const MeetingWrapper = styled(Box)`
     background: ${({ theme }) => theme.palette.customColors.errorBg};
     color: ${({ theme }) => theme.palette.customColors.error};
     border-color: ${({ theme }) => theme.palette.customColors.error};
+  }
+
+  && .control-btn.is-sharing {
+    background: ${({ theme }) => theme.palette.customColors.brandTeal};
+    color: #ffffff;
+    border-color: transparent;
+
+    &:hover {
+      background: ${({ theme }) => theme.palette.customColors.brandTeal};
+      filter: brightness(0.94);
+    }
   }
 
   .participants-badge .MuiBadge-badge {
@@ -312,7 +327,8 @@ export const MeetingWrapper = styled(Box)`
     color: #ffffff;
     font-size: 15px;
     font-weight: 700;
-    box-shadow: 0 0 0 4px ${({ theme }) => theme.palette.customColors.brandTealLight};
+    box-shadow: 0 0 0 4px
+      ${({ theme }) => theme.palette.customColors.brandTealLight};
   }
 
   .identity-copy {
@@ -553,7 +569,8 @@ export const MeetingWrapper = styled(Box)`
     background: ${({ theme }) => theme.palette.customColors.brandTeal};
     font-size: 40px;
     font-weight: 700;
-    box-shadow: 0 0 0 8px ${({ theme }) => theme.palette.customColors.brandTealLight};
+    box-shadow: 0 0 0 8px
+      ${({ theme }) => theme.palette.customColors.brandTealLight};
   }
 
   .summary-loading {
@@ -911,6 +928,11 @@ export const MeetingMiniPlayerShell = styled(Box)`
     &:hover {
       opacity: 0.9;
     }
+  }
+
+  .mini-btn.is-sharing.MuiIconButton-root {
+    background: ${({ theme }) => theme.palette.customColors.brandTeal};
+    color: #ffffff;
   }
 
   .mini-btn.is-off.MuiIconButton-root,

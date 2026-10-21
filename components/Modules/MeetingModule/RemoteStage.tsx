@@ -7,33 +7,46 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 type RemoteStageProps = {
   participantId: string | null;
+  presenterId: string | null;
   patientName?: string;
   onNetworkQualityChange?: (quality: string) => void;
 };
 
 export default function RemoteStage({
   participantId,
+  presenterId,
   patientName,
   onNetworkQualityChange,
 }: RemoteStageProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [networkQuality, setNetworkQuality] = useState<'GOOD' | 'FAIR' | 'WEAK' | 'OFFLINE'>('GOOD');
+  const [networkQuality, setNetworkQuality] = useState<
+    'GOOD' | 'FAIR' | 'WEAK' | 'OFFLINE'
+  >('GOOD');
 
   const participantData = useParticipant(participantId || '');
-  const { webcamStream, micStream, webcamOn, micOn, getVideoStats, setQuality } =
-    participantData || {};
+  const shareParticipant = useParticipant(presenterId || '');
+  const {
+    webcamStream,
+    micStream,
+    webcamOn,
+    micOn,
+    getVideoStats,
+    setQuality,
+  } = participantData || {};
+  const { screenShareOn, setScreenShareQuality } = shareParticipant || {};
   const webcamTrackId = webcamStream?.track?.id ?? null;
 
   const displayName = useMemo(() => {
-    return (
-      patientName ||
-      participantData?.displayName ||
-      'Patient'
-    );
+    return patientName || participantData?.displayName || 'Patient';
   }, [patientName, participantData?.displayName]);
 
   useEffect(() => {
-    if (!participantId || !webcamOn || !webcamTrackId || typeof setQuality !== 'function') {
+    if (
+      !participantId ||
+      !webcamOn ||
+      !webcamTrackId ||
+      typeof setQuality !== 'function'
+    ) {
       return;
     }
 
@@ -49,12 +62,35 @@ export default function RemoteStage({
     };
   }, [participantId, webcamOn, webcamTrackId, setQuality]);
 
+  useEffect(() => {
+    if (
+      !presenterId ||
+      !screenShareOn ||
+      typeof setScreenShareQuality !== 'function'
+    ) {
+      return;
+    }
+
+    let cancelled = false;
+    setScreenShareQuality('high').catch((error) => {
+      if (!cancelled) {
+        console.warn('Unable to request high screen-share quality:', error);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [presenterId, screenShareOn, setScreenShareQuality]);
+
   // Attach remote audio track
   useEffect(() => {
     if (audioRef.current && micOn && micStream?.track) {
       const mediaStream = new MediaStream([micStream.track]);
       audioRef.current.srcObject = mediaStream;
-      audioRef.current.play().catch((e) => console.warn('Audio play interrupted:', e));
+      audioRef.current
+        .play()
+        .catch((e) => console.warn('Audio play interrupted:', e));
     } else if (audioRef.current) {
       audioRef.current.srcObject = null;
     }
@@ -99,22 +135,34 @@ export default function RemoteStage({
     <Box className="remote-video">
       <audio ref={audioRef} autoPlay playsInline />
 
-      {!participantId ? (
+      {presenterId && screenShareOn ? (
+        <VideoPlayer
+          participantId={presenterId}
+          type="share"
+          className="remote-player"
+          classNameVideo="remote-player-video"
+        />
+      ) : !participantId ? (
         <Box className="remote-waiting">
           <CircularProgress className="remote-spinner" size={48} />
           <Typography className="remote-waiting-title" component="p">
             Waiting for patient to join...
           </Typography>
           <Typography className="remote-waiting-copy">
-            {displayName} has been notified and will be connected as soon as they enter the room.
+            {displayName} has been notified and will be connected as soon as
+            they enter the room.
           </Typography>
         </Box>
       ) : !webcamOn ? (
         <Box className="remote-cam-off">
-          <Avatar className="remote-avatar">{displayName.charAt(0).toUpperCase()}</Avatar>
+          <Avatar className="remote-avatar">
+            {displayName.charAt(0).toUpperCase()}
+          </Avatar>
           <Box className="remote-cam-note">
             <VideocamOffIcon fontSize="small" />
-            <Typography component="span">Patient&apos;s camera is turned off</Typography>
+            <Typography component="span">
+              Patient&apos;s camera is turned off
+            </Typography>
           </Box>
         </Box>
       ) : (

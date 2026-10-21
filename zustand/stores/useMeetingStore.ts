@@ -40,7 +40,7 @@ interface IMeetingStoreState {
   resetMeetingStore: () => void;
 }
 
-const initialState = {
+export const initialState = {
   token: null,
   meetingId: null,
   appointmentId: null,

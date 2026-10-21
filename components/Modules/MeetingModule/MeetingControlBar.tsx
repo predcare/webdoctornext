@@ -3,12 +3,18 @@
 import CustomModal from '@/components/ui/CustomModal/CustomModal';
 import { resetMeetingAndGetSummaryPath } from '@/hooks/commons/meeting/meetingSessionLeave';
 import { useMeetingMedia } from '@/hooks/commons/meeting/useMeetingMedia';
-import { EndCallActions, MeetingParticipantsPopover } from '@/styles/CustomStyled/MeetingWrapper';
+import {
+  EndCallActions,
+  MeetingParticipantsPopover,
+} from '@/styles/CustomStyled/MeetingWrapper';
+import { useMeetingStore } from '@/zustand/stores/useMeetingStore';
 import CallEndIcon from '@mui/icons-material/CallEnd';
 import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import ScreenShareIcon from '@mui/icons-material/ScreenShare';
+import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import {
@@ -26,17 +32,23 @@ import { useRouter } from 'next/navigation';
 import React, { useCallback, useMemo, useState } from 'react';
 
 export default function MeetingControlBar() {
-  const [cameraAnchorEl, setCameraAnchorEl] = useState<null | HTMLElement>(null);
-  const [participantsAnchorEl, setParticipantsAnchorEl] = useState<null | HTMLElement>(null);
+  const [cameraAnchorEl, setCameraAnchorEl] = useState<null | HTMLElement>(
+    null,
+  );
+  const [participantsAnchorEl, setParticipantsAnchorEl] =
+    useState<null | HTMLElement>(null);
   const [isEndModalOpen, setIsEndModalOpen] = useState(false);
 
   const router = useRouter();
+  const setCallState = useMeetingStore((state) => state.setCallState);
   const { leave, participants, localParticipant } = useMeeting();
   const {
     isMicOn,
     isCameraOn,
+    isScreenShareOn,
     toggleMic,
     toggleCamera,
+    toggleScreenShare,
     webcams,
     hasMultipleCameras,
     selectedVideoDeviceId,
@@ -69,20 +81,22 @@ export default function MeetingControlBar() {
   }, []);
 
   const handleConfirmEndCall = useCallback(async () => {
+    if (useMeetingStore.getState().callState === 'ENDED') return;
     setIsEndModalOpen(false);
+    setCallState('ENDED');
     try {
       await leave();
     } catch (error) {
       console.warn('Error during leave:', error);
       router.replace(resetMeetingAndGetSummaryPath());
     }
-  }, [leave, router]);
+  }, [leave, router, setCallState]);
 
   const handleCameraMenuOpen = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       setCameraAnchorEl(event.currentTarget);
     },
-    []
+    [],
   );
 
   const handleCameraMenuClose = useCallback(() => {
@@ -94,7 +108,7 @@ export default function MeetingControlBar() {
       switchCamera(deviceId);
       handleCameraMenuClose();
     },
-    [switchCamera, handleCameraMenuClose]
+    [switchCamera, handleCameraMenuClose],
   );
 
   return (
@@ -119,6 +133,16 @@ export default function MeetingControlBar() {
             aria-label={isCameraOn ? 'Turn Camera Off' : 'Turn Camera On'}
           >
             {isCameraOn ? <VideocamIcon /> : <VideocamOffIcon />}
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip title={isScreenShareOn ? 'Stop sharing' : 'Share screen'}>
+          <IconButton
+            className={`control-btn${isScreenShareOn ? ' is-sharing' : ''}`}
+            onClick={toggleScreenShare}
+            aria-label={isScreenShareOn ? 'Stop sharing' : 'Share screen'}
+          >
+            {isScreenShareOn ? <StopScreenShareIcon /> : <ScreenShareIcon />}
           </IconButton>
         </Tooltip>
 
@@ -179,7 +203,9 @@ export default function MeetingControlBar() {
             Participants ({participantCount})
           </Typography>
           {participantList.length === 0 ? (
-            <Typography className="participants-empty">No one has joined yet.</Typography>
+            <Typography className="participants-empty">
+              No one has joined yet.
+            </Typography>
           ) : (
             participantList.map((participant) => {
               const isLocal = participant.id === localParticipant?.id;
@@ -200,6 +226,7 @@ export default function MeetingControlBar() {
                     ) : (
                       <VideocamOffIcon className="is-off" />
                     )}
+                    {participant.screenShareOn ? <ScreenShareIcon /> : null}
                   </Box>
                 </Box>
               );
@@ -231,7 +258,11 @@ export default function MeetingControlBar() {
           <Button onClick={handleCloseEndModal} color="inherit">
             Cancel
           </Button>
-          <Button onClick={handleConfirmEndCall} color="error" variant="contained">
+          <Button
+            onClick={handleConfirmEndCall}
+            color="error"
+            variant="contained"
+          >
             Yes, End Call
           </Button>
         </EndCallActions>

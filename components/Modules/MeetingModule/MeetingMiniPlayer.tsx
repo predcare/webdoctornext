@@ -10,26 +10,42 @@ import CallEndIcon from '@mui/icons-material/CallEnd';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
+import ScreenShareIcon from '@mui/icons-material/ScreenShare';
+import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import { Avatar, IconButton, Tooltip } from '@mui/material';
-import { useMeeting, useParticipant, VideoPlayer } from '@videosdk.live/react-sdk';
+import {
+  useMeeting,
+  useParticipant,
+  VideoPlayer,
+} from '@videosdk.live/react-sdk';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function MeetingMiniPlayer() {
-
   const router = useRouter();
-  const { leave } = useMeeting();
+  const { leave, presenterId } = useMeeting();
   const appointmentId = useMeetingStore((state) => state.appointmentId);
   const patientInfo = useMeetingStore((state) => state.patientInfo);
-  const remoteParticipantId = useMeetingStore((state) => state.remoteParticipantId);
+  const remoteParticipantId = useMeetingStore(
+    (state) => state.remoteParticipantId,
+  );
 
   const participantData = useParticipant(remoteParticipantId || '');
+  const shareParticipant = useParticipant(presenterId || '');
   const { webcamStream, webcamOn, setQuality } = participantData || {};
+  const { screenShareOn, setScreenShareQuality } = shareParticipant || {};
   const webcamTrackId = webcamStream?.track?.id ?? null;
 
-  const { isMicOn, isCameraOn, toggleMic, toggleCamera } = useMeetingMedia();
+  const {
+    isMicOn,
+    isCameraOn,
+    isScreenShareOn,
+    toggleMic,
+    toggleCamera,
+    toggleScreenShare,
+  } = useMeetingMedia();
   const { formattedTime } = useMeetingCountdown();
 
   const handleReturnToMeeting = () => {
@@ -47,7 +63,33 @@ export default function MeetingMiniPlayer() {
   };
 
   useEffect(() => {
-    if (!remoteParticipantId || !webcamOn || !webcamTrackId || typeof setQuality !== 'function') {
+    if (
+      !presenterId ||
+      !screenShareOn ||
+      typeof setScreenShareQuality !== 'function'
+    ) {
+      return;
+    }
+
+    let cancelled = false;
+    setScreenShareQuality('high').catch((error) => {
+      if (!cancelled) {
+        console.warn('Unable to request high screen-share quality:', error);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [presenterId, screenShareOn, setScreenShareQuality]);
+
+  useEffect(() => {
+    if (
+      !remoteParticipantId ||
+      !webcamOn ||
+      !webcamTrackId ||
+      typeof setQuality !== 'function'
+    ) {
       return;
     }
 
@@ -79,7 +121,14 @@ export default function MeetingMiniPlayer() {
       </div>
 
       <div className="mini-stage">
-        {webcamOn && remoteParticipantId ? (
+        {presenterId && screenShareOn ? (
+          <VideoPlayer
+            participantId={presenterId}
+            type="share"
+            className="mini-player-frame"
+            classNameVideo="mini-player-video"
+          />
+        ) : webcamOn && remoteParticipantId ? (
           <VideoPlayer
             participantId={remoteParticipantId}
             type="video"
@@ -110,7 +159,22 @@ export default function MeetingMiniPlayer() {
           {isCameraOn ? <VideocamIcon /> : <VideocamOffIcon />}
         </IconButton>
 
-        <IconButton className="mini-btn end-call" size="small" onClick={handleEndCall}>
+        <Tooltip title={isScreenShareOn ? 'Stop sharing' : 'Share screen'}>
+          <IconButton
+            className={`mini-btn${isScreenShareOn ? ' is-sharing' : ''}`}
+            size="small"
+            onClick={toggleScreenShare}
+            aria-label={isScreenShareOn ? 'Stop sharing' : 'Share screen'}
+          >
+            {isScreenShareOn ? <StopScreenShareIcon /> : <ScreenShareIcon />}
+          </IconButton>
+        </Tooltip>
+
+        <IconButton
+          className="mini-btn end-call"
+          size="small"
+          onClick={handleEndCall}
+        >
           <CallEndIcon />
         </IconButton>
       </div>

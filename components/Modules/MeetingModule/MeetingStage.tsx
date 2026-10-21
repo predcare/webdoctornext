@@ -7,8 +7,10 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import HdIcon from '@mui/icons-material/Hd';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
 import { Box, Typography } from '@mui/material';
+import { useMeeting, useParticipant } from '@videosdk.live/react-sdk';
 import { useState } from 'react';
 import LocalVideoTile from './LocalVideoTile';
 import MeetingControlBar from './MeetingControlBar';
@@ -27,6 +29,8 @@ export default function MeetingStage() {
   );
   const isOffline = useNetworkStore((state) => state.isOffline);
   const { formattedTime, isWarning, isUrgent } = useMeetingCountdown();
+  const { presenterId, localParticipant } = useMeeting();
+  const { screenShareOn } = useParticipant(presenterId || '');
 
   const patientDisplayName = patientInfo?.name || 'Patient';
   const patientGeneratedId = patientInfo?.alphanumericId;
@@ -34,16 +38,29 @@ export default function MeetingStage() {
     appointmentGeneratedId ||
     (appointmentId != null ? String(appointmentId) : '');
   const networkStatusLabel = isOffline ? 'OFFLINE' : networkLabel;
+  const isSharing = Boolean(presenterId) && screenShareOn;
+  const isLocalShare = isSharing && presenterId === localParticipant?.id;
 
   return (
     <Box className="stage">
       <Box className="remote-feed">
         <RemoteStage
           participantId={remoteParticipantId}
+          presenterId={presenterId || null}
           patientName={patientDisplayName}
           onNetworkQualityChange={setNetworkLabel}
         />
         <Box className="status-row">
+          {isSharing ? (
+            <Box className="status-pill share-label">
+              <ScreenShareIcon />
+              <span>
+                {isLocalShare
+                  ? 'You are sharing your screen'
+                  : 'Patient is sharing their screen'}
+              </span>
+            </Box>
+          ) : null}
           <Box
             className={`status-pill timer${isUrgent ? ' urgent' : isWarning ? ' warning' : ''}`}
           >
@@ -61,7 +78,9 @@ export default function MeetingStage() {
           </Box>
           <Box
             className="status-pill encrypted"
-            title={appointmentLabel ? `ENCRYPTED ${appointmentLabel}` : 'ENCRYPTED'}
+            title={
+              appointmentLabel ? `ENCRYPTED ${appointmentLabel}` : 'ENCRYPTED'
+            }
           >
             <LockOutlinedIcon />
             <span>ENCRYPTED</span>
