@@ -80,13 +80,9 @@ export const getMyPatientsEmrs = async (patientId: number | string) => {
 
 export const getMyPatientsPrescriptions = async (
   patientId: number | string,
-  params?: {
-    clinic_id?: number | string;
-  },
 ) => {
   const res = await axiosInstance.get<IRootResponse<IPatientPrescriptionDoc[]>>(
     `${endpoints.patients.prescriptions(patientId)}`,
-    { params },
   );
   return res.data;
 };
@@ -126,7 +122,6 @@ export const getMyPatientsConsults = async (params: {
   limit: number;
   patientId: string | number;
   status?: string;
-  clinic_id?: number;
 }) => {
   const res = await axiosInstance.get<IPatientConsultApptRoot>(
     `${endpoints.patients.consults(params?.patientId)}`,

@@ -5,7 +5,6 @@ import CustomTable from '@/components/ui/CustomTable/CustomTable';
 import { useMyPatientConsults } from '@/hooks/react-query/patients/patients.hooks';
 import { formatDate, formatTimeSlot } from '@/lib/commons/common.utils';
 import { PatientAppointmentsWrapper } from '@/styles/CustomStyled/PatientAppointmentsWrapper';
-import { useAuthStore } from '@/zustand/stores/useAuthStore';
 import { memo, useState } from 'react';
 
 const headList = [
@@ -23,14 +22,12 @@ type ConsultationsTabProps = {
 
 function ConsultationsTab({ patientId }: ConsultationsTabProps) {
   const [page, setPage] = useState(1);
-  const { userData } = useAuthStore((state) => state)
   const { data: ptConsults, isPending: ptConsultPending } =
     useMyPatientConsults({
       limit: 10,
       page,
       patientId,
       status: 'completed,confirmed,in-progress',
-      clinic_id: Number(userData?.clinic?.id)
     });
 
   return (
