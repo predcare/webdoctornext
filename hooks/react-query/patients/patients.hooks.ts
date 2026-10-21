@@ -90,10 +90,14 @@ export const useMyPatientEmrs = (params?: { patientId?: number | string }) =>
 
 export const useMyPatientPrescriptions = (params?: {
   patientId?: number | string;
+  clinic_id?: number | string;
 }) =>
   useQuery({
     queryKey: [PatientsQueryKeys.Prescriptions, params],
-    queryFn: () => getMyPatientsPrescriptions(params?.patientId!),
+    queryFn: () =>
+      getMyPatientsPrescriptions(params?.patientId!, {
+        clinic_id: Number(params?.clinic_id),
+      }),
     enabled: !!params?.patientId,
     select: (v) => {
       if (Array.isArray(v)) return v;
@@ -137,6 +141,7 @@ export const useMyPatientConsults = (params: {
   limit: number;
   patientId: string | number;
   status?: string;
+  clinic_id?: number;
 }) =>
   useQuery({
     queryKey: [PatientsQueryKeys.MyConsults, params],

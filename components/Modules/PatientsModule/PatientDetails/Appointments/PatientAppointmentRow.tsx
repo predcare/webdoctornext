@@ -9,7 +9,7 @@ import {
 import { projectRoutes } from '@/routes';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, Button, TableCell, TableRow, Typography } from '@mui/material';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { memo } from 'react';
 
 type PatientAppointmentRowProps = {
@@ -31,6 +31,7 @@ function PatientAppointmentRow({
   appointmentTime,
   appointmentStatus,
 }: PatientAppointmentRowProps) {
+  const router = useRouter();
   const isVideo = consultationType?.toLowerCase().trim() === 'video';
   const typeColors = getAppointmentTypeColors(consultationType);
   const statusColors = getAppointmentStatusColors(appointmentStatus);
@@ -39,7 +40,11 @@ function PatientAppointmentRow({
     <TableRow>
       <TableCell>
         <Box className="stack-cell">
-          <Typography component="p" className="cell-title" title={appointmentId}>
+          <Typography
+            component="p"
+            className="cell-title"
+            title={appointmentId}
+          >
             #{appointmentId}
           </Typography>
           {reason ? (
@@ -81,16 +86,20 @@ function PatientAppointmentRow({
         </Box>
       </TableCell>
       <TableCell>
-        <Button
-          className="row-view"
-          size="small"
-          variant="outlined"
-          component={Link}
-          href={projectRoutes.appointmentDetails(id)}
-          startIcon={<VisibilityOutlinedIcon fontSize="inherit" />}
-        >
-          View
-        </Button>
+        <Box className="stack-cell">
+          <Button
+            className="row-view"
+            size="small"
+            variant="outlined"
+            type="button"
+            onClick={() => {
+              router.push(projectRoutes.appointmentDetails(id));
+            }}
+            startIcon={<VisibilityOutlinedIcon fontSize="inherit" />}
+          >
+            View
+          </Button>
+        </Box>
       </TableCell>
     </TableRow>
   );

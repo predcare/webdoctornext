@@ -9,7 +9,7 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import MailOutlinedIcon from '@mui/icons-material/MailOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import VerifiedIcon from '@mui/icons-material/Verified';
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Avatar, Box, Button, Grid, Typography } from '@mui/material';
 import { memo, useMemo, type ReactNode } from 'react';
 
 type InfoRow = {
@@ -25,6 +25,7 @@ type PatientProfileCardProps = {
   patientCode: string;
   ptStatus: string;
   phone: string;
+  profileImg?: string;
   email: string;
   city: string;
   name: string;
@@ -40,35 +41,45 @@ function PatientProfileCard({
   patientCode,
   ptStatus,
   phone,
+  profileImg,
   email,
   city,
   name,
   onAppointmentBook,
-  onProfileEdit,
 }: PatientProfileCardProps) {
-  const personalRows: InfoRow[] = [
-    { label: 'Gender', value: gender },
-    { label: 'Age', value: age },
-    { label: 'Date of Birth', value: dateOfBirth },
-    {
-      label: 'Blood Type',
-      value: (
-        <Box component="span" className="blood-chip">
-          {bloodType}
-        </Box>
-      ),
-    },
-  ];
   const isVerified = useMemo(() => {
     return ptStatus === 'active' ? true : false;
   }, [ptStatus]);
+
+  const personalRows: InfoRow[] = useMemo(
+    () => [
+      { label: 'Gender', value: gender },
+      { label: 'Age', value: age },
+      { label: 'Date of Birth', value: dateOfBirth },
+      {
+        label: 'Blood Type',
+        value: (
+          <Box component="span" className="blood-chip">
+            {bloodType}
+          </Box>
+        ),
+      },
+    ],
+    [gender, age, dateOfBirth, bloodType]
+  );
 
   return (
     <Box className="detail-card profile-card">
       <Box className="profile-head">
         <Box className="profile-identity">
-          <Box className={`profile-avatar ${avatarTone(getInitials(name))}`}>
-            {getInitials(name)}
+          <Box sx={{ position: 'relative', display: 'inline-flex', flexShrink: 0 }}>
+            <Avatar
+              className={`profile-avatar ${avatarTone(getInitials(name))}`}
+              src={profileImg || undefined}
+              alt={name}
+            >
+              {getInitials(name)}
+            </Avatar>
             {isVerified ? (
               <VerifiedIcon className="avatar-badge" aria-label="Verified" />
             ) : null}
