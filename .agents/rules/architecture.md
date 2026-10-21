@@ -65,3 +65,16 @@ The dashboard layout already authenticates and frames the page. Auth screens sta
 - Schemas: `<Name>Schema` and `T<Name>SchemaType` via `yup.InferType`.
 
 Existing misspelled folders stay as they are unless the task is a dedicated rename.
+
+---
+
+## 6. Component Internal Structure (Top-to-Bottom Order)
+
+Inside all page and feature components, maintain this order:
+
+1. **States & Refs**: `useState` and `useRef` always at the top.
+2. **Hooks**: Router (`useRouter`), stores (`zustand`), queries/mutations (`useQuery`, `useMutation`), forms (`useForm`).
+3. **useMemo, useCallback & Functions**: `useMemo`, `useCallback`, event handlers, action triggers, and computation helpers.
+4. **useEffects**: All `useEffect` hooks (form resets, subscriptions, scroll listeners) placed after helper functions.
+5. **Render Guards & JSX**: Skeleton/loading returns and the primary JSX return statement.
+

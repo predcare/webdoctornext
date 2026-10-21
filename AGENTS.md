@@ -38,3 +38,24 @@ Before adding screens, components, API calls, or forms, follow `.agents/rules/`:
 - `data-and-forms.md` — API client, React Query, Yup forms, and Zustand
 
 Cursor also loads the same constraints from `.cursor/rules/`.
+
+## Component & Page Code Ordering Rules
+
+In all page and feature components, always organize internal declarations in this strict top-to-bottom sequence:
+
+1. **States & Refs (Always at the very top)**
+   - `useState` declarations
+   - `useRef` declarations
+2. **Hooks**
+   - Router, navigation, and store hooks (`useRouter`, Zustand stores)
+   - React Query data fetching & mutation hooks (`useQuery`, `useMutation`)
+   - Form hooks (`useForm`, etc.)
+3. **useMemo & Functions**
+   - `useMemo` and `useCallback` definitions
+   - Event handlers, action triggers, and helper functions
+4. **useEffects**
+   - All `useEffect` lifecycle & synchronization hooks (e.g. populating forms, subscriptions, scroll listeners) placed after functions and before render
+5. **Render Guards & JSX**
+   - Loading/skeleton checks (`if (isLoading) return ...`)
+   - Main component JSX `return (...)`
+

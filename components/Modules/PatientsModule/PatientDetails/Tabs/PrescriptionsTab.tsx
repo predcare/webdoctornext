@@ -12,7 +12,6 @@ import type {
   IPatientLabTest,
   IPatientMedication,
 } from '@/typescripts/interfaces/prescriptions.interfaces';
-import { useAuthStore } from '@/zustand/stores/useAuthStore';
 import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
 import { useRouter } from 'next/navigation';
 import { memo, useCallback } from 'react';
@@ -33,8 +32,6 @@ interface IPrescriptionsTabProps {
 
 function PrescriptionsTab({ patientId }: IPrescriptionsTabProps) {
   const router = useRouter();
-  const { userData } = useAuthStore((state) => state);
-  const clinicId = userData?.clinic?.id;
 
   const { data: prescriptions, isPending: isPrescriptionsPending } =
     useMyPatientPrescriptions({
@@ -46,10 +43,9 @@ function PrescriptionsTab({ patientId }: IPrescriptionsTabProps) {
     router.push(
       projectRoutes.managePrescription({
         patientId,
-        clinicId: clinicId,
       }),
     );
-  }, [router, patientId, clinicId]);
+  }, [router, patientId]);
 
   return (
     <PatientTabContentWrapper>
@@ -105,7 +101,6 @@ function PrescriptionsTab({ patientId }: IPrescriptionsTabProps) {
                     projectRoutes.managePrescription({
                       patientId,
                       prescriptionId: prescription.id,
-                      clinicId,
                     }),
                   )
                 }

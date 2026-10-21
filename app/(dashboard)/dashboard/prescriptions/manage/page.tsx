@@ -15,15 +15,13 @@ type RouteProps = {
     tab?: string;
     patientId?: string;
     prescriptionId?: string;
-    clinicId?: string;
   }>;
 };
 
 async function ManagePrescriptionContent({ searchParams }: RouteProps) {
-  const { tab, patientId, prescriptionId, clinicId } = await searchParams;
+  const { tab, patientId, prescriptionId } = await searchParams;
   const decodedPatientId = decodeUrlParam(patientId);
   const decodedPrescriptionId = decodeUrlParam(prescriptionId);
-  const decodedClinicId = decodeUrlParam(clinicId);
 
   if (!decodedPatientId)
     return (
@@ -40,7 +38,6 @@ async function ManagePrescriptionContent({ searchParams }: RouteProps) {
       tab={resolveConsultationTab(tab)}
       patientId={decodedPatientId}
       prescriptionId={decodedPrescriptionId ?? undefined}
-      clinicId={decodedClinicId ?? undefined}
     />
   );
 }

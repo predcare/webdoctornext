@@ -1,7 +1,5 @@
 'use client';
 
-import ConsultationPatientHeader from '@/components/Modules/PrescriptionsModule/ManagePrescription/ConsultationPatientHeader';
-import ConsultationWorkspaceTabs from '@/components/Modules/PrescriptionsModule/ManagePrescription/ConsultationWorkspaceTabs';
 import {
   clinicalNoteFields,
   followUpReferralFields,
@@ -9,6 +7,8 @@ import {
   type ConsultationTabId,
   type FollowUpReferralField,
 } from '@/components/Modules/PrescriptionsModule/ManagePrescription/constants';
+import ConsultationPatientHeader from '@/components/Modules/PrescriptionsModule/ManagePrescription/ConsultationPatientHeader';
+import ConsultationWorkspaceTabs from '@/components/Modules/PrescriptionsModule/ManagePrescription/ConsultationWorkspaceTabs';
 import AllergiesConditionsSection from '@/components/Modules/PrescriptionsModule/ManagePrescription/sections/AllergiesConditionsSection';
 import ClinicalNotesSection from '@/components/Modules/PrescriptionsModule/ManagePrescription/sections/ClinicalNotesSection';
 import ConsultationActionsBar from '@/components/Modules/PrescriptionsModule/ManagePrescription/sections/ConsultationActionsBar';
@@ -16,6 +16,7 @@ import FollowUpReferralSection from '@/components/Modules/PrescriptionsModule/Ma
 import LabTestsSection from '@/components/Modules/PrescriptionsModule/ManagePrescription/sections/LabTestsSection';
 import PatientVitalsSection from '@/components/Modules/PrescriptionsModule/ManagePrescription/sections/PatientVitalsSection';
 import PrescriptionSection from '@/components/Modules/PrescriptionsModule/ManagePrescription/sections/PrescriptionSection';
+import ManagePrescriptionSkeleton from '@/components/Modules/PrescriptionsModule/ManagePrescription/Skeletons/ManagePrescriptionSkeleton';
 import { queryClient } from '@/components/Providers/ReactQueryProvider';
 import { useMyPatientInfo } from '@/hooks/react-query/patients/patients.hooks';
 import {
@@ -121,16 +122,12 @@ export default function ManagePrescriptionPage({
   const clinicalFields = clinicalNotesByTab[tab];
   const followUpFields = followUpByTab[tab];
 
-  const { data: patientInfo } = useMyPatientInfo({
-    patientId,
-  });
-
-  const { userData } = useAuthStore((state) => state);
   const { showLoader, hideLoader } = useLoadingStore((state) => state);
 
   const currentPrescriptionId = useRef<number | null>(
     prescriptionId ? Number(prescriptionId) : null,
   );
+  const hasPrescriptionId = Boolean(prescriptionId);
 
   const [autoSaveStatus, setAutoSaveStatus] = useState<
     'idle' | 'typing' | 'saving' | 'saved' | 'error'
@@ -139,10 +136,23 @@ export default function ManagePrescriptionPage({
   const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isSavingRef = useRef<boolean>(false);
   const isInitialLoadRef = useRef<boolean>(!!prescriptionId);
+  const [isFormReady, setIsFormReady] = useState<boolean>(!prescriptionId);
 
-  const { data: prescriptionInfo } = useGetPrescriptionDetails({
+  const {
+    data: prescriptionInfo,
+    isFetching: prescriptionInfoPending,
+    isError: isPrescriptionInfoError,
+  } = useGetPrescriptionDetails({
     id: Number(prescriptionId),
   });
+  const { data: patientInfo, isFetching: patientInfoPending } =
+    useMyPatientInfo({
+      patientId,
+    });
+
+  const isPageLoading =
+    patientInfoPending ||
+    (hasPrescriptionId && (prescriptionInfoPending || !isFormReady));
 
   const { mutate: createPrescription } = useCreatePrescription();
   const { mutate: updatePrescription } = useUpdatePrescription();
@@ -155,7 +165,6 @@ export default function ManagePrescriptionPage({
     defaultValues: defaultFormValues,
   });
 
-  // Zero-rerender tab switching with URL sync
   const handleTabChange = (nextTab: ConsultationTabId) => {
     setTab(nextTab);
     if (typeof window !== 'undefined') {
@@ -171,64 +180,6 @@ export default function ManagePrescriptionPage({
       block: 'end',
     });
   };
-
-  // Populate form if existing prescription data is loaded
-  useEffect(() => {
-    if (prescriptionInfo?.data && isInitialLoadRef.current) {
-      const rx = prescriptionInfo.data;
-      if (rx.id) {
-        currentPrescriptionId.current = Number(rx.id);
-      }
-
-      methods.reset({
-        chief_complaints: rx.chief_complaints || rx.symptoms || '',
-        examination_notes: rx.examination_notes || '',
-        diagnosis: rx.diagnosis || '',
-        treatment_plan: rx.treatment_plan || '',
-        chronic_conditions: rx.chronic_conditions || '',
-        drug_allergies: rx.drug_allergies || '',
-        blood_pressure: rx.blood_pressure || '',
-        pulse: rx.pulse || '',
-        temperature: rx.temperature || '',
-        spo2: rx.spo2 || '',
-        weight: rx.weight || '',
-        height: rx.height || '',
-        bmi: rx.bmi || '',
-        custom_vitals: rx.custom_vitals || [],
-        medications: (rx.medications || []).map((m) => ({
-          name: m.name || '',
-          strength: m.strength || '',
-          strengthUnit: m.strengthUnit || 'mg',
-          dosage: m.dosage || '',
-          durationNum: m.durationNum || '5',
-          durationUnit: m.durationUnit || 'days',
-          timing: m.timing || '',
-          instructions: m.instructions || '',
-        })),
-        lab_tests_structured: (rx.lab_tests || []).map((l) => ({
-          name: l.name || l.text || '',
-          instructions: l.instructions || '',
-        })),
-        general_advice: rx.general_advice || '',
-        follow_up_date: rx.follow_up_date || rx.follow_up || '',
-        referral_specialist: rx.referral_specialist || '',
-        referral_doctor_hospital: rx.referral_doctor_hospital || '',
-        referral_doctor_name: rx.referral_doctor_name || '',
-        referral_reason: rx.referral_reason || '',
-        notes: rx.notes || '',
-      });
-
-      if (rx.updated_at || rx.created_at) {
-        const d = new Date(rx.updated_at || rx.created_at);
-        setLastSavedAt(
-          d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        );
-        setAutoSaveStatus('saved');
-      }
-
-      isInitialLoadRef.current = false;
-    }
-  }, [prescriptionInfo?.data, methods]);
 
   const hasAnyContent = (_data: TCreatePrescriptionFormValues) => {
     const validMedications = _data?.medications?.filter(
@@ -274,6 +225,8 @@ export default function ManagePrescriptionPage({
     _data: TCreatePrescriptionFormValues,
     status: 'draft' | 'completed' = 'draft',
   ): ICreatePrescriptionPayload => {
+    const currentUser = useAuthStore.getState().userData;
+    const clinicId = currentUser?.clinic?.id;
     const rx = prescriptionInfo?.data;
     const validMedications = _data?.medications?.filter(
       (m) => m?.name && m.name.trim() !== '',
@@ -288,10 +241,10 @@ export default function ManagePrescriptionPage({
     );
 
     const rawPayload: Record<string, any> = {
-      doctor_id: userData?.user_id || '',
+      doctor_id: currentUser?.id || '',
       patient_id: patientId ?? rx?.patient_id ?? '',
-      clinic_id: userData?.clinic?.id ?? rx?.clinic_id ?? '',
-      appointment_id: '',
+      clinic_id: clinicId ?? rx?.clinic_id ?? '',
+      appointment_id: rx?.appointment_id ?? '',
       type: UserRoles.DOCTOR,
       chief_complaints: _data?.chief_complaints,
       diagnosis: _data?.diagnosis,
@@ -395,31 +348,6 @@ export default function ManagePrescriptionPage({
       });
     }
   };
-
-  // Debounced auto-save immediately on any field change/typing
-  useEffect(() => {
-    const subscription = methods.watch(() => {
-      if (isInitialLoadRef.current) return;
-      const currentValues = methods.getValues();
-      if (!hasAnyContent(currentValues)) return;
-
-      setAutoSaveStatus('typing');
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
-      }
-
-      autoSaveTimerRef.current = setTimeout(() => {
-        triggerAutoSave(methods.getValues());
-      }, 1000);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
-      }
-    };
-  }, [methods]);
 
   const handleFinalSubmit = (_data: TCreatePrescriptionFormValues) => {
     if (!hasAnyContent(_data)) {
@@ -591,6 +519,31 @@ export default function ManagePrescriptionPage({
     }
   };
 
+  // Debounced auto-save immediately on any field change/typing
+  useEffect(() => {
+    const subscription = methods.watch(() => {
+      if (isInitialLoadRef.current) return;
+      const currentValues = methods.getValues();
+      if (!hasAnyContent(currentValues)) return;
+
+      setAutoSaveStatus('typing');
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+
+      autoSaveTimerRef.current = setTimeout(() => {
+        triggerAutoSave(methods.getValues());
+      }, 1000);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [methods]);
+
   useEffect(() => {
     const scroller = getMainScroller();
     if (!scroller) return;
@@ -609,6 +562,79 @@ export default function ManagePrescriptionPage({
       window.removeEventListener('resize', update);
     };
   }, [tab]);
+
+  // Populate form if existing prescription data is loaded
+  useEffect(() => {
+    if (prescriptionInfo?.data && isInitialLoadRef.current) {
+      const rx = prescriptionInfo.data;
+      if (rx.id) {
+        currentPrescriptionId.current = Number(rx.id);
+      }
+
+      methods.reset({
+        chief_complaints: rx.chief_complaints || rx.symptoms || '',
+        examination_notes: rx.examination_notes || '',
+        diagnosis: rx.diagnosis || '',
+        treatment_plan: rx.treatment_plan || '',
+        chronic_conditions: rx.chronic_conditions || '',
+        drug_allergies: rx.drug_allergies || '',
+        blood_pressure: rx.blood_pressure || '',
+        pulse: rx.pulse || '',
+        temperature: rx.temperature || '',
+        spo2: rx.spo2 || '',
+        weight: rx.weight || '',
+        height: rx.height || '',
+        bmi: rx.bmi || '',
+        custom_vitals: rx.custom_vitals || [],
+        medications: (rx.medications || []).map((m) => ({
+          name: m.name || '',
+          strength: m.strength || '',
+          strengthUnit: m.strengthUnit || 'mg',
+          dosage: m.dosage || '',
+          durationNum: m.durationNum || '5',
+          durationUnit: m.durationUnit || 'days',
+          timing: m.timing || '',
+          instructions: m.instructions || '',
+        })),
+        lab_tests_structured: (rx.lab_tests || []).map((l) => ({
+          name: l.name || l.text || '',
+          instructions: l.instructions || '',
+        })),
+        general_advice: rx.general_advice || '',
+        follow_up_date: rx.follow_up_date || rx.follow_up || '',
+        referral_specialist: rx.referral_specialist || '',
+        referral_doctor_hospital: rx.referral_doctor_hospital || '',
+        referral_doctor_name: rx.referral_doctor_name || '',
+        referral_reason: rx.referral_reason || '',
+        notes: rx.notes || '',
+      });
+
+      if (rx.updated_at || rx.created_at) {
+        const d = new Date(rx.updated_at || rx.created_at);
+        setLastSavedAt(
+          d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        );
+        setAutoSaveStatus('saved');
+      }
+
+      isInitialLoadRef.current = false;
+      setIsFormReady(true);
+    }
+  }, [prescriptionInfo?.data, methods]);
+
+  useEffect(() => {
+    if (isPrescriptionInfoError) {
+      setIsFormReady(true);
+    }
+  }, [isPrescriptionInfoError]);
+
+  if (isPageLoading) {
+    return (
+      <ManagePrescriptionWrapper>
+        <ManagePrescriptionSkeleton tab={tab} />
+      </ManagePrescriptionWrapper>
+    );
+  }
 
   return (
     <ManagePrescriptionWrapper>

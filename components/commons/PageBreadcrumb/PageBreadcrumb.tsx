@@ -8,6 +8,7 @@ import { memo, type ReactNode } from 'react';
 export type BreadcrumbItem = {
   label: string;
   href?: string;
+  replace?: boolean;
 };
 
 type PageBreadcrumbProps = {
@@ -21,7 +22,12 @@ function PageBreadcrumb({ items, action }: PageBreadcrumbProps) {
       <Breadcrumbs aria-label="Breadcrumb">
         {items.map((item) =>
           item.href ? (
-            <Link key={item.label} className="crumb-link" href={item.href}>
+            <Link
+              key={item.label}
+              className="crumb-link"
+              href={item.href}
+              replace={item.replace}
+            >
               {item.label}
             </Link>
           ) : (
