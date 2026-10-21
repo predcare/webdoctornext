@@ -1,13 +1,14 @@
 'use client';
 
+import CustomInput from '@/components/ui/CustomInput/CustomInput';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
-import { Box, Button, IconButton, TextField, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
+import { memo } from 'react';
 
-export default function MeetingSidePanel() {
+function MeetingSidePanel() {
   return (
     <Box className="side-panel">
       <Box className="panel-card profile-block">
@@ -16,13 +17,6 @@ export default function MeetingSidePanel() {
             <PersonOutlineOutlinedIcon />
             Patient Profile
           </Typography>
-          <IconButton
-            className="settings-btn"
-            aria-label="Meeting settings"
-            type="button"
-          >
-            <SettingsOutlinedIcon />
-          </IconButton>
         </Box>
 
         <Box className="identity">
@@ -90,7 +84,7 @@ export default function MeetingSidePanel() {
           <StickyNote2OutlinedIcon />
           Doctor Notes
         </Typography>
-        <TextField
+        <CustomInput
           className="notes-field"
           placeholder="Write your notes here..."
           multiline
@@ -101,3 +95,5 @@ export default function MeetingSidePanel() {
     </Box>
   );
 }
+
+export default memo(MeetingSidePanel);
