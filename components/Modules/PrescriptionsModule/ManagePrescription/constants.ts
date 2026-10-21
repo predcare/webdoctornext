@@ -60,4 +60,5 @@ export const prescriptionTableHeads = [
   'Duration',
   'Timing',
   'Instructions',
+  'Action',
 ];

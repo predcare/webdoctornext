@@ -1,19 +1,23 @@
-import RNFS from 'react-native-fs';
-import { arrayBufferToBase64 } from '../../../lib/commons/file.utils';
+import { saveOrOpenFile } from '@/lib/commons/file.utils';
 import axiosInstance from '../../../services/api/apiClient';
 import { endpoints } from '../../../services/api/endpoints';
-import { ICommonRoot, IRootResponse } from '../../../typescripts/interfaces/common.interfaces';
+import {
+  ICommonRoot,
+  IRootResponse,
+} from '../../../typescripts/interfaces/common.interfaces';
 import { IPatientPrescriptionDoc } from '../../../typescripts/interfaces/prescriptions.interfaces';
 import {
-    ICreatePrescriptionPayload,
-    IGetDoctorPrescriptionsParams,
-    IUpdatePrescriptionPayload,
+  ICreatePrescriptionPayload,
+  IGetDoctorPrescriptionsParams,
+  IUpdatePrescriptionPayload,
 } from './payload.interfaces';
 
-export const createPrescription = async (payload: ICreatePrescriptionPayload) => {
+export const createPrescription = async (
+  payload: ICreatePrescriptionPayload,
+) => {
   const res = await axiosInstance.post<IRootResponse<{ id: number }>>(
     endpoints.prescritions.create,
-    payload
+    payload,
   );
   return res.data;
 };
@@ -25,50 +29,64 @@ export const updatePrescription = async ({
   id: number | string;
   payload: IUpdatePrescriptionPayload;
 }) => {
-  const res = await axiosInstance.put<ICommonRoot>(endpoints.prescritions.update(id), payload);
+  const res = await axiosInstance.put<ICommonRoot>(
+    endpoints.prescritions.update(id),
+    payload,
+  );
   return res.data;
 };
 
 export const getPrescriptionDetails = async (id: string | number) => {
   const res = await axiosInstance.get<IRootResponse<IPatientPrescriptionDoc>>(
-    endpoints.prescritions.get(id)
+    endpoints.prescritions.get(id),
   );
   return res.data;
 };
 
 export const resendPrescriptionEmail = async (id: string | number) => {
-  const res = await axiosInstance.post<ICommonRoot>(endpoints.prescritions.sendAgain(id));
+  const res = await axiosInstance.post<ICommonRoot>(
+    endpoints.prescritions.sendAgain(id),
+  );
   return res.data;
 };
 
 export const downloadPrescriptionPdf = async ({
   id,
+  action = 'save',
   onProgress,
 }: {
   id: string | number;
+  action?: 'open' | 'save';
   onProgress?: (progressPercentage: number) => void;
-}): Promise<string> => {
+}): Promise<string | null> => {
   const filename = `Prescription_RX${String(id).padStart(6, '0')}.pdf`;
-  const destPath = `${RNFS.CachesDirectoryPath}/${filename}`;
 
-  const response = await axiosInstance.get(endpoints.prescritions.downloadPrescription(id), {
-    responseType: 'arraybuffer',
-    onDownloadProgress: e => {
-      if (e.total && onProgress) {
-        onProgress(Math.round((e.loaded / e.total) * 100));
-      }
+  const response = await axiosInstance.get(
+    endpoints.prescritions.downloadPrescription(id),
+    {
+      responseType: 'arraybuffer',
+      onDownloadProgress: (e) => {
+        if (e.total && onProgress) {
+          onProgress(Math.round((e.loaded / e.total) * 100));
+        }
+      },
     },
-  });
+  );
 
-  const base64 = arrayBufferToBase64(response.data as ArrayBuffer);
-  if (await RNFS.exists(destPath)) {
-    await RNFS.unlink(destPath);
-  }
-  await RNFS.writeFile(destPath, base64, 'base64');
-  return destPath;
+  return saveOrOpenFile({
+    data: response.data as ArrayBuffer,
+    filename,
+    action,
+    successMessage:
+      action === 'open'
+        ? 'Opening prescription PDF...'
+        : `${filename} downloaded`,
+  });
 };
 
-export const getAllPrescriptionsForDoctor = async (params?: IGetDoctorPrescriptionsParams) => {
+export const getAllPrescriptionsForDoctor = async (
+  params?: IGetDoctorPrescriptionsParams,
+) => {
   const res = await axiosInstance.get<IRootResponse<IPatientPrescriptionDoc[]>>(
     endpoints.prescritions.getAll,
     {
@@ -77,7 +95,7 @@ export const getAllPrescriptionsForDoctor = async (params?: IGetDoctorPrescripti
         limit: 100,
         ...params,
       },
-    }
+    },
   );
   return res.data;
 };

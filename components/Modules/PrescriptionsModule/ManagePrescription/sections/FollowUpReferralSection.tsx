@@ -1,11 +1,15 @@
+'use client';
+
 import {
   followUpReferralFields,
   type FollowUpReferralField,
 } from '@/components/Modules/PrescriptionsModule/ManagePrescription/constants';
 import CustomInput from '@/components/ui/CustomInput/CustomInput';
+import { TCreatePrescriptionFormValues } from '@/lib/schemas/createPrescription.schema';
 import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
 import { Box, Grid, Typography } from '@mui/material';
+import { useFormContext } from 'react-hook-form';
 
 type FollowUpReferralSectionProps = {
   fields?: readonly FollowUpReferralField[];
@@ -14,6 +18,8 @@ type FollowUpReferralSectionProps = {
 export default function FollowUpReferralSection({
   fields = followUpReferralFields,
 }: FollowUpReferralSectionProps) {
+  const { register } = useFormContext<TCreatePrescriptionFormValues>();
+
   const show = (field: FollowUpReferralField) => fields.includes(field);
   const cardSize = fields.length === 1 ? { xs: 12 } : { xs: 12, md: 6 };
 
@@ -28,21 +34,21 @@ export default function FollowUpReferralSection({
                   <EventOutlinedIcon />
                 </Box>
                 <Typography component="h3" className="card-title">
-                  Follow-up Appointment
+                  Follow-up Appointment & Advice
                 </Typography>
               </Box>
             </Box>
             <CustomInput
-              name="follow_up_date"
               type="date"
-              inputLabelName="Schedule Date"
+              inputLabelName="Schedule Follow-up Date"
+              {...register('follow_up_date')}
             />
             <CustomInput
-              name="general_advice"
               inputLabelName="General Advice"
-              placeholder="General advice for the patient..."
+              placeholder="Advice for diet, hydration, rest, or warning symptoms..."
               multiline
               minRows={3}
+              {...register('general_advice')}
             />
           </Box>
         </Grid>
@@ -62,24 +68,24 @@ export default function FollowUpReferralSection({
               </Box>
             </Box>
             <CustomInput
-              name="referral_doctor_name"
               inputLabelName="Doctor Name"
-              placeholder="Referred doctor name"
+              placeholder="e.g. Dr. John Smith"
+              {...register('referral_doctor_name')}
             />
             <CustomInput
-              name="referral_specialist"
               inputLabelName="Specialist"
-              placeholder="e.g., Cardiologist"
+              placeholder="e.g. Cardiologist, Neurologist"
+              {...register('referral_specialist')}
             />
             <CustomInput
-              name="referral_doctor_hospital"
-              inputLabelName="Clinic/Hospital"
-              placeholder="Referred to"
+              inputLabelName="Clinic / Hospital"
+              placeholder="e.g. City General Hospital"
+              {...register('referral_doctor_hospital')}
             />
             <CustomInput
-              name="referral_reason"
               inputLabelName="Reason for Referral"
-              placeholder="Reason for referral"
+              placeholder="e.g. Further cardiac evaluation"
+              {...register('referral_reason')}
             />
           </Box>
         </Grid>

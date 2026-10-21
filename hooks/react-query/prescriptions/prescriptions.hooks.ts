@@ -49,11 +49,13 @@ export const useDownloadPrescriptionPdf = () => {
     mutationKey: [PrescriptionQueryKeys.Pdf],
     mutationFn: ({
       id,
+      action = 'save',
       onProgress,
     }: {
       id: string | number;
+      action?: 'open' | 'save';
       onProgress?: (progress: number) => void;
-    }) => downloadPrescriptionPdf({ id, onProgress }),
+    }) => downloadPrescriptionPdf({ id, action, onProgress }),
   });
 };
 export const useGetAllPrescriptions = (params?: IGetDoctorPrescriptionsParams) => {

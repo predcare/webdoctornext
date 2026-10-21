@@ -1,15 +1,17 @@
+'use client';
+
 import {
   clinicalNoteFields,
   type ClinicalNoteField,
 } from '@/components/Modules/PrescriptionsModule/ManagePrescription/constants';
 import CustomInput from '@/components/ui/CustomInput/CustomInput';
-import AddIcon from '@mui/icons-material/Add';
+import { TCreatePrescriptionFormValues } from '@/lib/schemas/createPrescription.schema';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import ContentPasteOutlinedIcon from '@mui/icons-material/ContentPasteOutlined';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import HealingOutlinedIcon from '@mui/icons-material/HealingOutlined';
-import SearchIcon from '@mui/icons-material/Search';
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
+import { useFormContext } from 'react-hook-form';
 
 type ClinicalNotesSectionProps = {
   fields?: readonly ClinicalNoteField[];
@@ -18,6 +20,8 @@ type ClinicalNotesSectionProps = {
 export default function ClinicalNotesSection({
   fields = clinicalNoteFields,
 }: ClinicalNotesSectionProps) {
+  const { register } = useFormContext<TCreatePrescriptionFormValues>();
+
   const show = (field: ClinicalNoteField) => fields.includes(field);
   const cardSize = fields.length === 1 ? { xs: 12 } : { xs: 12, md: 6 };
 
@@ -37,10 +41,10 @@ export default function ClinicalNotesSection({
               </Box>
             </Box>
             <CustomInput
-              name="chief_complaints"
               placeholder="Enter symptoms and chief complaints..."
               multiline
               minRows={3}
+              {...register('chief_complaints')}
             />
           </Box>
         </Grid>
@@ -60,10 +64,10 @@ export default function ClinicalNotesSection({
               </Box>
             </Box>
             <CustomInput
-              name="examination_notes"
               placeholder="Examination findings..."
               multiline
               minRows={3}
+              {...register('examination_notes')}
             />
           </Box>
         </Grid>
@@ -82,22 +86,12 @@ export default function ClinicalNotesSection({
                 </Typography>
               </Box>
             </Box>
-            <Box className="chip-add-row">
-              <CustomInput
-                name="diagnosis"
-                placeholder="Type diagnosis and press Add..."
-                startAdornment={<SearchIcon />}
-              />
-              <Button
-                type="button"
-                className="ghost-btn"
-                variant="outlined"
-                disableElevation
-                startIcon={<AddIcon fontSize="small" />}
-              >
-                Add
-              </Button>
-            </Box>
+            <CustomInput
+              placeholder="Enter diagnosis..."
+              multiline
+              minRows={3}
+              {...register('diagnosis')}
+            />
           </Box>
         </Grid>
       ) : null}
@@ -116,10 +110,10 @@ export default function ClinicalNotesSection({
               </Box>
             </Box>
             <CustomInput
-              name="treatment_plan"
               placeholder="Enter treatment plan..."
               multiline
               minRows={3}
+              {...register('treatment_plan')}
             />
           </Box>
         </Grid>

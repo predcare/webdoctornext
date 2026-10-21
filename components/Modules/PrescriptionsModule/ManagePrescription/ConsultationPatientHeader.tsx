@@ -1,4 +1,4 @@
-import type { PrescriptionWorkspacePatient } from '@/resources/mock';
+import { getInitials } from '@/lib/commons/common.utils';
 import { avatarTone } from '@/utils/avatarTone';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import MailOutlinedIcon from '@mui/icons-material/MailOutlined';
@@ -7,50 +7,68 @@ import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import { Box, Grid, Typography } from '@mui/material';
 
 type ConsultationPatientHeaderProps = {
-  patient: PrescriptionWorkspacePatient;
+  ptName: string
+  patientCode: string;
+  ptPhone: string
+  ptEmail: string
+  ptGender: string
+  ptAge: string
+  ptCity: string
+  ptBloodGroup: string
+  ptLastVisit: string
+  ptRegisteredDate: string
 };
 
 export default function ConsultationPatientHeader({
-  patient,
+  ptName,
+  ptPhone,
+  ptEmail,
+  ptGender,
+  ptAge,
+  ptCity,
+  ptBloodGroup,
+  ptLastVisit,
+  ptRegisteredDate,
+  patientCode,
 }: ConsultationPatientHeaderProps) {
   const stats = [
-    { label: 'Blood Type', value: patient.bloodType },
-    { label: 'Last Visit', value: patient.lastVisit },
-    { label: 'Registered', value: patient.registered },
-    { label: 'City', value: patient.city },
+    { label: 'Blood Type', value: ptBloodGroup },
+    { label: 'Last Visit', value: ptLastVisit },
+    { label: 'Registered', value: ptRegisteredDate },
+    { label: 'City', value: ptCity },
   ];
 
   return (
     <Box className="patient-head">
       <Box className="patient-identity">
-        <Box className={`patient-avatar ${avatarTone(patient.initial)}`}>
-          {patient.initial}
+        <Box className={`patient-avatar ${avatarTone(getInitials(ptName))}`}>
+          {getInitials(ptName)}
         </Box>
         <Box className="patient-copy">
           <Box className="patient-title-row">
             <Typography component="h2" className="patient-name">
-              {patient.name}
+              {ptName}
             </Typography>
             <Typography component="span" className="code-chip">
-              #{patient.patientCode}
+              #{patientCode}
             </Typography>
           </Box>
           <Box className="patient-meta">
             <Typography component="span" className="meta-item">
               <PersonOutlineOutlinedIcon />
-              {patient.gender}, {patient.age}y
+              {ptGender}, {ptAge}
             </Typography>
             <Typography component="span" className="meta-item">
               <PhoneOutlinedIcon />
-              {patient.phone}
+              {ptPhone}
             </Typography>
             <Typography component="span" className="meta-item">
               <MailOutlinedIcon />
-              {patient.email}
+              {ptEmail}
             </Typography>
             <Typography component="span" className="meta-item">
               <LocationOnOutlinedIcon />
-              {patient.city}
+              {ptCity}
             </Typography>
           </Box>
         </Box>

@@ -5,14 +5,16 @@ import PrescriptionRow from '@/components/Modules/PatientsModule/PatientDetails/
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
 import { useMyPatientPrescriptions } from '@/hooks/react-query/patients/patients.hooks';
 import { formatDate, openInNewTab } from '@/lib/commons/common.utils';
-import { showInDevelopment } from '@/lib/commons/toast';
+import { showErrorToast, showInDevelopment } from '@/lib/commons/toast';
+import { projectRoutes } from '@/routes';
 import { PatientTabContentWrapper } from '@/styles/CustomStyled/PatientTabContentWrapper';
 import type {
   IPatientLabTest,
   IPatientMedication,
 } from '@/typescripts/interfaces/prescriptions.interfaces';
 import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
-import { memo } from 'react';
+import { useRouter } from 'next/navigation';
+import { memo, useCallback } from 'react';
 
 const headList = [
   'Date',
@@ -29,10 +31,16 @@ interface IPrescriptionsTabProps {
 }
 
 function PrescriptionsTab({ patientId }: IPrescriptionsTabProps) {
+  const router = useRouter();
   const { data: prescriptions, isPending: isPrescriptionsPending } =
     useMyPatientPrescriptions({
       patientId,
     });
+
+  const handleNewPrescription = useCallback(() => {
+    if (!patientId) return showErrorToast('Invalid patient ID.');
+    router.push(projectRoutes.managePrescription(patientId));
+  }, [router, patientId]);
 
   return (
     <PatientTabContentWrapper>
@@ -40,6 +48,7 @@ function PrescriptionsTab({ patientId }: IPrescriptionsTabProps) {
         title="Prescriptions"
         icon={<MedicationOutlinedIcon />}
         actionLabel="New Prescription"
+        actionOnClick={handleNewPrescription}
       >
         <CustomTable
           className="tab-table prescriptions-table"
@@ -77,9 +86,19 @@ function PrescriptionsTab({ patientId }: IPrescriptionsTabProps) {
                   )
                   .filter(Boolean)}
                 followUpDate={formatDate(followUp)}
-                emailSentAt={formatDate(prescription.email_sent_at, 'DD MMM, hh:mm A')}
+                emailSentAt={formatDate(
+                  prescription.email_sent_at,
+                  'DD MMM, hh:mm A',
+                )}
                 onView={() => openInNewTab(prescription.pdf_url)}
-                onEdit={showInDevelopment}
+                onEdit={() =>
+                  router.push(
+                    projectRoutes.managePrescription(
+                      patientId,
+                      prescription.id,
+                    ),
+                  )
+                }
               />
             );
           })}

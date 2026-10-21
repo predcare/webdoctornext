@@ -31,7 +31,21 @@ export const projectRoutes = {
   availabilityCalendar: '/dashboard/availability/calendar',
   meeting: '/dashboard/meeting',
   profile: '/dashboard/profile',
-  managePrescription: '/dashboard/prescriptions/manage',
+  managePrescription: (
+    patientId: string,
+    prescriptionId?: string | number,
+    tab?: string,
+  ) => {
+    const params = new URLSearchParams();
+    params.set('patientId', encodeUrlParam(patientId));
+    if (prescriptionId) {
+      params.set('prescriptionId', encodeUrlParam(prescriptionId));
+    }
+    if (tab) {
+      params.set('tab', tab);
+    }
+    return `/dashboard/prescriptions/manage?${params.toString()}`;
+  },
 
   // Legal Pages
   privacyPolicy: '/privacy-policy',
