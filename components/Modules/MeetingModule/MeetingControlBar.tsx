@@ -1,8 +1,9 @@
 'use client';
 
+import CustomModal from '@/components/ui/CustomModal/CustomModal';
 import { resetMeetingAndGetSummaryPath } from '@/hooks/commons/meeting/meetingSessionLeave';
 import { useMeetingMedia } from '@/hooks/commons/meeting/useMeetingMedia';
-import { EndCallDialog, MeetingParticipantsPopover } from '@/styles/CustomStyled/MeetingWrapper';
+import { EndCallActions, MeetingParticipantsPopover } from '@/styles/CustomStyled/MeetingWrapper';
 import CallEndIcon from '@mui/icons-material/CallEnd';
 import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
 import MicIcon from '@mui/icons-material/Mic';
@@ -14,10 +15,6 @@ import {
   Badge,
   Box,
   Button,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   IconButton,
   Menu,
   MenuItem,
@@ -222,33 +219,23 @@ export default function MeetingControlBar() {
         </Tooltip>
       </Box>
 
-      {/* End Call Confirmation Dialog */}
-      <EndCallDialog
+      <CustomModal
         open={isEndModalOpen}
         onClose={handleCloseEndModal}
-        aria-labelledby="end-call-dialog-title"
+        className="confirmationModal"
+        heading="End Consultation Call?"
+        subheading="Are you sure you want to end this video session? You will be directed to the post-consultation summary."
+        isWhiteBg
       >
-        <DialogTitle id="end-call-dialog-title">End Consultation Call?</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to end this video session? You will be directed to
-            the post-consultation summary.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
+        <EndCallActions>
           <Button onClick={handleCloseEndModal} color="inherit">
             Cancel
           </Button>
-          <Button
-            onClick={handleConfirmEndCall}
-            color="error"
-            variant="contained"
-            autoFocus
-          >
+          <Button onClick={handleConfirmEndCall} color="error" variant="contained">
             Yes, End Call
           </Button>
-        </DialogActions>
-      </EndCallDialog>
+        </EndCallActions>
+      </CustomModal>
     </>
   );
 }

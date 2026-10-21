@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Dialog, Popover, styled } from '@mui/material';
+import { Box, Popover, styled } from '@mui/material';
 
 const headerOffsetLg = 77;
 
@@ -790,10 +790,10 @@ export const MeetingParticipantsPopover = styled(Popover)`
   }
 `;
 
-export const EndCallDialog = styled(Dialog)`
-  .MuiDialogActions-root {
-    padding: 8px 24px 16px;
-  }
+export const EndCallActions = styled(Box)`
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
 `;
 
 export const MeetingMiniPlayerShell = styled(Box)`
