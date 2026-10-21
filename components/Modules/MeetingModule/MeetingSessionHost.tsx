@@ -5,7 +5,7 @@ import {
   resetMeetingAndGetSummaryPath,
 } from '@/hooks/commons/meeting/meetingSessionLeave';
 import { useMeetingCountdownTicker } from '@/hooks/commons/meeting/useMeetingCountdown';
-import { normalizePathname, projectRoutes } from '@/routes';
+import { isMeetingCallPath, normalizePathname, projectRoutes } from '@/routes';
 import { useAuthStore } from '@/zustand/stores/useAuthStore';
 import { useMeetingStore } from '@/zustand/stores/useMeetingStore';
 import { MeetingProvider, useMeeting } from '@videosdk.live/react-sdk';
@@ -63,7 +63,7 @@ function MeetingSessionController() {
 
   useMeetingCountdownTicker();
 
-  const isMeetingRoute = pathname === projectRoutes.meeting;
+  const isMeetingRoute = isMeetingCallPath(pathname);
   const isSummaryRoute = pathname.startsWith(`${projectRoutes.meeting}/summary`);
 
   useEffect(() => {
@@ -76,11 +76,11 @@ function MeetingSessionController() {
   useEffect(() => {
     const previousPath = previousPathRef.current;
 
-    if (pathname === projectRoutes.meeting) {
+    if (isMeetingCallPath(pathname)) {
       if (useMeetingStore.getState().isMiniPlayer) {
         setIsMiniPlayer(false);
       }
-    } else if (previousPath === projectRoutes.meeting) {
+    } else if (isMeetingCallPath(previousPath)) {
       setIsMiniPlayer(true);
     }
 

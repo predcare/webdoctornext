@@ -7,10 +7,18 @@ const MeetingPage = dynamic(() => import('./MeetingPage'), {
   ssr: false,
 });
 
-export default function MeetingPageClient() {
+type MeetingPageClientProps = {
+  patientId: string;
+  appointmentId: string;
+};
+
+export default function MeetingPageClient({
+  patientId,
+  appointmentId,
+}: MeetingPageClientProps) {
   return (
     <Suspense fallback={null}>
-      <MeetingPage />
+      <MeetingPage patientId={patientId} appointmentId={appointmentId} />
     </Suspense>
   );
 }

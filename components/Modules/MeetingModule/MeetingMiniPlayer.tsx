@@ -33,12 +33,8 @@ export default function MeetingMiniPlayer() {
   const { formattedTime } = useMeetingCountdown();
 
   const handleReturnToMeeting = () => {
-    router.push(
-      appointmentId
-        ? `${projectRoutes.meeting}?appointmentId=${appointmentId}${patientInfo?.id ? `&patientId=${patientInfo.id}` : ''
-        }`
-        : projectRoutes.meeting,
-    );
+    if (!appointmentId || !patientInfo?.id) return;
+    router.push(projectRoutes.meetingCall(patientInfo.id, appointmentId));
   };
 
   const handleEndCall = async () => {

@@ -37,6 +37,8 @@ export const projectRoutes = {
     `/dashboard/availability/manage-availability?availabilityId=${encodeUrlParam(id)}`,
   availabilityCalendar: '/dashboard/availability/calendar',
   meeting: '/dashboard/meeting',
+  meetingCall: (patientId: string | number, appointmentId: string | number) =>
+    `/dashboard/meeting/${encodeUrlParam(patientId)}?appointmentId=${encodeUrlParam(appointmentId)}`,
   meetingSummary: (id?: string | number) =>
     id
       ? `/dashboard/meeting/summary?appointmentId=${encodeUrlParam(id)}`
@@ -70,4 +72,10 @@ export const projectRoutes = {
   faq: '/faq',
   sitemap: '/sitemap',
   rssFeed: '/rss-feed',
+};
+
+export const isMeetingCallPath = (pathname: string) => {
+  const path = normalizePathname(pathname);
+  if (!path.startsWith(`${projectRoutes.meeting}/`)) return false;
+  return !path.startsWith(`${projectRoutes.meeting}/summary`);
 };

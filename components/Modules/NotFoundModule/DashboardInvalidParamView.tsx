@@ -8,7 +8,6 @@ import {
 import { projectRoutes } from '@/routes';
 import { NotFoundWrapper } from '@/styles/CustomStyled/NotFoundWrapper';
 import { Button } from '@mui/material';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
@@ -87,7 +86,6 @@ const DashboardInvalidParamView = ({
           </Button>
 
           <Button
-            component={Link}
             href={projectRoutes.dashboard}
             variant="outlined"
             className="secondary-btn"

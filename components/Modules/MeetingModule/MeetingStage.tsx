@@ -18,6 +18,10 @@ export default function MeetingStage() {
   const [networkLabel, setNetworkLabel] = useState<string>('GOOD');
 
   const patientInfo = useMeetingStore((state) => state.patientInfo);
+  const appointmentGeneratedId = useMeetingStore(
+    (state) => state.appointmentGeneratedId,
+  );
+  const appointmentId = useMeetingStore((state) => state.appointmentId);
   const remoteParticipantId = useMeetingStore(
     (state) => state.remoteParticipantId,
   );
@@ -25,19 +29,20 @@ export default function MeetingStage() {
   const { formattedTime, isWarning, isUrgent } = useMeetingCountdown();
 
   const patientDisplayName = patientInfo?.name || 'Patient';
+  const patientGeneratedId = patientInfo?.alphanumericId;
+  const appointmentLabel =
+    appointmentGeneratedId ||
+    (appointmentId != null ? String(appointmentId) : '');
   const networkStatusLabel = isOffline ? 'OFFLINE' : networkLabel;
 
   return (
     <Box className="stage">
       <Box className="remote-feed">
-        {/* Remote participant video stream or waiting/cam-off view */}
         <RemoteStage
           participantId={remoteParticipantId}
           patientName={patientDisplayName}
           onNetworkQualityChange={setNetworkLabel}
         />
-
-        {/* Top Status Indicators */}
         <Box className="status-row">
           <Box
             className={`status-pill timer${isUrgent ? ' urgent' : isWarning ? ' warning' : ''}`}
@@ -54,20 +59,33 @@ export default function MeetingStage() {
             <span>NET: {networkStatusLabel}</span>
             <ArrowUpwardIcon className="net-arrow" />
           </Box>
-          <Box className="status-pill encrypted">
+          <Box
+            className="status-pill encrypted"
+            title={appointmentLabel ? `ENCRYPTED ${appointmentLabel}` : 'ENCRYPTED'}
+          >
             <LockOutlinedIcon />
             <span>ENCRYPTED</span>
+            {appointmentLabel ? (
+              <span className="status-pill-id">{appointmentLabel}</span>
+            ) : null}
           </Box>
+          <Typography
+            className="remote-name"
+            component="p"
+            title={
+              patientGeneratedId
+                ? `${patientDisplayName} ${patientGeneratedId}`
+                : patientDisplayName
+            }
+          >
+            <span className="remote-name-text">{patientDisplayName}</span>
+            {patientGeneratedId ? (
+              <span className="remote-name-id">{patientGeneratedId}</span>
+            ) : null}
+          </Typography>
         </Box>
-
-        {/* Remote Patient Name Pill */}
-        <Typography className="remote-name" component="p">
-          {patientDisplayName}
-        </Typography>
         <MeetingControlBar />
       </Box>
-
-      {/* Doctor's Local Camera Preview */}
       <LocalVideoTile />
     </Box>
   );

@@ -32,16 +32,19 @@ export const MeetingWrapper = styled(Box)`
     position: absolute;
     top: 14px;
     left: 14px;
+    right: 14px;
     z-index: 2;
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
-    max-width: calc(100% - 180px);
+    max-width: none;
   }
 
   .status-pill {
     display: inline-flex;
     align-items: center;
+    flex-shrink: 0;
     gap: 4px;
     height: 22px;
     padding: 0 8px;
@@ -87,24 +90,52 @@ export const MeetingWrapper = styled(Box)`
     }
   }
 
-  .remote-name {
-    position: absolute;
-    top: 14px;
-    right: 14px;
-    z-index: 2;
-    margin: 0;
-    max-width: 46%;
+  .status-pill-id {
+    min-width: 0;
+    max-width: 34vw;
+    margin-left: 2px;
+    padding-left: 6px;
     overflow: hidden;
-    padding: 6px 10px;
+    border-left: 1px solid rgba(255, 255, 255, 0.45);
+    text-overflow: ellipsis;
+  }
+
+  .remote-name {
+    position: static;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1 1 140px;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+    overflow: hidden;
+    padding: 4px 10px;
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.92);
     color: ${({ theme }) => theme.palette.customColors.heading};
     font-size: 11px;
     font-weight: 600;
     line-height: 14px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
     box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+  }
+
+  .remote-name-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .remote-name-id {
+    flex-shrink: 0;
+    max-width: 42vw;
+    overflow: hidden;
+    color: ${({ theme }) => theme.palette.customColors.textMuted};
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .control-bar {
@@ -269,7 +300,7 @@ export const MeetingWrapper = styled(Box)`
     min-width: 0;
   }
 
-  .avatar {
+  && .avatar {
     width: 42px;
     height: 42px;
     border-radius: 50%;
@@ -647,12 +678,6 @@ export const MeetingWrapper = styled(Box)`
       min-height: 480px;
     }
 
-    .remote-name {
-      top: 16px;
-      right: 16px;
-      max-width: 280px;
-    }
-
     .control-bar {
       bottom: 16px;
       gap: 10px;
@@ -707,12 +732,6 @@ export const MeetingWrapper = styled(Box)`
       height: 112px;
       right: 20px;
       bottom: 84px;
-    }
-
-    .remote-name {
-      top: 16px;
-      right: 16px;
-      max-width: 280px;
     }
 
     .side-panel {

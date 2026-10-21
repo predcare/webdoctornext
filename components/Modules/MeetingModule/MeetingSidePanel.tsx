@@ -1,45 +1,48 @@
 'use client';
 
 import CustomInput from '@/components/ui/CustomInput/CustomInput';
-import { getAge } from '@/lib/commons/common.utils';
+import { _toTitleCase, getAge, getInitials } from '@/lib/commons/common.utils';
 import { projectRoutes } from '@/routes';
+import { IMyPatientDoc } from '@/typescripts/interfaces/patients.interfaces';
 import { useMeetingStore } from '@/zustand/stores/useMeetingStore';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
-import { Box, Button, Typography } from '@mui/material';
+import { Avatar, Box, Button, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { memo, useCallback, useMemo } from 'react';
 
-function MeetingSidePanel() {
+type MeetingSidePanelProps = {
+  patient?: IMyPatientDoc | null;
+};
 
+function MeetingSidePanel({ patient }: MeetingSidePanelProps) {
   const router = useRouter();
-  const patientInfo = useMeetingStore((state) => state.patientInfo);
   const doctorNotes = useMeetingStore((state) => state.doctorNotes);
   const setDoctorNotes = useMeetingStore((state) => state.setDoctorNotes);
 
-  const patientName = patientInfo?.name || 'Patient';
-  const patientId = patientInfo?.alphanumericId || patientInfo?.id || 'N/A';
+  const patientName = patient?.name || 'Patient';
+  const patientId = patient?.patient_id || patient?.id || 'N/A';
   const age = useMemo(() => {
-    if (patientInfo?.age) return `${patientInfo.age} Years`;
-    if (patientInfo?.dateOfBirth) return `${getAge(patientInfo.dateOfBirth)} Years`;
+    if (patient?.date_of_birth) return `${getAge(patient.date_of_birth, { large: true })}`;
     return 'N/A';
-  }, [patientInfo?.age, patientInfo?.dateOfBirth]);
-  const gender = patientInfo?.gender || 'N/A';
-  const complaint = patientInfo?.complaint || 'Not specified';
+  }, [patient?.date_of_birth]);
+  const gender = _toTitleCase(patient?.gender || 'N/A');
+  const complaint = patient?.medical_history || 'Not specified';
 
   const handleUploadRecords = useCallback(() => {
-    if (patientInfo?.id) {
-      router.push(`/dashboard/patients/${patientInfo.id}`);
-    } else {
-      router.push(projectRoutes.patients);
+    if (patient?.user_id) {
+      router.push(projectRoutes.patientDetails(patient.user_id));
     }
-  }, [patientInfo?.id, router]);
+  }, [patient?.user_id, router]);
 
   const handleWritePrescription = useCallback(() => {
-    router.push(projectRoutes.managePrescriptions);
-  }, [router]);
+    router.push(projectRoutes.managePrescription({
+      patientId: patient?.user_id || '',
+      tab: 'prescriptions',
+    }));
+  }, [patient?.user_id, router]);
 
   const handleNotesChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -59,9 +62,17 @@ function MeetingSidePanel() {
         </Box>
 
         <Box className="identity">
-          <Box className="avatar" aria-hidden>
-            {patientName.charAt(0).toUpperCase()}
-          </Box>
+          <Avatar
+            className="avatar"
+            src={
+              typeof patient?.profile_image === 'string'
+                ? patient.profile_image
+                : undefined
+            }
+            alt={patientName}
+          >
+            {getInitials(patientName)}
+          </Avatar>
           <Box className="identity-copy">
             <Typography className="patient-name" component="p">
               {patientName}
@@ -93,7 +104,7 @@ function MeetingSidePanel() {
 
         <Box className="complaint">
           <Typography className="meta-label" component="span">
-            Primary complaint
+            Medical History
           </Typography>
           <Box className="complaint-box">{complaint}</Box>
         </Box>

@@ -1,6 +1,6 @@
 'use client';
 
-import { normalizePathname, projectRoutes } from '@/routes';
+import { isMeetingCallPath, normalizePathname } from '@/routes';
 import { useLoadingStore } from '@/zustand/stores/useLoadingStore';
 import { usePathname } from 'next/navigation';
 import { ComponentType, ReactNode, useEffect, useState } from 'react';
@@ -36,7 +36,7 @@ export default function MeetingSessionSlot({ children }: MeetingSessionSlotProps
 
   useEffect(() => {
     if (
-      pathname === projectRoutes.meeting &&
+      isMeetingCallPath(pathname) &&
       isLoading &&
       loaderMessage.toLowerCase().includes('joining')
     ) {

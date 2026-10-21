@@ -33,12 +33,13 @@ export const useJoinVideoCall = () => {
       patientName,
       appointmentGeneratedId,
     }: TJoinVideoCallParams) => {
+      if (!patientId) {
+        showErrorToast('Patient is required to start this video call.');
+        return;
+      }
+
       if (currentMeetingId && String(currentApptId) === String(appointmentId)) {
-        router.push(
-          `${projectRoutes.meeting}?appointmentId=${appointmentId}${
-            patientId ? `&patientId=${patientId}` : ''
-          }`,
-        );
+        router.push(projectRoutes.meetingCall(patientId, appointmentId));
         return;
       }
 
@@ -108,11 +109,7 @@ export const useJoinVideoCall = () => {
 
         setIsJoining(false);
 
-        router.push(
-          `${projectRoutes.meeting}?appointmentId=${appointmentId}${
-            patientId ? `&patientId=${patientId}` : ''
-          }`,
-        );
+        router.push(projectRoutes.meetingCall(patientId, appointmentId));
       } catch (err: any) {
         hideLoader();
         setIsJoining(false);
