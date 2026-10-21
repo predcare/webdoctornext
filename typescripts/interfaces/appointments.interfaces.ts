@@ -227,6 +227,7 @@ export interface IApptInfoDoc {
   call_elapsed_seconds: number;
   call_timer_paused: boolean;
   doctor_last_heartbeat: any;
+  appointment_duration: string | number;
   patient_last_heartbeat: any;
   call_end_time: any;
   call_duration_seconds: any;

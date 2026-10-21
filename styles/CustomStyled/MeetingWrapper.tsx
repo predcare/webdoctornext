@@ -110,18 +110,19 @@ export const MeetingWrapper = styled(Box)`
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    flex: 1 1 140px;
+    flex: 0 1 auto;
     min-width: 0;
-    max-width: 100%;
+    max-width: fit-content;
     margin: 0;
     overflow: hidden;
-    padding: 4px 10px;
-    border-radius: 8px;
+    height: 22px;
+    padding: 0 10px;
+    border-radius: 999px;
     background: rgba(255, 255, 255, 0.92);
     color: ${({ theme }) => theme.palette.customColors.heading};
     font-size: 11px;
     font-weight: 600;
-    line-height: 14px;
+    line-height: 1;
     box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
   }
 
@@ -586,23 +587,32 @@ export const MeetingWrapper = styled(Box)`
     color: ${({ theme }) => theme.palette.customColors.brandTeal};
   }
 
+  &:has(.summary-page) {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
   .summary-page {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 24px 16px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 16px 0;
   }
 
   .summary-card.MuiPaper-root {
+    width: 100%;
     overflow: hidden;
     border-radius: 16px;
     background: ${({ theme }) => theme.palette.customColors.cardBg};
-    border: 1px solid ${({ theme }) => theme.palette.customColors.border};
-    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+    border: none;
+    box-shadow: none
   }
 
   .summary-banner {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 16px;
     padding: 24px;
     background: ${({ theme }) => theme.palette.customColors.successBg};
@@ -665,18 +675,95 @@ export const MeetingWrapper = styled(Box)`
     border-color: ${({ theme }) => theme.palette.customColors.border};
   }
 
+  .summary-section-heading {
+    margin-bottom: 12px;
+    color: ${({ theme }) => theme.palette.customColors.textMuted};
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .summary-contact-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .summary-contact-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: ${({ theme }) => theme.palette.customColors.textSecondary};
+    font-size: 13px;
+
+    .MuiSvgIcon-root {
+      font-size: 15px;
+      color: ${({ theme }) => theme.palette.customColors.brandTeal};
+    }
+  }
+
   .summary-meta-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     color: ${({ theme }) => theme.palette.customColors.textSecondary};
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.04em;
+
+    .MuiSvgIcon-root {
+      font-size: 15px;
+      color: ${({ theme }) => theme.palette.customColors.brandTeal};
+    }
+  }
+
+  .summary-meta-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    background: ${({ theme }) => theme.palette.customColors.hoverBg};
+    border: 1px solid ${({ theme }) => theme.palette.customColors.border};
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+      border-color: ${({ theme }) => theme.palette.customColors.brandTeal};
+    }
   }
 
   .summary-meta-value {
-    margin: 4px 0 0;
+    margin: 6px 0 0;
     color: ${({ theme }) => theme.palette.customColors.heading};
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
+  }
+
+  .summary-clinical-box {
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: ${({ theme }) => theme.palette.customColors.hoverBg};
+    border: 1px solid ${({ theme }) => theme.palette.customColors.border};
+  }
+
+  .summary-allergy-alert {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: ${({ theme }) => theme.palette.customColors.errorBg};
+    color: ${({ theme }) => theme.palette.customColors.error};
+    font-size: 12px;
+    font-weight: 600;
+
+    .MuiSvgIcon-root {
+      font-size: 16px;
+    }
   }
 
   .summary-actions {
@@ -713,7 +800,7 @@ export const MeetingWrapper = styled(Box)`
     }
 
     .summary-page {
-      padding: 40px 24px;
+      padding: 20px 0;
     }
 
     .summary-body.MuiCardContent-root,
@@ -724,6 +811,13 @@ export const MeetingWrapper = styled(Box)`
   }
 
   ${({ theme }) => theme.breakpoints.up('lg')} {
+    &:has(.summary-page) {
+      height: auto;
+      overflow: visible;
+      flex-direction: column;
+      margin-bottom: 24px;
+    }
+
     flex-direction: row;
     align-items: stretch;
     gap: 16px;
