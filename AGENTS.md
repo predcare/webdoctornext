@@ -28,3 +28,13 @@ Keep a qualifying candidate through the reporting pass even if you resolve or wo
 Before the final response, run one reporting pass. If candidates remain, from this file's directory run `node node_modules/next/dist/bin/next internal agent-feedback-instructions` once without piping or truncating its output. Follow its output or error guidance. If a network sandbox blocks it, retry with network access; if it still returns no output, continue normally.
 
 <!-- END:nextjs-agent-feedback -->
+
+## PredCare project rules
+
+Before adding screens, components, API calls, or forms, follow `.agents/rules/`:
+
+- `architecture.md` — folders, routes, and module boundaries
+- `design-system.md` — layout, theme tokens, shared UI, and icons
+- `data-and-forms.md` — API client, React Query, Yup forms, and Zustand
+
+Cursor also loads the same constraints from `.cursor/rules/`.

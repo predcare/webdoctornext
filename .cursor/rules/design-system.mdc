@@ -1,0 +1,16 @@
+---
+description: PredCare UI layout, theme tokens, shared components, and icons
+alwaysApply: true
+---
+
+# Design system
+
+Follow `.agents/rules/design-system.md`. This is the PredCare doctor web portal (Next.js, MUI). Do not add React Native primitives.
+
+- Dashboard pages render inside the existing shell. Do not rebuild the sidebar, header, or `AuthGate`.
+- `app/**/page.tsx` only exports metadata and renders the module screen inside `Suspense`. UI lives in `components/Modules/<Feature>Module/` with `'use client'`.
+- Start portal screens with `PageBreadcrumb` and a `styles/CustomStyled/<Feature>Wrapper.tsx`. Navigate only through `projectRoutes`.
+- Reuse `components/ui` (`CustomInput`, `CustomSelect`, `CustomTable`, `CustomModal`, `CustomTabsGroup`) and `components/commons` (`PageBreadcrumb`, `EmptyState`, `CommonErrorText`). Import the component file directly.
+- New product SVGs go in `components/ui/Icons/`, use `currentColor`, accept `size?: number` (default 20), and are exported from that folder's `index.ts`.
+- Colors come from `theme.palette.customColors` (`brandTeal`, `pageBg`, `cardBg`, `heading`, `textSecondary`, `border`, status colors). Add new tokens to `themes/_colorPalette.ts` and `_themeTypes.ts` for both light and dark.
+- Cards: 16px radius, `cardBg`, 1px `border`, `0 1px 2px rgba(15, 23, 42, 0.04)` shadow. Inputs stay on the shared controls (10px radius, 44px height, teal focus ring).

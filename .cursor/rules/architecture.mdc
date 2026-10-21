@@ -1,0 +1,15 @@
+---
+description: PredCare folder structure, routing, and module boundaries
+alwaysApply: true
+---
+
+# Architecture
+
+Follow `.agents/rules/architecture.md`.
+
+- Routes and metadata: `app/(auth)`, `app/(cms)`, `app/(dashboard)`. Screen UI: `components/Modules/<Feature>Module/`. Styles: `styles/CustomStyled/`. Paths: `routes/index.ts`.
+- Import with `@/`. New files must not climb out of a feature with deep relative imports.
+- Share a control across modules by moving it to `components/ui` or `components/commons`. Do not import one module's screen into another.
+- Clinical data is loaded in React Query hooks, not in Server Components. `page.tsx` stays a Server Component.
+- Keep existing folder spellings (`DahsboardModule`, `contants`, `availablity`) unless the task is a rename.
+- Read `node_modules/next/dist/docs/` before using a Next.js API. This repo is Next.js 16.
