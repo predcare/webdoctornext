@@ -245,32 +245,30 @@ export default function ManagePrescriptionPage({
 
     return Boolean(
       _data?.chief_complaints?.trim() ||
-        _data?.examination_notes?.trim() ||
-        _data?.diagnosis?.trim() ||
-        _data?.treatment_plan?.trim() ||
-        _data?.chronic_conditions?.trim() ||
-        _data?.drug_allergies?.trim() ||
-        _data?.blood_pressure?.trim() ||
-        _data?.pulse?.trim() ||
-        _data?.temperature?.trim() ||
-        _data?.spo2?.trim() ||
-        _data?.weight?.trim() ||
-        _data?.height?.trim() ||
-        _data?.bmi?.trim() ||
-        _data?.general_advice?.trim() ||
-        _data?.follow_up_date?.trim() ||
-        _data?.referral_specialist?.trim() ||
-        _data?.referral_doctor_hospital?.trim() ||
-        _data?.referral_doctor_name?.trim() ||
-        _data?.referral_reason?.trim() ||
-        _data?.notes?.trim() ||
-        (validMedications && validMedications.length > 0) ||
-        (validCustomVitals && validCustomVitals.length > 0) ||
-        (validLabTests && validLabTests.length > 0),
+      _data?.examination_notes?.trim() ||
+      _data?.diagnosis?.trim() ||
+      _data?.treatment_plan?.trim() ||
+      _data?.chronic_conditions?.trim() ||
+      _data?.drug_allergies?.trim() ||
+      _data?.blood_pressure?.trim() ||
+      _data?.pulse?.trim() ||
+      _data?.temperature?.trim() ||
+      _data?.spo2?.trim() ||
+      _data?.weight?.trim() ||
+      _data?.height?.trim() ||
+      _data?.bmi?.trim() ||
+      _data?.general_advice?.trim() ||
+      _data?.follow_up_date?.trim() ||
+      _data?.referral_specialist?.trim() ||
+      _data?.referral_doctor_hospital?.trim() ||
+      _data?.referral_doctor_name?.trim() ||
+      _data?.referral_reason?.trim() ||
+      _data?.notes?.trim() ||
+      (validMedications && validMedications.length > 0) ||
+      (validCustomVitals && validCustomVitals.length > 0) ||
+      (validLabTests && validLabTests.length > 0),
     );
   };
-
-  console.log('userData?.clinic?.id', userData?.clinic?.id)
 
   const buildPrescriptionPayload = (
     _data: TCreatePrescriptionFormValues,

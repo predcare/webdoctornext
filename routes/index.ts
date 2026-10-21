@@ -31,15 +31,20 @@ export const projectRoutes = {
   availabilityCalendar: '/dashboard/availability/calendar',
   meeting: '/dashboard/meeting',
   profile: '/dashboard/profile',
-  managePrescription: (
-    patientId: string,
-    prescriptionId?: string | number,
-    tab?: string,
-  ) => {
+  managePrescription: (urlParams: {
+    patientId: string;
+    prescriptionId?: string | number;
+    tab?: string;
+    clinicId?: string | number;
+  }) => {
+    const { patientId, prescriptionId, tab, clinicId } = urlParams;
     const params = new URLSearchParams();
     params.set('patientId', encodeUrlParam(patientId));
     if (prescriptionId) {
       params.set('prescriptionId', encodeUrlParam(prescriptionId));
+    }
+    if (clinicId) {
+      params.set('clinicId', encodeUrlParam(clinicId));
     }
     if (tab) {
       params.set('tab', tab);

@@ -5,13 +5,14 @@ import PrescriptionRow from '@/components/Modules/PatientsModule/PatientDetails/
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
 import { useMyPatientPrescriptions } from '@/hooks/react-query/patients/patients.hooks';
 import { formatDate, openInNewTab } from '@/lib/commons/common.utils';
-import { showErrorToast, showInDevelopment } from '@/lib/commons/toast';
+import { showErrorToast } from '@/lib/commons/toast';
 import { projectRoutes } from '@/routes';
 import { PatientTabContentWrapper } from '@/styles/CustomStyled/PatientTabContentWrapper';
 import type {
   IPatientLabTest,
   IPatientMedication,
 } from '@/typescripts/interfaces/prescriptions.interfaces';
+import { useAuthStore } from '@/zustand/stores/useAuthStore';
 import MedicationOutlinedIcon from '@mui/icons-material/MedicationOutlined';
 import { useRouter } from 'next/navigation';
 import { memo, useCallback } from 'react';
@@ -32,6 +33,9 @@ interface IPrescriptionsTabProps {
 
 function PrescriptionsTab({ patientId }: IPrescriptionsTabProps) {
   const router = useRouter();
+  const { userData } = useAuthStore((state) => state);
+  const clinicId = userData?.clinic?.id;
+
   const { data: prescriptions, isPending: isPrescriptionsPending } =
     useMyPatientPrescriptions({
       patientId,
@@ -39,8 +43,13 @@ function PrescriptionsTab({ patientId }: IPrescriptionsTabProps) {
 
   const handleNewPrescription = useCallback(() => {
     if (!patientId) return showErrorToast('Invalid patient ID.');
-    router.push(projectRoutes.managePrescription(patientId));
-  }, [router, patientId]);
+    router.push(
+      projectRoutes.managePrescription({
+        patientId,
+        clinicId: clinicId,
+      }),
+    );
+  }, [router, patientId, clinicId]);
 
   return (
     <PatientTabContentWrapper>
@@ -93,10 +102,11 @@ function PrescriptionsTab({ patientId }: IPrescriptionsTabProps) {
                 onView={() => openInNewTab(prescription.pdf_url)}
                 onEdit={() =>
                   router.push(
-                    projectRoutes.managePrescription(
+                    projectRoutes.managePrescription({
                       patientId,
-                      prescription.id,
-                    ),
+                      prescriptionId: prescription.id,
+                      clinicId,
+                    }),
                   )
                 }
               />
