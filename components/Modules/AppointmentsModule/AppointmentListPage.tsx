@@ -24,6 +24,7 @@ import {
 } from '@/lib/commons/common.utils';
 import { projectRoutes } from '@/routes';
 import { AppointmentListWrapper } from '@/styles/CustomStyled/AppointmentListWrapper';
+import { IMyAppointmentDoc } from '@/typescripts/interfaces/appointments.interfaces';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
@@ -82,9 +83,8 @@ export default function AppointmentListPage() {
   }, []);
 
   const handleJoinCall = useCallback(
-    (apptInfo: any) => {
-      const patientId =
-        apptInfo.patient_id || apptInfo.patientInfo?.patientId || '';
+    (apptInfo: IMyAppointmentDoc) => {
+      const patientId = apptInfo.patient_id || '';
       joinVideoCall({
         appointmentId: apptInfo.id,
         patientId,
