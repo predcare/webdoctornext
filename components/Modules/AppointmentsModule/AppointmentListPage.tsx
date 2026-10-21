@@ -12,6 +12,7 @@ import AppointmentRow from '@/components/Modules/AppointmentsModule/AppointmentR
 import AppointmentSummaryCards from '@/components/Modules/AppointmentsModule/AppointmentSummaryCards';
 import CustomActionMenu from '@/components/ui/CustomActionMenu/CustomActionMenu';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
+import { useJoinVideoCall } from '@/hooks/commons/meeting/useJoinVideoCall';
 import { useActionMenu } from '@/hooks/commons/useActionMenu';
 import { useDebounce } from '@/hooks/commons/useDebounce';
 import { useMyAppointments } from '@/hooks/react-query/appointments/appointments.hooks';
@@ -51,19 +52,7 @@ export default function AppointmentListPage() {
   );
   const [page, setPage] = useState(1);
   const debounceSearch = useDebounce(filterStates.search.trim(), 500);
-
-  const updateFilterState = useCallback((updates: Partial<FilterStates>) => {
-    setFilterStates((prev) => ({
-      ...prev,
-      ...updates,
-    }));
-    setPage(1);
-  }, []);
-
-  const handleResetFilters = useCallback(() => {
-    setFilterStates(defaultAppointmentFilterStates);
-    setPage(1);
-  }, []);
+  const { joinVideoCall } = useJoinVideoCall();
 
   const queryParams = useMemo(
     () => buildAppointmentQueryParams(filterStates, debounceSearch, page),
@@ -77,6 +66,34 @@ export default function AppointmentListPage() {
 
   const { data: appointmentList, isPending: isLoadingAppointments } =
     useMyAppointments(queryParams);
+
+  // 3. useMemo & Functions
+  const updateFilterState = useCallback((updates: Partial<FilterStates>) => {
+    setFilterStates((prev) => ({
+      ...prev,
+      ...updates,
+    }));
+    setPage(1);
+  }, []);
+
+  const handleResetFilters = useCallback(() => {
+    setFilterStates(defaultAppointmentFilterStates);
+    setPage(1);
+  }, []);
+
+  const handleJoinCall = useCallback(
+    (apptInfo: any) => {
+      const patientId =
+        apptInfo.patient_id || apptInfo.patientInfo?.patientId || '';
+      joinVideoCall({
+        appointmentId: apptInfo.id,
+        patientId,
+        patientName: apptInfo.patientInfo?.name,
+        appointmentGeneratedId: apptInfo.appointment_id,
+      });
+    },
+    [joinVideoCall],
+  );
 
   return (
     <AppointmentListWrapper>
@@ -138,7 +155,7 @@ export default function AppointmentListPage() {
               )}
               appointmentStatus={apptInfo.appointment_status}
               appointmentType={apptInfo.consultation_type}
-              onJoinCall={() => router.push(projectRoutes.meeting)}
+              onJoinCall={() => handleJoinCall(apptInfo)}
             />
           );
         })}

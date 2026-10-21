@@ -51,6 +51,11 @@ export const useApptToken = (params?: { appointmentId?: number | string }) =>
     enabled: !!params?.appointmentId,
   });
 
+export const useGetTokenMutation = () =>
+  useMutation({
+    mutationFn: (appointmentId: number | string) => getApptToken(appointmentId),
+  });
+
 export const useSendHeartBeat = () =>
   useMutation({
     mutationFn: sendHeartBeat,

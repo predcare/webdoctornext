@@ -30,7 +30,12 @@ export const projectRoutes = {
     `/dashboard/availability/manage-availability?availabilityId=${encodeUrlParam(id)}`,
   availabilityCalendar: '/dashboard/availability/calendar',
   meeting: '/dashboard/meeting',
+  meetingSummary: (id?: string | number) =>
+    id
+      ? `/dashboard/meeting/summary?appointmentId=${encodeUrlParam(id)}`
+      : '/dashboard/meeting/summary',
   profile: '/dashboard/profile',
+  managePrescriptions: '/dashboard/prescriptions/manage',
   managePrescription: (urlParams: {
     patientId: string;
     prescriptionId?: string | number;

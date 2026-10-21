@@ -1,32 +1,58 @@
 'use client';
 
+import { useMeetingCountdown } from '@/hooks/commons/meeting/useMeetingCountdown';
+import { useMeetingStore } from '@/zustand/stores/useMeetingStore';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import CallEndIcon from '@mui/icons-material/CallEnd';
 import HdIcon from '@mui/icons-material/Hd';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import MicNoneIcon from '@mui/icons-material/MicNone';
-import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
-import ScreenShareOutlinedIcon from '@mui/icons-material/ScreenShareOutlined';
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
-import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
-import { Box, IconButton, Typography } from '@mui/material';
-
-const controls = [
-  { label: 'Microphone', icon: <MicNoneIcon /> },
-  { label: 'Camera', icon: <VideocamOutlinedIcon /> },
-  { label: 'Share screen', icon: <ScreenShareOutlinedIcon /> },
-  { label: 'Participants', icon: <PeopleAltOutlinedIcon /> },
-];
+import { Box, Typography } from '@mui/material';
+import React, { useState } from 'react';
+import LocalVideoTile from './LocalVideoTile';
+import MeetingControlBar from './MeetingControlBar';
+import RemoteStage from './RemoteStage';
 
 export default function MeetingStage() {
+  // 1. States & Refs
+  const [networkLabel, setNetworkLabel] = useState<string>('GOOD');
+
+  // 2. Hooks
+  const patientInfo = useMeetingStore((state) => state.patientInfo);
+  const remoteParticipantId = useMeetingStore((state) => state.remoteParticipantId);
+  const { formattedTime, isWarning, isUrgent } = useMeetingCountdown();
+
+  // 3. useMemo & Functions
+  const patientDisplayName = patientInfo?.name || 'Patient';
+
+  // 4. useEffects
+  // (none)
+
+  // 5. Render Guards & JSX
   return (
     <Box className="stage">
       <Box className="remote-feed">
+        {/* Remote participant video stream or waiting/cam-off view */}
+        <RemoteStage
+          participantId={remoteParticipantId}
+          patientName={patientDisplayName}
+          onNetworkQualityChange={setNetworkLabel}
+        />
+
+        {/* Top Status Indicators */}
         <Box className="status-row">
-          <Box className="status-pill timer">
+          <Box
+            className={`status-pill timer ${isUrgent ? 'urgent' : isWarning ? 'warning' : ''}`}
+            sx={{
+              backgroundColor: isUrgent
+                ? '#dc2626 !important'
+                : isWarning
+                  ? '#d97706 !important'
+                  : undefined,
+            }}
+          >
             <AccessTimeIcon />
-            <span>4:53</span>
+            <span>{formattedTime}</span>
           </Box>
           <Box className="status-pill hd">
             <HdIcon />
@@ -34,7 +60,7 @@ export default function MeetingStage() {
           </Box>
           <Box className="status-pill net">
             <SignalCellularAltIcon />
-            <span>NET: GOOD 75.34/79.8</span>
+            <span>NET: {networkLabel}</span>
             <ArrowUpwardIcon className="net-arrow" />
           </Box>
           <Box className="status-pill encrypted">
@@ -43,32 +69,17 @@ export default function MeetingStage() {
           </Box>
         </Box>
 
+        {/* Remote Patient Name Pill */}
         <Typography className="remote-name" component="p">
-          Bina Pani Rani Sudha Roy Chowdhury
+          {patientDisplayName}
         </Typography>
 
-        <Box className="control-bar">
-          {controls.map((control) => (
-            <IconButton
-              key={control.label}
-              className="control-btn"
-              aria-label={control.label}
-              type="button"
-            >
-              {control.icon}
-            </IconButton>
-          ))}
-          <IconButton
-            className="control-btn end-call"
-            aria-label="End call"
-            type="button"
-          >
-            <CallEndIcon />
-          </IconButton>
-        </Box>
+        {/* Controls: Mute, Camera, Camera switch, End Call */}
+        <MeetingControlBar />
       </Box>
 
-      <Box className="local-tile" aria-label="Local participant" />
+      {/* Doctor's Local Camera Preview */}
+      <LocalVideoTile />
     </Box>
   );
 }
