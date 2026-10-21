@@ -1,5 +1,12 @@
 import { encodeUrlParam } from '@/lib/functions/_urlParams.lib';
 
+export const normalizePathname = (path: string) => {
+  if (path.length > 1 && path.endsWith('/')) {
+    return path.slice(0, -1);
+  }
+  return path;
+};
+
 export const projectRoutes = {
   home: '/',
   aboutUs: '/about-us',

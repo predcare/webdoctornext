@@ -16,14 +16,9 @@ type MeetingPageProps = {
 };
 
 export default function MeetingPage({
-  appointmentId,
-  patientId,
   initialPatient,
+  patientId,
 }: MeetingPageProps) {
-  // 1. States & Refs
-  // (none)
-
-  // 2. Hooks
   const router = useRouter();
   const token = useMeetingStore((state) => state.token);
   const meetingId = useMeetingStore((state) => state.meetingId);
@@ -34,7 +29,6 @@ export default function MeetingPage({
     router.push('/dashboard/appointments');
   };
 
-  // 4. useEffects
   useEffect(() => {
     if (initialPatient) {
       setPatientInfo({
@@ -72,8 +66,13 @@ export default function MeetingPage({
         <Typography variant="h5" sx={{ fontWeight: 600 }} color="text.primary">
           No Active Video Call Session
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 420 }}>
-          Please start or join your consultation directly from the Appointments list.
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{ maxWidth: 420 }}
+        >
+          Please start or join your consultation directly from the Appointments
+          list.
         </Typography>
         <Button
           variant="contained"

@@ -7,7 +7,7 @@ import { useAuthStore } from '@/zustand/stores/useAuthStore';
 import { useSocketStore } from '@/zustand/stores/useSocketStore';
 import React, { useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
-import CallSocketListeners from './CallSocketListeners';
+import SocketListeners from './SocketListeners';
 
 type SocketProviderProps = {
   children?: React.ReactNode;
@@ -19,6 +19,7 @@ export default function SocketProvider({ children }: SocketProviderProps) {
 
   // 2. Hooks
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const userId = useAuthStore((state) => state.userData?.id);
   const setSocket = useSocketStore((state) => state.setSocket);
   const setIsConnected = useSocketStore((state) => state.setIsConnected);
 
@@ -42,6 +43,9 @@ export default function SocketProvider({ children }: SocketProviderProps) {
 
     const socketInstance = io(baseUrl, {
       auth: { token },
+      extraHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
       query: { token },
       transports: ['websocket', 'polling'],
       reconnection: true,
@@ -70,11 +74,11 @@ export default function SocketProvider({ children }: SocketProviderProps) {
       setSocket(null);
       setIsConnected(false);
     };
-  }, [isLoggedIn, setSocket, setIsConnected]);
+  }, [isLoggedIn, userId, setSocket, setIsConnected]);
 
   return (
     <>
-      <CallSocketListeners />
+      <SocketListeners />
       {children}
     </>
   );

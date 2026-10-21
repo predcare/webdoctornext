@@ -1,18 +1,20 @@
 'use client';
 
+import { resetMeetingAndGetSummaryPath } from '@/hooks/commons/meeting/meetingSessionLeave';
 import { useMeetingCountdown } from '@/hooks/commons/meeting/useMeetingCountdown';
 import { useMeetingMedia } from '@/hooks/commons/meeting/useMeetingMedia';
+import { projectRoutes } from '@/routes';
 import { useMeetingStore } from '@/zustand/stores/useMeetingStore';
-import { useMeeting, useParticipant } from '@videosdk.live/react-sdk';
 import CallEndIcon from '@mui/icons-material/CallEnd';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import VideocamOffIcon from '@mui/icons-material/VideocamOff';
-import { Avatar, Box, IconButton, Tooltip, Typography } from '@mui/material';
+import { Avatar, Box, IconButton, Tooltip } from '@mui/material';
+import { useMeeting, useParticipant } from '@videosdk.live/react-sdk';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function MeetingMiniPlayer() {
   // 1. States & Refs
@@ -24,7 +26,6 @@ export default function MeetingMiniPlayer() {
   const appointmentId = useMeetingStore((state) => state.appointmentId);
   const patientInfo = useMeetingStore((state) => state.patientInfo);
   const remoteParticipantId = useMeetingStore((state) => state.remoteParticipantId);
-  const resetMeetingStore = useMeetingStore((state) => state.resetMeetingStore);
 
   const participantData = useParticipant(remoteParticipantId || '');
   const { webcamStream, webcamOn } = participantData || {};
@@ -36,26 +37,19 @@ export default function MeetingMiniPlayer() {
   const handleReturnToMeeting = () => {
     router.push(
       appointmentId
-        ? `/dashboard/meeting?appointmentId=${appointmentId}${
-            patientInfo?.id ? `&patientId=${patientInfo.id}` : ''
-          }`
-        : '/dashboard/meeting'
+        ? `${projectRoutes.meeting}?appointmentId=${appointmentId}${patientInfo?.id ? `&patientId=${patientInfo.id}` : ''
+        }`
+        : projectRoutes.meeting,
     );
   };
 
   const handleEndCall = async () => {
     try {
       await leave();
-    } catch (e) {
-      console.warn('Error during mini player leave:', e);
+    } catch (error) {
+      console.warn('Error during mini player leave:', error);
+      router.replace(resetMeetingAndGetSummaryPath());
     }
-    const currentId = appointmentId;
-    resetMeetingStore();
-    router.push(
-      currentId
-        ? `/dashboard/meeting/summary?appointmentId=${currentId}`
-        : '/dashboard/appointments'
-    );
   };
 
   // 4. useEffects

@@ -2,6 +2,7 @@ export const SocketEvents = {
   CONNECT: 'connect',
   DISCONNECT: 'disconnect',
   CONNECT_ERROR: 'connect_error',
+  HEARTBEAT: 'HEARTBEAT',
   INCOMING_CALL: 'incoming_call',
   INCOMING_CALL_CANCELLED: 'incoming_call_cancelled',
   CALL_CONNECTED: 'call_connected',

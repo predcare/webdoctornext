@@ -2,6 +2,7 @@
 
 import { useGetTokenMutation } from '@/hooks/react-query/appointments/appointments.hooks';
 import { showErrorToast } from '@/lib/commons/toast';
+import { projectRoutes } from '@/routes';
 import { useLoadingStore } from '@/zustand/stores/useLoadingStore';
 import { useMeetingStore } from '@/zustand/stores/useMeetingStore';
 import { useRouter } from 'next/navigation';
@@ -37,7 +38,7 @@ export const useJoinVideoCall = () => {
     }: TJoinVideoCallParams) => {
       if (currentMeetingId && String(currentApptId) === String(appointmentId)) {
         router.push(
-          `/dashboard/meeting?appointmentId=${appointmentId}${
+          `${projectRoutes.meeting}?appointmentId=${appointmentId}${
             patientId ? `&patientId=${patientId}` : ''
           }`,
         );
@@ -108,11 +109,10 @@ export const useJoinVideoCall = () => {
           callElapsedSeconds: appointment?.call_elapsed_seconds || 0,
         });
 
-        hideLoader();
         setIsJoining(false);
 
         router.push(
-          `/dashboard/meeting?appointmentId=${appointmentId}${
+          `${projectRoutes.meeting}?appointmentId=${appointmentId}${
             patientId ? `&patientId=${patientId}` : ''
           }`,
         );
@@ -135,10 +135,6 @@ export const useJoinVideoCall = () => {
     ],
   );
 
-  // 4. useEffects
-  // (none)
-
-  // 5. Render Guards & Return
   return {
     joinVideoCall,
     isJoining,

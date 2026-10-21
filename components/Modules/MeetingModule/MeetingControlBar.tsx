@@ -1,7 +1,7 @@
 'use client';
 
+import { resetMeetingAndGetSummaryPath } from '@/hooks/commons/meeting/meetingSessionLeave';
 import { useMeetingMedia } from '@/hooks/commons/meeting/useMeetingMedia';
-import { useMeetingStore } from '@/zustand/stores/useMeetingStore';
 import { useMeeting } from '@videosdk.live/react-sdk';
 import CallEndIcon from '@mui/icons-material/CallEnd';
 import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
@@ -33,8 +33,6 @@ export default function MeetingControlBar() {
   // 2. Hooks
   const router = useRouter();
   const { leave } = useMeeting();
-  const appointmentId = useMeetingStore((state) => state.appointmentId);
-  const resetMeetingStore = useMeetingStore((state) => state.resetMeetingStore);
   const {
     isMicOn,
     isCameraOn,
@@ -59,17 +57,11 @@ export default function MeetingControlBar() {
     setIsEndModalOpen(false);
     try {
       await leave();
-    } catch (e) {
-      console.warn('Error during leave:', e);
+    } catch (error) {
+      console.warn('Error during leave:', error);
+      router.replace(resetMeetingAndGetSummaryPath());
     }
-    const currentId = appointmentId;
-    resetMeetingStore();
-    router.push(
-      currentId
-        ? `/dashboard/meeting/summary?appointmentId=${currentId}`
-        : '/dashboard/appointments'
-    );
-  }, [leave, appointmentId, resetMeetingStore, router]);
+  }, [leave, router]);
 
   const handleCameraMenuOpen = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {

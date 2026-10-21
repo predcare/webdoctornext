@@ -1,53 +1,71 @@
 'use client';
 
-import { registerLeaveHandler } from '@/hooks/commons/meeting/meetingSessionLeave';
+import {
+  registerLeaveHandler,
+  resetMeetingAndGetSummaryPath,
+} from '@/hooks/commons/meeting/meetingSessionLeave';
+import { useMeetingCountdownTicker } from '@/hooks/commons/meeting/useMeetingCountdown';
+import { normalizePathname, projectRoutes } from '@/routes';
 import { useAuthStore } from '@/zustand/stores/useAuthStore';
 import { useMeetingStore } from '@/zustand/stores/useMeetingStore';
 import { MeetingProvider, useMeeting } from '@videosdk.live/react-sdk';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { ReactNode, useEffect, useMemo, useRef } from 'react';
 import MeetingMiniPlayer from './MeetingMiniPlayer';
 
-function MeetingSessionController() {
+type MeetingSessionHostProps = {
+  children: ReactNode;
+};
 
+function MeetingSessionController() {
   const router = useRouter();
-  const pathname = usePathname();
-  const appointmentId = useMeetingStore((state) => state.appointmentId);
+  const pathname = normalizePathname(usePathname() || '');
+  const hasEndedRef = useRef(false);
+  const previousPathRef = useRef(pathname);
+
   const setRemoteParticipantId = useMeetingStore(
-    (state) => state.setRemoteParticipantId
+    (state) => state.setRemoteParticipantId,
   );
   const setCallState = useMeetingStore((state) => state.setCallState);
   const setErrorState = useMeetingStore((state) => state.setErrorState);
-  const resetMeetingStore = useMeetingStore((state) => state.resetMeetingStore);
+  const isMiniPlayer = useMeetingStore((state) => state.isMiniPlayer);
+  const setIsMiniPlayer = useMeetingStore((state) => state.setIsMiniPlayer);
 
   const meeting = useMeeting({
     onMeetingJoined: () => {
-      setCallState('WAITING_FOR_PATIENT');
-    },
-    onParticipantJoined: (participant) => {
-      setRemoteParticipantId(participant.id);
-    },
-    onParticipantLeft: () => {
-      setRemoteParticipantId(null);
-    },
-    onMeetingLeft: () => {
-      const currentApptId = appointmentId;
-      resetMeetingStore();
-      router.replace(
-        currentApptId
-          ? `/dashboard/meeting/summary?appointmentId=${currentApptId}`
-          : '/dashboard/appointments'
+      const state = useMeetingStore.getState();
+      if (state.callState === 'ERROR' || state.callState === 'ENDED') {
+        return;
+      }
+      setCallState(
+        state.remoteParticipantId ? 'CONNECTED' : 'WAITING_FOR_PATIENT',
       );
     },
-    onError: (error) => {
-      setErrorState(error?.message || 'Video session encountered an error.');
+    onMeetingLeft: () => {
+      if (hasEndedRef.current) {
+        return;
+      }
+      hasEndedRef.current = true;
+      const currentPath = normalizePathname(window.location.pathname);
+      if (currentPath === projectRoutes.managePrescriptions) {
+        useMeetingStore.getState().resetMeetingStore();
+        return;
+      }
+      const summaryPath = resetMeetingAndGetSummaryPath();
+      router.replace(summaryPath);
+    },
+    onError: ({ message }) => {
+      setErrorState(message || 'Video session encountered an error.');
     },
   });
+  const { participants, localParticipant } = meeting;
+  const localParticipantId = localParticipant?.id;
 
-  // 3. useMemo & Functions
-  const isMeetingRoute = pathname === '/dashboard/meeting';
+  useMeetingCountdownTicker();
 
-  // 4. useEffects
+  const isMeetingRoute = pathname === projectRoutes.meeting;
+  const isSummaryRoute = pathname.startsWith(`${projectRoutes.meeting}/summary`);
+
   useEffect(() => {
     registerLeaveHandler(meeting.leave);
     return () => {
@@ -55,26 +73,46 @@ function MeetingSessionController() {
     };
   }, [meeting.leave]);
 
-  // 5. Render Guards & JSX
-  if (!isMeetingRoute) {
+  useEffect(() => {
+    const previousPath = previousPathRef.current;
+
+    if (pathname === projectRoutes.meeting) {
+      if (useMeetingStore.getState().isMiniPlayer) {
+        setIsMiniPlayer(false);
+      }
+    } else if (previousPath === projectRoutes.meeting) {
+      setIsMiniPlayer(true);
+    }
+
+    previousPathRef.current = pathname;
+  }, [pathname, setIsMiniPlayer]);
+
+  useEffect(() => {
+    let patientId: string | null = null;
+    for (const [id] of participants) {
+      if (id !== localParticipantId) {
+        patientId = id;
+        break;
+      }
+    }
+
+    if (useMeetingStore.getState().remoteParticipantId !== patientId) {
+      setRemoteParticipantId(patientId);
+    }
+  }, [participants, localParticipantId, setRemoteParticipantId]);
+
+  if (isMiniPlayer && !isMeetingRoute && !isSummaryRoute) {
     return <MeetingMiniPlayer />;
   }
 
   return null;
 }
 
-export default function MeetingSessionHost() {
-  // 1. States & Refs
-  // (none)
-
-  // 2. Hooks
+export default function MeetingSessionHost({ children }: MeetingSessionHostProps) {
   const token = useMeetingStore((state) => state.token);
   const meetingId = useMeetingStore((state) => state.meetingId);
-  const isMicOn = useMeetingStore((state) => state.isMicOn);
-  const isCameraOn = useMeetingStore((state) => state.isCameraOn);
   const userData = useAuthStore((state) => state.userData);
 
-  // 3. useMemo & Functions
   const doctorName = useMemo(() => {
     return userData?.name ? `Dr. ${userData.name}` : 'Doctor';
   }, [userData?.name]);
@@ -83,20 +121,25 @@ export default function MeetingSessionHost() {
     return userData?.id ? `doctor_${userData.id}` : undefined;
   }, [userData?.id]);
 
-  // 4. useEffects
-  // (none)
+  const initialMedia = useMemo(() => {
+    const { isMicOn, isCameraOn } = useMeetingStore.getState();
+    return {
+      micEnabled: isMicOn,
+      webcamEnabled: isCameraOn,
+    };
+  }, [meetingId]);
 
-  // 5. Render Guards & JSX
   if (!token || !meetingId) {
-    return null;
+    return children;
   }
 
   return (
     <MeetingProvider
+      key={meetingId}
       config={{
         meetingId,
-        micEnabled: isMicOn,
-        webcamEnabled: isCameraOn,
+        micEnabled: initialMedia.micEnabled,
+        webcamEnabled: initialMedia.webcamEnabled,
         name: doctorName,
         participantId: doctorParticipantId,
         maxResolution: 'hd',
@@ -107,6 +150,7 @@ export default function MeetingSessionHost() {
       joinWithoutUserInteraction={true}
     >
       <MeetingSessionController />
+      {children}
     </MeetingProvider>
   );
 }
