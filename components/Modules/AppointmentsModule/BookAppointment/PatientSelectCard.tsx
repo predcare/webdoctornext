@@ -20,6 +20,7 @@ type PatientSelectCardProps = {
   loading?: boolean;
   hasMore?: boolean;
   loadingMore?: boolean;
+  isDisabled?: boolean;
   onLoadMore?: () => void;
 };
 
@@ -35,6 +36,7 @@ export default function PatientSelectCard({
   hasMore = false,
   loadingMore = false,
   onLoadMore,
+  isDisabled = false
 }: PatientSelectCardProps) {
   return (
     <>
@@ -61,6 +63,7 @@ export default function PatientSelectCard({
           loading={loading}
           loadingText="Searching patients..."
           hasMore={hasMore}
+          disabled={isDisabled}
           loadingMore={loadingMore}
           onLoadMore={onLoadMore}
           noOptionsText="No patients found"
@@ -120,7 +123,6 @@ export default function PatientSelectCard({
             Add New Patient
           </Link>
         </Box>
-
         {selectedPatient ? (
           <SelectedPatientPanel patient={selectedPatient} />
         ) : null}

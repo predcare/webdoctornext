@@ -115,6 +115,7 @@ function TodayAppointmentsTable() {
                             router.push(
                                 projectRoutes.managePrescription({
                                     patientId: String(patientId),
+                                    appointmentId: String(appointmentId),
                                 }),
                             );
                         },
@@ -134,6 +135,7 @@ function TodayAppointmentsTable() {
                 router.push(
                     projectRoutes.managePrescription({
                         patientId: String(patientId),
+                        appointmentId: String(appointmentId),
                     }),
                 );
             }

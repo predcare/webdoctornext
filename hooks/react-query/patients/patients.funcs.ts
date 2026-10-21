@@ -22,6 +22,7 @@ export interface IGetMyPatientsParams {
   page?: number;
   limit?: number;
   search?: string;
+  patient_id?: number;
 }
 
 export const getMyPatientsList = async (params?: IGetMyPatientsParams) => {
@@ -29,6 +30,7 @@ export const getMyPatientsList = async (params?: IGetMyPatientsParams) => {
     page: params?.page ?? 1,
     limit: params?.limit ?? 10,
     search: params?.search,
+    patient_id: params?.patient_id,
   };
   const res = await axiosInstance.get<IRootResponse<IMyPatientDoc[]>>(
     `${endpoints.patients.get}`,

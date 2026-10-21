@@ -10,11 +10,13 @@ import ChoiceCardGrid from './ChoiceCardGrid';
 type ConsultationTypeCardProps = {
   value: BookingConsultType;
   onChange: (value: BookingConsultType) => void;
+  mode?: "book" | "reschedule";
 };
 
 export default function ConsultationTypeCard({
   value,
   onChange,
+  mode = "book",
 }: ConsultationTypeCardProps) {
   return (
     <Box className="book-card">
@@ -26,6 +28,7 @@ export default function ConsultationTypeCard({
         value={value}
         onChange={onChange}
         ariaLabel="Consultation type"
+        disabled={mode === "reschedule"}
       />
     </Box>
   );

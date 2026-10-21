@@ -162,6 +162,7 @@ export default function AppointmentListPage() {
                     router.push(
                       projectRoutes.managePrescription({
                         patientId: String(patientId),
+                        appointmentId: String(appointmentId),
                       }),
                     );
                   } finally {
@@ -185,6 +186,7 @@ export default function AppointmentListPage() {
             router.push(
               projectRoutes.managePrescription({
                 patientId: String(patientId),
+                appointmentId: String(appointmentId),
               }),
             );
           }
@@ -291,12 +293,9 @@ export default function AppointmentListPage() {
   );
 
   const handleReschedule = useCallback(
-    (item: IMyAppointmentDoc) => {
-      const patientId = item.patientInfo?.patientId || item.patient_id;
-      const params = new URLSearchParams();
-      if (patientId) params.set('patientId', String(patientId));
-      if (item.id) params.set('rescheduleId', String(item.id));
-      router.push(`${projectRoutes.bookAppointment}?${params.toString()}`);
+    (apptId: string) => {
+      if (!apptId) return showErrorToast('Failed to get appointment id');
+      router.push(`${projectRoutes.appointmentReschedule(apptId)}`);
     },
     [router],
   );
@@ -444,8 +443,8 @@ export default function AppointmentListPage() {
               !actionMenu.activeId ||
               actionMenu.activeStatus?.toLowerCase() !== 'confirmed',
             onClick: () => {
-              if (activeAppointment) {
-                handleReschedule(activeAppointment);
+              if (actionMenu.activeId) {
+                handleReschedule(actionMenu.activeId);
               }
             },
           },
@@ -457,7 +456,7 @@ export default function AppointmentListPage() {
             dividerBefore: true,
             hidden:
               !actionMenu.activeId ||
-              !['confirmed', 'in_progress', 'in-progress'].includes(
+              !['confirmed'].includes(
                 actionMenu.activeStatus?.toLowerCase() || '',
               ),
             onClick: () => {

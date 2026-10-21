@@ -15,15 +15,17 @@ type RouteProps = {
     tab?: string;
     patientId?: string;
     prescriptionId?: string;
+    appointmentId?: string;
   }>;
 };
 
 async function ManagePrescriptionContent({ searchParams }: RouteProps) {
-  const { tab, patientId, prescriptionId } = await searchParams;
+  const { tab, patientId, prescriptionId, appointmentId } = await searchParams;
   const decodedPatientId = decodeUrlParam(patientId);
   const decodedPrescriptionId = decodeUrlParam(prescriptionId);
+  const decodedAppointmentId = decodeUrlParam(appointmentId);
 
-  if (!decodedPatientId)
+  if (!decodedPatientId || (decodedPrescriptionId && !decodedAppointmentId))
     return (
       <DashboardInvalidParamView
         title="Invalid Patient ID"
@@ -38,6 +40,7 @@ async function ManagePrescriptionContent({ searchParams }: RouteProps) {
       tab={resolveConsultationTab(tab)}
       patientId={decodedPatientId}
       prescriptionId={decodedPrescriptionId ?? undefined}
+      appointmentId={decodedAppointmentId ?? undefined}
     />
   );
 }

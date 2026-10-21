@@ -10,6 +10,7 @@ import {
   getAvailablity,
   getDocBookingAvails,
   getDoctorAvailDates,
+  getDoctorRescheduledAvailDates,
   getDoctorTimingsByDate,
   updateAvailability,
 } from './availablity.funcs';
@@ -99,4 +100,23 @@ export const useGetAvailabilityById = (id?: number | string) =>
     queryFn: () => getAvailabilityById(String(id)),
     select: (v) => v.data,
     enabled: Boolean(id),
+  });
+
+export const useDoctorRescheduledAvailDates = (params: {
+  doctorId: number;
+  consultation_type: string;
+  clinicId: number;
+  slot_duration: number;
+}) =>
+  useQuery({
+    queryKey: [DoctorAvailabilityQueryKeys.GET_RESCHEDULED_AVAIL_DATES, params],
+    queryFn: () =>
+      getDoctorRescheduledAvailDates({
+        doctor_id: params?.doctorId,
+        consultation_type: params?.consultation_type,
+        clinic_id: params?.clinicId,
+        slot_duration: params?.slot_duration,
+      }),
+    select: (v) => v.data,
+    enabled: Boolean(params?.doctorId && params?.slot_duration),
   });

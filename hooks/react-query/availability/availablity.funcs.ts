@@ -91,3 +91,18 @@ export const getAvailabilityById = async (id: number | string) => {
   );
   return res.data;
 };
+
+export const getDoctorRescheduledAvailDates = async (params?: {
+  doctor_id: number;
+  consultation_type: string;
+  clinic_id: number;
+  slot_duration: number;
+}) => {
+  const res = await axiosInstance.get<IRootResponse<string[]>>(
+    `${endpoints.availablity.rescheduleAvailDates}`,
+    {
+      params,
+    },
+  );
+  return res.data;
+};

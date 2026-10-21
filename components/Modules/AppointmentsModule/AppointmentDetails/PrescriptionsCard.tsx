@@ -49,6 +49,7 @@ function PrescriptionsCard({
         projectRoutes.managePrescription({
           patientId: String(item.patient_id),
           prescriptionId: item.prescription_id,
+          appointmentId: String(item?.appointment_id),
         }),
       );
     },

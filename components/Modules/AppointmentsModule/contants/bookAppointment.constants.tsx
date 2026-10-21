@@ -8,7 +8,7 @@ import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import type { ReactNode } from 'react';
 
 export type BookingConsultType = ConsultType.IN_PERSON | ConsultType.VIDEO;
-export type VisitCategoryId = 'new' | 'regular' | 'follow-up';
+export type VisitCategoryId = 'first_visit' | 'regular' | 'follow-up';
 
 export interface IChoiceOption<T extends string> {
   id: T;
@@ -48,7 +48,7 @@ export const consultationTypes: IChoiceOption<BookingConsultType>[] = [
 
 export const visitCategories: IVisitCategoryOption[] = [
   {
-    id: 'new',
+    id: 'first_visit',
     label: 'New Visit',
     hint: 'First appointment',
     icon: <PersonAddAltOutlinedIcon />,

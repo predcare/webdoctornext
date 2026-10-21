@@ -1,8 +1,8 @@
 'use client';
 
-import { Box, styled } from '@mui/material';
+import { styled } from '@mui/material';
 
-export const CustomCheckboxWrapper = styled(Box)`
+export const CustomCheckboxWrapper = styled('label')`
   display: inline-flex;
   align-items: flex-start;
   gap: 10px;

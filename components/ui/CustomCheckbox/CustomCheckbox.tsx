@@ -59,7 +59,6 @@ const CustomCheckbox = ({
 
   return (
     <CustomCheckboxWrapper
-      component="label"
       className={rootClassName}
       aria-disabled={disabled || undefined}
     >

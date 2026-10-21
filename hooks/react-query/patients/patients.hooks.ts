@@ -22,14 +22,19 @@ import {
   ILinkExistingPatientPayload,
 } from './payload.interfaces';
 
-export const useMyPatientList = (params?: IGetMyPatientsParams) =>
+export const useMyPatientList = (
+  params?: IGetMyPatientsParams,
+  options?: { enabled?: boolean },
+) =>
   useQuery({
     queryKey: [PatientsQueryKeys.PatientsList, params],
     queryFn: () => getMyPatientsList(params),
+    enabled: options?.enabled ?? true,
   });
 
 export const useMyPatientInfiniteList = (
   params?: Omit<IGetMyPatientsParams, 'page'>,
+  options?: { enabled?: boolean },
 ) =>
   useInfiniteQuery({
     queryKey: [PatientsQueryKeys.PatientsList, 'infinite', params],
@@ -46,6 +51,7 @@ export const useMyPatientInfiniteList = (
       }
       return undefined;
     },
+    enabled: options?.enabled ?? true,
   });
 
 export const useDeletePatient = () => {

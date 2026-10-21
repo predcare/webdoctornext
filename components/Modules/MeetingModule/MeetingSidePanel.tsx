@@ -2,6 +2,7 @@
 
 import CustomInput from '@/components/ui/CustomInput/CustomInput';
 import { _toTitleCase, getAge, getInitials } from '@/lib/commons/common.utils';
+import { showErrorToast } from '@/lib/commons/toast';
 import { projectRoutes } from '@/routes';
 import { IMyPatientDoc } from '@/typescripts/interfaces/patients.interfaces';
 import { useMeetingStore } from '@/zustand/stores/useMeetingStore';
@@ -20,6 +21,7 @@ type MeetingSidePanelProps = {
 function MeetingSidePanel({ patient }: MeetingSidePanelProps) {
   const router = useRouter();
   const doctorNotes = useMeetingStore((state) => state.doctorNotes);
+  const appointmentId = useMeetingStore((state) => state.appointmentId);
   const setDoctorNotes = useMeetingStore((state) => state.setDoctorNotes);
 
   const patientName = patient?.name || 'Patient';
@@ -38,9 +40,11 @@ function MeetingSidePanel({ patient }: MeetingSidePanelProps) {
   }, [patient?.user_id, router]);
 
   const handleWritePrescription = useCallback(() => {
+    if (!appointmentId) return showErrorToast("Appointment ID is required")
     router.push(projectRoutes.managePrescription({
       patientId: patient?.user_id || '',
       tab: 'prescriptions',
+      appointmentId: appointmentId
     }));
   }, [patient?.user_id, router]);
 

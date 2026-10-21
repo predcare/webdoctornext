@@ -108,12 +108,14 @@ type ManagePrescriptionPageProps = {
   tab: ConsultationTabId;
   patientId: string;
   prescriptionId?: string;
+  appointmentId?: string;
 };
 
 export default function ManagePrescriptionPage({
   tab: initialTab,
   patientId,
   prescriptionId,
+  appointmentId,
 }: ManagePrescriptionPageProps) {
   const router = useRouter();
   const [tab, setTab] = useState(initialTab);
@@ -124,7 +126,7 @@ export default function ManagePrescriptionPage({
   const followUpFields = followUpByTab[tab];
 
   const { showLoader, hideLoader } = useLoadingStore((state) => state);
-  const { apptIdforInPerson, clearInPersonAppointment } = useMeetingStore((state) => state);
+  const { clearInPersonAppointment } = useMeetingStore((state) => state);
 
   const currentPrescriptionId = useRef<number | null>(
     prescriptionId ? Number(prescriptionId) : null,
@@ -228,8 +230,6 @@ export default function ManagePrescriptionPage({
     status: 'draft' | 'completed' = 'draft',
   ): ICreatePrescriptionPayload => {
     const currentUser = useAuthStore.getState().userData;
-    const apptIdforInPerson = useMeetingStore.getState().apptIdforInPerson;
-    const clearInPersonAppointment = useMeetingStore.getState().clearInPersonAppointment;
     const clinicId = currentUser?.clinic?.id;
     const rx = prescriptionInfo?.data;
     const validMedications = _data?.medications?.filter(
@@ -248,7 +248,7 @@ export default function ManagePrescriptionPage({
       doctor_id: currentUser?.id || '',
       patient_id: patientId ?? rx?.patient_id ?? '',
       clinic_id: clinicId ?? rx?.clinic_id ?? '',
-      appointment_id: rx?.appointment_id ?? apptIdforInPerson ?? '',
+      appointment_id: rx?.appointment_id ?? appointmentId ?? '',
       type: UserRoles.DOCTOR,
       chief_complaints: _data?.chief_complaints,
       diagnosis: _data?.diagnosis,

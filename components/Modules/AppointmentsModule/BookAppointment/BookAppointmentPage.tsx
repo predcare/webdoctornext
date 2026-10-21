@@ -13,7 +13,6 @@ import {
 import { useMyPatientInfiniteList } from '@/hooks/react-query/patients/patients.hooks';
 import { MyAppointmentsQueryKeys } from '@/hooks/react-query/query.keys';
 import {
-  areSlotsConsecutive,
   groupTimingSlotsByPeriod,
   ISlotItem,
   normalizeApiTime,
@@ -30,7 +29,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Box, Button } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   BookingConsultType,
   breadcrumbItems,
@@ -52,7 +51,7 @@ interface IFormStates {
   consultationType: BookingConsultType;
   visitCategory: VisitCategoryId;
   selectedDate: string;
-  selectedSlots: ISlotItem[] | null;
+  selectedSlot: ISlotItem | null;
   reason: string;
 }
 
@@ -60,9 +59,12 @@ const initialFormState: IFormStates = {
   consultationType: ConsultType.IN_PERSON,
   visitCategory: 'regular',
   selectedDate: '',
-  selectedSlots: null,
+  selectedSlot: null,
   reason: '',
 };
+
+const isSameSlot = (a: ISlotItem, b: ISlotItem) =>
+  a.start === b.start && a.end === b.end;
 
 type BookAppointmentPageProps = {
   patientId?: string;
@@ -71,19 +73,20 @@ type BookAppointmentPageProps = {
 export default function BookAppointmentPage({
   patientId,
 }: BookAppointmentPageProps) {
-  const router = useRouter();
   const [selectedPatient, setSelectedPatient] = useState<IMyPatientDoc | null>(
     null,
   );
   const [prefilledFor, setPrefilledFor] = useState<string | null>(null);
   const [formStates, setFormState] = useState<IFormStates>(initialFormState);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const router = useRouter();
   const userData = useAuthStore((state) => state.userData);
   const { showLoader, hideLoader } = useLoadingStore((state) => state);
 
   const doctorId = Number(userData?.id || userData?.user_id || 0);
   const clinicId = Number(userData?.clinic?.id || userData?.clinic_id || 0);
 
-  const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearch = useDebounce(searchQuery, PATIENT_SEARCH_DEBOUNCE);
 
   const {
@@ -96,36 +99,6 @@ export default function BookAppointmentPage({
     limit: PATIENT_PAGE_LIMIT,
     search: debouncedSearch.trim() || undefined,
   });
-
-  const patientOptions = useMemo(() => {
-    const seen = new Set<string>();
-    const list: IMyPatientDoc[] = [];
-    const push = (patient: IMyPatientDoc) => {
-      const key = String(patient.id);
-      if (seen.has(key)) return;
-      seen.add(key);
-      list.push(patient);
-    };
-    patientPages?.pages.forEach((page) => page?.data?.forEach(push));
-    if (selectedPatient) push(selectedPatient);
-    return list;
-  }, [patientPages, selectedPatient]);
-
-  if (patientId && prefilledFor !== patientId) {
-    const match = patientOptions.find((p) => String(p.id) === patientId);
-    if (match) {
-      setPrefilledFor(patientId);
-      setSelectedPatient(match);
-    }
-  }
-
-  const isPatientSearching = searchQuery !== debouncedSearch;
-  const isPatientListLoading =
-    isPatientListPending || isPatientSearching || !isFetchingNextPage;
-
-  const handleLoadMorePatients = () => {
-    if (hasNextPage && !isFetchingNextPage) fetchNextPage();
-  };
 
   const {
     data: availDatesRaw,
@@ -152,6 +125,28 @@ export default function BookAppointmentPage({
 
   const { mutate: bookAppt } = useBookAppointments();
 
+  const patientOptions = useMemo(() => {
+    const seen = new Set<string>();
+    const list: IMyPatientDoc[] = [];
+    const push = (patient: IMyPatientDoc) => {
+      const key = String(patient.id);
+      if (seen.has(key)) return;
+      seen.add(key);
+      list.push(patient);
+    };
+    patientPages?.pages.forEach((page) => page?.data?.forEach(push));
+    if (selectedPatient) push(selectedPatient);
+    return list;
+  }, [patientPages, selectedPatient]);
+
+  const isPatientSearching = searchQuery !== debouncedSearch;
+  const isPatientListLoading =
+    isPatientListPending || isPatientSearching || !isFetchingNextPage;
+
+  const handleLoadMorePatients = () => {
+    if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+  };
+
   const availableDates = useMemo(
     () => normalizeAvailableDates(availDatesRaw ?? []),
     [availDatesRaw],
@@ -174,7 +169,7 @@ export default function BookAppointmentPage({
     return parseFloat(String(fee || 0)) || 0;
   }, [timingSlots, formStates.consultationType]);
 
-  const totalAmount = singleSlotFee * (formStates.selectedSlots?.length || 1);
+  const totalAmount = singleSlotFee;
 
   const selectedConsult = consultationTypes.find(
     (row) => row.id === formStates.consultationType,
@@ -189,7 +184,7 @@ export default function BookAppointmentPage({
 
   const handlePatientSelect = (patient: IMyPatientDoc | null) => {
     setSelectedPatient(patient);
-    if (!patient) updateFormState({ selectedDate: '', selectedSlots: null });
+    if (!patient) updateFormState({ selectedDate: '', selectedSlot: null });
   };
 
   const handleConsultTypeChange = (consultationType: BookingConsultType) => {
@@ -201,101 +196,65 @@ export default function BookAppointmentPage({
     updateFormState({
       consultationType,
       selectedDate: '',
-      selectedSlots: null,
+      selectedSlot: null,
     });
   };
 
   const handleDateSelect = (selectedDate: string) => {
     if (selectedDate === formStates.selectedDate) return;
-    updateFormState({ selectedDate, selectedSlots: null });
+    updateFormState({ selectedDate, selectedSlot: null });
   };
 
   const handleSlotPress = (slot: ISlotItem) => {
     if (slot.booked) return;
-    const currentSelected = formStates.selectedSlots ?? [];
+    const isSelected = formStates.selectedSlot
+      ? isSameSlot(formStates.selectedSlot, slot)
+      : false;
 
-    const isSelected = currentSelected.some(
-      (selectedSlot) => selectedSlot.start === slot.start,
-    );
-
-    if (isSelected) {
-      const updated = currentSelected.filter(
-        (selectedSlot) => selectedSlot.start !== slot.start,
-      );
-
-      if (updated.length > 0 && !areSlotsConsecutive(updated)) {
-        showErrorToast('Please select consecutive slots only.');
-        return;
-      }
-
-      updateFormState({
-        selectedSlots: updated.length > 0 ? updated : null,
-      });
-      return;
-    }
-
-    if (currentSelected.length === 0) {
-      updateFormState({ selectedSlots: [slot] });
-      return;
-    }
-
-    const sorted = [...currentSelected].sort((a, b) =>
-      a.start.localeCompare(b.start),
-    );
-    const first = sorted[0];
-    const last = sorted[sorted.length - 1];
-
-    if (slot.start === last.end || slot.end === first.start) {
-      updateFormState({ selectedSlots: [...currentSelected, slot] });
-    } else {
-      showErrorToast('Please select consecutive slots only.');
-    }
+    updateFormState({
+      selectedSlot: isSelected ? null : slot,
+    });
   };
 
   const handleBookAppointment = () => {
     if (!selectedPatient) return showErrorToast('Select Patient First');
     if (!formStates.selectedDate)
       return showErrorToast('Select Appointment Date');
-    if (!formStates.selectedSlots || formStates.selectedSlots.length === 0) {
+    if (!formStates.selectedSlot) {
       return showErrorToast('Select at least one Time Slot');
-    }
-    if (!areSlotsConsecutive(formStates.selectedSlots)) {
-      return showErrorToast('Please select consecutive slots only.');
     }
     if (!doctorId || !clinicId)
       return showErrorToast('Doctor/Clinic information is missing');
 
-    if (formStates.selectedSlots.some((s) => s.booked)) {
+    if (formStates.selectedSlot.booked) {
       return showErrorToast(
-        'One or more selected slots are already booked. Please choose another.',
+        'Selected slot is already booked. Please choose another.',
       );
     }
 
-    const sorted = [...formStates.selectedSlots].sort((a, b) =>
-      a.start.localeCompare(b.start),
-    );
-    const firstSlot = sorted[0];
-    const lastSlot = sorted[sorted.length - 1];
+    const slot = formStates.selectedSlot;
 
     showLoader('Please Wait. While Booking Appointment...');
     const payload: ICreateAppointmentPayload = {
       doctor_id: String(doctorId),
       patient_id: String(selectedPatient.user_id),
       clinic_id: String(clinicId),
-      availability_id: sorted.map((s) => String(s.availability_id || '')),
+      availability_id: [String(slot.availability_id || '')],
       appointment_date: formStates.selectedDate,
-      start_time: normalizeApiTime(firstSlot.start),
-      end_time: normalizeApiTime(lastSlot.end),
+      start_time: normalizeApiTime(slot.start),
+      end_time: normalizeApiTime(slot.end),
       consultation_type: formStates.consultationType,
       appointment_type: selectedVisit?.appointmentType || 'first_visit',
       reason: formStates.reason.trim() || null,
       symptoms: null,
       medications: null,
-      appointment_slot_time: sorted.map((s) => ({
-        start: normalizeApiTime(s.start),
-        end: normalizeApiTime(s.end),
-        booked: true,
-      })),
+      appointment_slot_time: [
+        {
+          start: normalizeApiTime(slot.start),
+          end: normalizeApiTime(slot.end),
+          booked: true,
+        },
+      ],
       appointment_fee: totalAmount,
       appointment_status: ConsultStatus.CONFIRMED,
       payment_status: 'pending',
@@ -324,6 +283,15 @@ export default function BookAppointmentPage({
       },
     });
   };
+
+  useEffect(() => {
+    if (!patientId || prefilledFor === patientId) return;
+    const match = patientOptions.find((p) => String(p.id) === patientId);
+    if (match) {
+      setPrefilledFor(patientId);
+      setSelectedPatient(match);
+    }
+  }, [patientId, prefilledFor, patientOptions]);
 
   return (
     <BookAppointmentWrapper>
@@ -379,7 +347,9 @@ export default function BookAppointmentPage({
               error={isTimingsError}
               onRetry={() => refetchTimings()}
               selectedDate={formStates.selectedDate}
-              selectedSlots={formStates.selectedSlots}
+              selectedSlots={
+                formStates.selectedSlot ? [formStates.selectedSlot] : null
+              }
               onSlotPress={handleSlotPress}
             />
           )}
@@ -405,7 +375,9 @@ export default function BookAppointmentPage({
             patientName={selectedPatient?.name}
             consultationLabel={selectedConsult?.label}
             selectedDate={formStates.selectedDate}
-            selectedSlots={formStates.selectedSlots}
+            selectedSlots={
+              formStates.selectedSlot ? [formStates.selectedSlot] : null
+            }
             visitLabel={selectedVisit?.label}
             totalAmount={totalAmount}
           />

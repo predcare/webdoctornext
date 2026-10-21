@@ -27,6 +27,8 @@ export const projectRoutes = {
   dashboard: '/dashboard',
   appointments: '/dashboard/appointments',
   appointmentDetails: (id: string) => `/dashboard/appointments/${id}`,
+  appointmentReschedule: (id: string) =>
+    `/dashboard/appointments/reschedule-appointment/${encodeUrlParam(id)}`,
   bookAppointment: `/dashboard/appointments/book-appointment`,
   patients: '/dashboard/patients',
   addPatient: '/dashboard/patients/add-patient',
@@ -49,8 +51,9 @@ export const projectRoutes = {
     patientId: string;
     prescriptionId?: string | number;
     tab?: string;
+    appointmentId?: string | number;
   }) => {
-    const { patientId, prescriptionId, tab } = urlParams;
+    const { patientId, prescriptionId, tab, appointmentId } = urlParams;
     const params = new URLSearchParams();
     params.set('patientId', encodeUrlParam(patientId));
     if (prescriptionId) {
@@ -58,6 +61,9 @@ export const projectRoutes = {
     }
     if (tab) {
       params.set('tab', tab);
+    }
+    if (appointmentId) {
+      params.set('appointmentId', encodeUrlParam(appointmentId));
     }
     return `/dashboard/prescriptions/manage?${params.toString()}`;
   },

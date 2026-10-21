@@ -100,6 +100,7 @@ function PrescriptionsTab({ patientId }: IPrescriptionsTabProps) {
                     projectRoutes.managePrescription({
                       patientId,
                       prescriptionId: prescription.id,
+                      appointmentId: prescription?.appointment_id
                     }),
                   )
                 }

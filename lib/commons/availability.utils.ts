@@ -1,11 +1,11 @@
 import dayjs from 'dayjs';
-import type { TAvailabilityFormValues } from '../schemas/availability.schema';
 import {
   IDocBookingAvailRoot,
   IDocBookingAvailSlot,
   IMyAvailabilityDoc,
   ITimeSlotsDoc,
 } from '../../typescripts/interfaces/availability.interfaces';
+import type { TAvailabilityFormValues } from '../schemas/availability.schema';
 
 export type TimeValue = {
   hour: string;
@@ -45,7 +45,9 @@ export const formatAvailabilityDate = (iso: string) => {
   return `${Number(day)} ${MONTH_LABELS[monthIndex]}`;
 };
 
-export const parseTimeStringToTimeValue = (timeStr?: string | null): TimeValue => {
+export const parseTimeStringToTimeValue = (
+  timeStr?: string | null,
+): TimeValue => {
   if (!timeStr) return { hour: '09', minute: '00', period: 'AM' };
   const trimmed = timeStr.trim();
   const parts = trimmed.split(':');
@@ -455,7 +457,9 @@ export const normalizeAvailableDates = (dates: string[] = []): string[] => {
 };
 
 export const getRelativeDayLabel = (date: string): string => {
-  const diffDays = dayjs(date).startOf('day').diff(dayjs().startOf('day'), 'day');
+  const diffDays = dayjs(date)
+    .startOf('day')
+    .diff(dayjs().startOf('day'), 'day');
   if (diffDays === 0) return 'Today';
   if (diffDays === 1) return 'Tomorrow';
   if (diffDays === -1) return 'Yesterday';
