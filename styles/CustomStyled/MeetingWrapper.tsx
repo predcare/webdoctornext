@@ -87,9 +87,9 @@ export const MeetingWrapper = styled(Box)`
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.92);
     color: ${({ theme }) => theme.palette.customColors.heading};
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 600;
-    line-height: 18px;
+    line-height: 14px;
     white-space: nowrap;
     text-overflow: ellipsis;
     box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);

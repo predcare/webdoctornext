@@ -3,7 +3,6 @@
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import CallEndIcon from '@mui/icons-material/CallEnd';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import HdIcon from '@mui/icons-material/Hd';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import MicNoneIcon from '@mui/icons-material/MicNone';
@@ -18,7 +17,6 @@ const controls = [
   { label: 'Camera', icon: <VideocamOutlinedIcon /> },
   { label: 'Share screen', icon: <ScreenShareOutlinedIcon /> },
   { label: 'Participants', icon: <PeopleAltOutlinedIcon /> },
-  { label: 'Reactions', icon: <FavoriteBorderIcon /> },
 ];
 
 export default function MeetingStage() {
