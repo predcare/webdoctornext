@@ -24,6 +24,12 @@ interface IMeetingStoreState {
   isMiniPlayer: boolean;
   doctorNotes: string;
 
+  // In-person appointment state
+  apptIdforInPerson: string | null;
+  patientIdforInPerson: string | null;
+  patientNameforInPerson: string | null;
+  statusforInPerson: string | null;
+
   // Actions
   setMeetingSession: (params: IMeetingSessionData) => void;
   setPatientInfo: (patient: IMeetingPatientInfo) => void;
@@ -38,6 +44,13 @@ interface IMeetingStoreState {
   setIsMiniPlayer: (isMiniPlayer: boolean) => void;
   setDoctorNotes: (notes: string) => void;
   resetMeetingStore: () => void;
+  clearInPersonAppointment: () => void;
+  setInPersonAppointment: (params: {
+    apptIdforInPerson?: string | null;
+    patientIdforInPerson?: string | null;
+    patientNameforInPerson?: string | null;
+    statusforInPerson?: string | null;
+  }) => void;
 }
 
 export const initialState = {
@@ -60,8 +73,16 @@ export const initialState = {
   doctorNotes: '',
 };
 
+const initialInPersonState = {
+  apptIdforInPerson: null as string | null,
+  patientIdforInPerson: null as string | null,
+  patientNameforInPerson: null as string | null,
+  statusforInPerson: null as string | null,
+};
+
 export const useMeetingStore = create<IMeetingStoreState>((set) => ({
   ...initialState,
+  ...initialInPersonState,
 
   setMeetingSession: ({
     token,
@@ -141,4 +162,24 @@ export const useMeetingStore = create<IMeetingStoreState>((set) => ({
   setDoctorNotes: (doctorNotes) => set({ doctorNotes }),
 
   resetMeetingStore: () => set({ ...initialState }),
+  clearInPersonAppointment: () =>
+    set({
+      apptIdforInPerson: null,
+      patientIdforInPerson: null,
+      patientNameforInPerson: null,
+      statusforInPerson: null,
+    }),
+
+  setInPersonAppointment: ({
+    apptIdforInPerson,
+    patientIdforInPerson,
+    patientNameforInPerson,
+    statusforInPerson,
+  }) =>
+    set({
+      apptIdforInPerson: apptIdforInPerson ?? null,
+      patientIdforInPerson: patientIdforInPerson ?? null,
+      patientNameforInPerson: patientNameforInPerson ?? null,
+      statusforInPerson: statusforInPerson ?? null,
+    }),
 }));
