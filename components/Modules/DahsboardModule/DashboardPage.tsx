@@ -75,7 +75,6 @@ export default function DashboardModulePage() {
                     />
                 ))}
             </DashboardStatsGrid>
-
             <TodayAppointmentsTable />
         </Box>
     );

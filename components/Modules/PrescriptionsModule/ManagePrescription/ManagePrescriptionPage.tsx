@@ -45,6 +45,7 @@ import { ManagePrescriptionWrapper } from '@/styles/CustomStyled/ManagePrescript
 import { UserRoles } from '@/typescripts/enums';
 import { useAuthStore } from '@/zustand/stores/useAuthStore';
 import { useLoadingStore } from '@/zustand/stores/useLoadingStore';
+import { useMeetingStore } from '@/zustand/stores/useMeetingStore';
 import { yupResolver } from '@hookform/resolvers/yup';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { IconButton } from '@mui/material';
@@ -123,6 +124,7 @@ export default function ManagePrescriptionPage({
   const followUpFields = followUpByTab[tab];
 
   const { showLoader, hideLoader } = useLoadingStore((state) => state);
+  const { apptIdforInPerson, clearInPersonAppointment } = useMeetingStore((state) => state);
 
   const currentPrescriptionId = useRef<number | null>(
     prescriptionId ? Number(prescriptionId) : null,
@@ -226,6 +228,8 @@ export default function ManagePrescriptionPage({
     status: 'draft' | 'completed' = 'draft',
   ): ICreatePrescriptionPayload => {
     const currentUser = useAuthStore.getState().userData;
+    const apptIdforInPerson = useMeetingStore.getState().apptIdforInPerson;
+    const clearInPersonAppointment = useMeetingStore.getState().clearInPersonAppointment;
     const clinicId = currentUser?.clinic?.id;
     const rx = prescriptionInfo?.data;
     const validMedications = _data?.medications?.filter(
@@ -244,7 +248,7 @@ export default function ManagePrescriptionPage({
       doctor_id: currentUser?.id || '',
       patient_id: patientId ?? rx?.patient_id ?? '',
       clinic_id: clinicId ?? rx?.clinic_id ?? '',
-      appointment_id: rx?.appointment_id ?? '',
+      appointment_id: rx?.appointment_id ?? apptIdforInPerson ?? '',
       type: UserRoles.DOCTOR,
       chief_complaints: _data?.chief_complaints,
       diagnosis: _data?.diagnosis,
@@ -312,6 +316,7 @@ export default function ManagePrescriptionPage({
             isSavingRef.current = false;
             setAutoSaveStatus('saved');
             setLastSavedAt(getFormattedTime());
+            clearInPersonAppointment();
           },
           onError: () => {
             isSavingRef.current = false;
@@ -340,6 +345,7 @@ export default function ManagePrescriptionPage({
           isSavingRef.current = false;
           setAutoSaveStatus('saved');
           setLastSavedAt(getFormattedTime());
+          clearInPersonAppointment();
         },
         onError: () => {
           isSavingRef.current = false;
@@ -383,6 +389,7 @@ export default function ManagePrescriptionPage({
             });
             showSuccessToast('Prescription completed successfully');
             hideLoader();
+            clearInPersonAppointment();
             router.push(projectRoutes.patientDetails(patientId));
           },
           onError: () => {
@@ -406,6 +413,7 @@ export default function ManagePrescriptionPage({
           });
           showSuccessToast('Prescription completed successfully');
           hideLoader();
+          clearInPersonAppointment();
           router.push(projectRoutes.patientDetails(patientId));
         },
         onError: () => {
@@ -447,6 +455,7 @@ export default function ManagePrescriptionPage({
             res?.message || "Prescription completed & sent to patient's email.",
           );
           hideLoader();
+          clearInPersonAppointment();
           router.push(projectRoutes.patientDetails(patientId));
         },
         onError: async (e: any) => {
@@ -491,6 +500,7 @@ export default function ManagePrescriptionPage({
           triggerEmailAndNavigate(
             createId || currentPrescriptionId.current || '',
           );
+          clearInPersonAppointment();
         },
         onError: () => {
           hideLoader();
