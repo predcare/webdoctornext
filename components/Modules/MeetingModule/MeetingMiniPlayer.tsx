@@ -4,6 +4,7 @@ import { resetMeetingAndGetSummaryPath } from '@/hooks/commons/meeting/meetingSe
 import { useMeetingCountdown } from '@/hooks/commons/meeting/useMeetingCountdown';
 import { useMeetingMedia } from '@/hooks/commons/meeting/useMeetingMedia';
 import { projectRoutes } from '@/routes';
+import { MeetingMiniPlayerShell } from '@/styles/CustomStyled/MeetingWrapper';
 import { useMeetingStore } from '@/zustand/stores/useMeetingStore';
 import CallEndIcon from '@mui/icons-material/CallEnd';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
@@ -11,16 +12,13 @@ import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import VideocamOffIcon from '@mui/icons-material/VideocamOff';
-import { Avatar, Box, IconButton, Tooltip } from '@mui/material';
-import { useMeeting, useParticipant } from '@videosdk.live/react-sdk';
+import { Avatar, IconButton, Tooltip } from '@mui/material';
+import { useMeeting, useParticipant, VideoPlayer } from '@videosdk.live/react-sdk';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 export default function MeetingMiniPlayer() {
-  // 1. States & Refs
-  const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // 2. Hooks
   const router = useRouter();
   const { leave } = useMeeting();
   const appointmentId = useMeetingStore((state) => state.appointmentId);
@@ -28,12 +26,12 @@ export default function MeetingMiniPlayer() {
   const remoteParticipantId = useMeetingStore((state) => state.remoteParticipantId);
 
   const participantData = useParticipant(remoteParticipantId || '');
-  const { webcamStream, webcamOn } = participantData || {};
+  const { webcamStream, webcamOn, setQuality } = participantData || {};
+  const webcamTrackId = webcamStream?.track?.id ?? null;
 
   const { isMicOn, isCameraOn, toggleMic, toggleCamera } = useMeetingMedia();
   const { formattedTime } = useMeetingCountdown();
 
-  // 3. useMemo & Functions
   const handleReturnToMeeting = () => {
     router.push(
       appointmentId
@@ -52,172 +50,74 @@ export default function MeetingMiniPlayer() {
     }
   };
 
-  // 4. useEffects
   useEffect(() => {
-    if (videoRef.current && webcamOn && webcamStream?.track) {
-      const mediaStream = new MediaStream([webcamStream.track]);
-      videoRef.current.srcObject = mediaStream;
-      videoRef.current.play().catch((e) => console.warn('Mini video play error:', e));
-    } else if (videoRef.current) {
-      videoRef.current.srcObject = null;
+    if (!remoteParticipantId || !webcamOn || !webcamTrackId || typeof setQuality !== 'function') {
+      return;
     }
-  }, [webcamStream, webcamOn]);
 
-  // 5. Render Guards & JSX
+    let cancelled = false;
+    setQuality('high').catch((error) => {
+      if (!cancelled) {
+        console.warn('Unable to request high remote video quality:', error);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [remoteParticipantId, webcamOn, webcamTrackId, setQuality]);
+
   return (
-    <Box
-      sx={{
-        position: 'fixed',
-        bottom: 24,
-        right: 24,
-        zIndex: 1400,
-        width: 260,
-        height: 160,
-        borderRadius: '16px',
-        overflow: 'hidden',
-        backgroundColor: '#0f172a',
-        boxShadow: '0 12px 36px rgba(0,0,0,0.4)',
-        border: '2px solid rgba(255,255,255,0.15)',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      {/* Top Header bar inside mini-player */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 8,
-          left: 8,
-          right: 8,
-          zIndex: 3,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Box
-          sx={{
-            px: 1,
-            py: 0.25,
-            borderRadius: '999px',
-            backgroundColor: 'rgba(0,0,0,0.6)',
-            color: '#ffffff',
-            fontSize: 11,
-            fontWeight: 700,
-          }}
-        >
-          {formattedTime}
-        </Box>
+    <MeetingMiniPlayerShell className="mini-player">
+      <div className="mini-top">
+        <span className="mini-timer">{formattedTime}</span>
         <Tooltip title="Maximize to Stage">
           <IconButton
+            className="mini-expand"
             size="small"
             onClick={handleReturnToMeeting}
-            sx={{
-              backgroundColor: 'rgba(0,0,0,0.6)',
-              color: '#ffffff',
-              '&:hover': { backgroundColor: 'rgba(0,0,0,0.85)' },
-            }}
           >
             <FullscreenIcon fontSize="small" />
           </IconButton>
         </Tooltip>
-      </Box>
+      </div>
 
-      {/* Video Content */}
-      <Box
-        sx={{
-          flex: 1,
-          width: '100%',
-          height: '100%',
-          position: 'relative',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#1e293b',
-        }}
-      >
-        {webcamOn && webcamStream?.track ? (
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+      <div className="mini-stage">
+        {webcamOn && remoteParticipantId ? (
+          <VideoPlayer
+            participantId={remoteParticipantId}
+            type="video"
+            className="mini-player-frame"
+            classNameVideo="mini-player-video"
           />
         ) : (
-          <Avatar
-            sx={{
-              width: 48,
-              height: 48,
-              bgcolor: '#0d9488',
-              fontSize: '1.25rem',
-              fontWeight: 700,
-            }}
-          >
+          <Avatar className="mini-avatar">
             {(patientInfo?.name || 'P').charAt(0).toUpperCase()}
           </Avatar>
         )}
-      </Box>
+      </div>
 
-      {/* Bottom Mini Control Bar */}
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: 6,
-          left: 0,
-          right: 0,
-          zIndex: 3,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 1,
-        }}
-      >
+      <div className="mini-controls">
         <IconButton
+          className={`mini-btn${isMicOn ? '' : ' is-off'}`}
           size="small"
           onClick={toggleMic}
-          sx={{
-            width: 28,
-            height: 28,
-            backgroundColor: isMicOn ? '#ffffff' : '#ef4444',
-            color: isMicOn ? '#0f172a' : '#ffffff',
-            '&:hover': { opacity: 0.9 },
-          }}
         >
-          {isMicOn ? <MicIcon sx={{ fontSize: 16 }} /> : <MicOffIcon sx={{ fontSize: 16 }} />}
+          {isMicOn ? <MicIcon /> : <MicOffIcon />}
         </IconButton>
 
         <IconButton
+          className={`mini-btn${isCameraOn ? '' : ' is-off'}`}
           size="small"
           onClick={toggleCamera}
-          sx={{
-            width: 28,
-            height: 28,
-            backgroundColor: isCameraOn ? '#ffffff' : '#ef4444',
-            color: isCameraOn ? '#0f172a' : '#ffffff',
-            '&:hover': { opacity: 0.9 },
-          }}
         >
-          {isCameraOn ? (
-            <VideocamIcon sx={{ fontSize: 16 }} />
-          ) : (
-            <VideocamOffIcon sx={{ fontSize: 16 }} />
-          )}
+          {isCameraOn ? <VideocamIcon /> : <VideocamOffIcon />}
         </IconButton>
 
-        <IconButton
-          size="small"
-          onClick={handleEndCall}
-          sx={{
-            width: 28,
-            height: 28,
-            backgroundColor: '#ef4444',
-            color: '#ffffff',
-            '&:hover': { backgroundColor: '#dc2626' },
-          }}
-        >
-          <CallEndIcon sx={{ fontSize: 16 }} />
+        <IconButton className="mini-btn end-call" size="small" onClick={handleEndCall}>
+          <CallEndIcon />
         </IconButton>
-      </Box>
-    </Box>
+      </div>
+    </MeetingMiniPlayerShell>
   );
 }

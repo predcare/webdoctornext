@@ -16,10 +16,8 @@ type TJoinVideoCallParams = {
 };
 
 export const useJoinVideoCall = () => {
-  // 1. States & Refs
   const [isJoining, setIsJoining] = useState(false);
 
-  // 2. Hooks
   const router = useRouter();
   const showLoader = useLoadingStore((state) => state.showLoader);
   const hideLoader = useLoadingStore((state) => state.hideLoader);
@@ -28,7 +26,6 @@ export const useJoinVideoCall = () => {
   const currentApptId = useMeetingStore((state) => state.appointmentId);
   const setMeetingSession = useMeetingStore((state) => state.setMeetingSession);
 
-  // 3. useMemo & Functions
   const joinVideoCall = useCallback(
     async ({
       appointmentId,

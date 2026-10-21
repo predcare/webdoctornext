@@ -70,7 +70,7 @@ Existing misspelled folders stay as they are unless the task is a dedicated rena
 
 ## 6. Component Internal Structure (Top-to-Bottom Order)
 
-Inside all page and feature components, maintain this order:
+Inside all page and feature components, maintain this order. Keep the order in the code. Do not add section comments such as `// 1. States & Refs`.
 
 1. **States & Refs**: `useState` and `useRef` always at the top.
 2. **Hooks**: Router (`useRouter`), stores (`zustand`), queries/mutations (`useQuery`, `useMutation`), forms (`useForm`).

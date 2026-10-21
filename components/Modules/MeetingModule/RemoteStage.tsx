@@ -1,9 +1,8 @@
 'use client';
 
-import { useMeetingStore } from '@/zustand/stores/useMeetingStore';
 import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import { Avatar, Box, CircularProgress, Typography } from '@mui/material';
-import { useParticipant } from '@videosdk.live/react-sdk';
+import { useParticipant, VideoPlayer } from '@videosdk.live/react-sdk';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 type RemoteStageProps = {
@@ -17,19 +16,14 @@ export default function RemoteStage({
   patientName,
   onNetworkQualityChange,
 }: RemoteStageProps) {
-  // 1. States & Refs
-  const videoRef = useRef<HTMLVideoElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [networkQuality, setNetworkQuality] = useState<'GOOD' | 'FAIR' | 'WEAK' | 'OFFLINE'>('GOOD');
 
-  // 2. Hooks
   const participantData = useParticipant(participantId || '');
-  const { webcamStream, micStream, webcamOn, micOn, getVideoStats } =
+  const { webcamStream, micStream, webcamOn, micOn, getVideoStats, setQuality } =
     participantData || {};
+  const webcamTrackId = webcamStream?.track?.id ?? null;
 
-  const callState = useMeetingStore((state) => state.callState);
-
-  // 3. useMemo & Functions
   const displayName = useMemo(() => {
     return (
       patientName ||
@@ -38,17 +32,22 @@ export default function RemoteStage({
     );
   }, [patientName, participantData?.displayName]);
 
-  // 4. useEffects
-  // Attach remote video track
   useEffect(() => {
-    if (videoRef.current && webcamOn && webcamStream?.track) {
-      const mediaStream = new MediaStream([webcamStream.track]);
-      videoRef.current.srcObject = mediaStream;
-      videoRef.current.play().catch((e) => console.warn('Video play interrupted:', e));
-    } else if (videoRef.current) {
-      videoRef.current.srcObject = null;
+    if (!participantId || !webcamOn || !webcamTrackId || typeof setQuality !== 'function') {
+      return;
     }
-  }, [webcamStream, webcamOn]);
+
+    let cancelled = false;
+    setQuality('high').catch((error) => {
+      if (!cancelled) {
+        console.warn('Unable to request high remote video quality:', error);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [participantId, webcamOn, webcamTrackId, setQuality]);
 
   // Attach remote audio track
   useEffect(() => {
@@ -96,85 +95,34 @@ export default function RemoteStage({
     return () => clearInterval(interval);
   }, [participantId, getVideoStats, onNetworkQualityChange]);
 
-  // 5. Render Guards & JSX
   return (
-    <Box
-      sx={{
-        position: 'absolute',
-        inset: 0,
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#0f172a',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Remote Audio output (invisible) */}
+    <Box className="remote-video">
       <audio ref={audioRef} autoPlay playsInline />
 
       {!participantId ? (
-        // Waiting for patient state
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 2,
-            color: '#f8fafc',
-            textAlign: 'center',
-            p: 3,
-          }}
-        >
-          <CircularProgress size={48} sx={{ color: '#0d9488' }} />
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+        <Box className="remote-waiting">
+          <CircularProgress className="remote-spinner" size={48} />
+          <Typography className="remote-waiting-title" component="p">
             Waiting for patient to join...
           </Typography>
-          <Typography variant="body2" sx={{ color: '#94a3b8', maxWidth: 360 }}>
+          <Typography className="remote-waiting-copy">
             {displayName} has been notified and will be connected as soon as they enter the room.
           </Typography>
         </Box>
       ) : !webcamOn ? (
-        // Patient camera is disabled
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 2,
-            color: '#f8fafc',
-            textAlign: 'center',
-          }}
-        >
-          <Avatar
-            sx={{
-              width: 96,
-              height: 96,
-              bgcolor: '#0d9488',
-              fontSize: '2.5rem',
-              fontWeight: 700,
-              boxShadow: '0 0 0 8px rgba(13, 148, 136, 0.2)',
-            }}
-          >
-            {displayName.charAt(0).toUpperCase()}
-          </Avatar>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#94a3b8' }}>
+        <Box className="remote-cam-off">
+          <Avatar className="remote-avatar">{displayName.charAt(0).toUpperCase()}</Avatar>
+          <Box className="remote-cam-note">
             <VideocamOffIcon fontSize="small" />
-            <Typography variant="body2">Patient&apos;s camera is turned off</Typography>
+            <Typography component="span">Patient&apos;s camera is turned off</Typography>
           </Box>
         </Box>
       ) : (
-        // Patient live video stream
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
+        <VideoPlayer
+          participantId={participantId}
+          type="video"
+          className="remote-player"
+          classNameVideo="remote-player-video"
         />
       )}
     </Box>

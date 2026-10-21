@@ -5,12 +5,10 @@ import { useMeeting } from '@videosdk.live/react-sdk';
 import { useCallback, useEffect, useState } from 'react';
 
 export const useMeetingMedia = () => {
-  // 1. States & Refs
   const [webcams, setWebcams] = useState<
     Array<{ deviceId: string; label: string }>
   >([]);
 
-  // 2. Hooks
   const {
     localMicOn,
     localWebcamOn,
@@ -31,7 +29,6 @@ export const useMeetingMedia = () => {
     (state) => state.setSelectedVideoDeviceId,
   );
 
-  // 3. useMemo & Functions
   const handleToggleMic = useCallback(() => {
     toggleMic();
     setMicState(!localMicOn);
@@ -54,7 +51,6 @@ export const useMeetingMedia = () => {
     [changeWebcam, setSelectedVideoDeviceId],
   );
 
-  // 4. useEffects
   useEffect(() => {
     let isMounted = true;
     getWebcams()
@@ -86,7 +82,6 @@ export const useMeetingMedia = () => {
     setCameraState,
   ]);
 
-  // 5. Render Guards & Return
   return {
     isMicOn: localMicOn ?? isMicOn,
     isCameraOn: localWebcamOn ?? isCameraOn,

@@ -1,6 +1,11 @@
 import GlobalBackdropLoader from '@/components/commons/BackdropLoader/GlobalBackdropLoader';
 import EventListener from '@/components/commons/EventListener/EventListener';
+import GlobalNoInternetBlocker from '@/components/commons/Network/GlobalNoInternetBlocker';
+import GlobalOfflineBanner from '@/components/commons/Network/GlobalOfflineBanner';
+import NetworkEventListener from '@/components/commons/Network/NetworkEventListener';
 import GlobalPopupAlert from '@/components/commons/PopupAlert/GlobalPopupAlert';
+import SocketListeners from '@/components/commons/Sockets/SocketListeners';
+import SocketProvider from '@/components/commons/Sockets/SocketProvider';
 import ReactQueryProvider from '@/components/Providers/ReactQueryProvider';
 import ProjectThemeProvider from '@/themes/ProjectThemeProvider';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
@@ -39,6 +44,11 @@ export default function RootLayout({
           <ProjectThemeProvider>
             <ReactQueryProvider>
               {children}
+              <SocketProvider />
+              <SocketListeners />
+              <NetworkEventListener />
+              <GlobalOfflineBanner />
+              <GlobalNoInternetBlocker />
               <GlobalBackdropLoader />
               <GlobalPopupAlert />
               <EventListener />

@@ -41,7 +41,7 @@ Cursor also loads the same constraints from `.cursor/rules/`.
 
 ## Component & Page Code Ordering Rules
 
-In all page and feature components, always organize internal declarations in this strict top-to-bottom sequence:
+In all page and feature components, always organize internal declarations in this strict top-to-bottom sequence. Keep the order in the code. Do not add section comments such as `// 1. States & Refs`.
 
 1. **States & Refs (Always at the very top)**
    - `useState` declarations

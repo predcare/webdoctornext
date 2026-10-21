@@ -5,28 +5,18 @@ import { getAuthToken } from '@/lib/commons/authToken';
 import { baseUrl } from '@/services/api/endpoints';
 import { useAuthStore } from '@/zustand/stores/useAuthStore';
 import { useSocketStore } from '@/zustand/stores/useSocketStore';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
-import SocketListeners from './SocketListeners';
 
-type SocketProviderProps = {
-  children?: React.ReactNode;
-};
-
-export default function SocketProvider({ children }: SocketProviderProps) {
-  // 1. States & Refs
+export default function SocketProvider() {
   const socketRef = useRef<Socket | null>(null);
 
-  // 2. Hooks
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
   const userId = useAuthStore((state) => state.userData?.id);
   const setSocket = useSocketStore((state) => state.setSocket);
   const setIsConnected = useSocketStore((state) => state.setIsConnected);
 
-  // 3. useMemo & Functions
-  // (none needed beyond effect cleanup)
 
-  // 4. useEffects
   useEffect(() => {
     if (!isLoggedIn) {
       if (socketRef.current) {
@@ -76,10 +66,5 @@ export default function SocketProvider({ children }: SocketProviderProps) {
     };
   }, [isLoggedIn, userId, setSocket, setIsConnected]);
 
-  return (
-    <>
-      <SocketListeners />
-      {children}
-    </>
-  );
+  return null;
 }

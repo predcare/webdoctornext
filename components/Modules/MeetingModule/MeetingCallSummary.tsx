@@ -4,6 +4,7 @@ import { useJoinVideoCall } from '@/hooks/commons/meeting/useJoinVideoCall';
 import { useMyAppointmentInfo } from '@/hooks/react-query/appointments/appointments.hooks';
 import { _toTitleCase, formatDate, formatTimeSlot, getAge } from '@/lib/commons/common.utils';
 import { projectRoutes } from '@/routes';
+import { MeetingWrapper } from '@/styles/CustomStyled/MeetingWrapper';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ListAltIcon from '@mui/icons-material/ListAlt';
@@ -23,10 +24,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 
 export default function MeetingCallSummary() {
-  // 1. States & Refs
-  // (none)
 
-  // 2. Hooks
   const router = useRouter();
   const searchParams = useSearchParams();
   const appointmentId = searchParams.get('appointmentId') || '';
@@ -37,7 +35,6 @@ export default function MeetingCallSummary() {
 
   const { joinVideoCall, isJoining } = useJoinVideoCall();
 
-  // 3. useMemo & Functions
   const canRejoin = useMemo(() => {
     if (!apptInfo) return false;
     const isVideo = apptInfo.consultation_type?.toLowerCase() === 'video';
@@ -65,27 +62,16 @@ export default function MeetingCallSummary() {
     router.push(projectRoutes.patients);
   };
 
-  // 4. useEffects
-  // (none)
-
-  // 5. Render Guards & JSX
   if (isLoading) {
     return (
-      <Box
-        sx={{
-          minHeight: '60vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 2,
-        }}
-      >
-        <CircularProgress size={40} sx={{ color: '#0d9488' }} />
-        <Typography variant="body2" color="text.secondary">
-          Loading consultation summary...
-        </Typography>
-      </Box>
+      <MeetingWrapper>
+        <Box className="summary-loading">
+          <CircularProgress className="summary-spinner" size={40} />
+          <Typography className="summary-identity-copy">
+            Loading consultation summary...
+          </Typography>
+        </Box>
+      </MeetingWrapper>
     );
   }
 
@@ -97,144 +83,96 @@ export default function MeetingCallSummary() {
   const gender = _toTitleCase(apptInfo?.patient?.gender || '') || 'N/A';
 
   return (
-    <Box
-      sx={{
-        maxWidth: 720,
-        mx: 'auto',
-        py: { xs: 3, md: 5 },
-        px: { xs: 2, sm: 3 },
-      }}
-    >
-      <Card
-        sx={{
-          borderRadius: 4,
-          boxShadow: '0 4px 20px rgba(15, 23, 42, 0.08)',
-          border: '1px solid #e2e8f0',
-          overflow: 'hidden',
-        }}
-      >
-        <Box
-          sx={{
-            py: 3,
-            px: 4,
-            backgroundColor: '#f0fdf4',
-            borderBottom: '1px solid #dcfce7',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
-          <CheckCircleOutlineIcon sx={{ fontSize: 36, color: '#16a34a' }} />
-          <Box>
-            <Typography variant="h6" sx={{ fontWeight: 700 }} color="#15803d">
-              Consultation Call Ended
-            </Typography>
-            <Typography variant="body2" color="#166534">
-              Your video consultation session has ended.
-            </Typography>
-          </Box>
-        </Box>
-
-        <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-          {/* Patient Details Header */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-            <Avatar
-              sx={{
-                width: 56,
-                height: 56,
-                bgcolor: '#0d9488',
-                fontSize: '1.5rem',
-                fontWeight: 700,
-              }}
-            >
-              {patientName.charAt(0).toUpperCase()}
-            </Avatar>
+    <MeetingWrapper>
+      <Box className="summary-page">
+        <Card className="summary-card">
+          <Box className="summary-banner">
+            <CheckCircleOutlineIcon className="summary-banner-icon" />
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                {patientName}
+              <Typography className="summary-banner-title" component="h2">
+                Consultation Call Ended
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Patient ID: {patientCode} &bull; {gender}, {age}
+              <Typography className="summary-banner-copy">
+                Your video consultation session has ended.
               </Typography>
             </Box>
           </Box>
 
-          <Divider sx={{ my: 2.5 }} />
+          <CardContent className="summary-body">
+            <Box className="summary-identity">
+              <Avatar className="summary-avatar">{patientName.charAt(0).toUpperCase()}</Avatar>
+              <Box>
+                <Typography className="summary-name" component="h3">
+                  {patientName}
+                </Typography>
+                <Typography className="summary-identity-copy">
+                  Patient ID: {patientCode} &bull; {gender}, {age}
+                </Typography>
+              </Box>
+            </Box>
 
-          {/* Appointment Meta Details */}
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 6, sm: 4 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                APPOINTMENT ID
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600, mt: 0.5 }}>
-                {apptInfo?.appointment_id || appointmentId || 'N/A'}
-              </Typography>
+            <Divider className="summary-divider" />
+
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 6, sm: 4 }}>
+                <Typography className="summary-meta-label">APPOINTMENT ID</Typography>
+                <Typography className="summary-meta-value">
+                  {apptInfo?.appointment_id || appointmentId || 'N/A'}
+                </Typography>
+              </Grid>
+              <Grid size={{ xs: 6, sm: 4 }}>
+                <Typography className="summary-meta-label">DATE</Typography>
+                <Typography className="summary-meta-value">
+                  {apptInfo?.appointment_date ? formatDate(apptInfo.appointment_date) : 'N/A'}
+                </Typography>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 4 }}>
+                <Typography className="summary-meta-label">TIME SLOT</Typography>
+                <Typography className="summary-meta-value">
+                  {formatTimeSlot(apptInfo?.start_time, apptInfo?.end_time) || 'N/A'}
+                </Typography>
+              </Grid>
             </Grid>
-            <Grid size={{ xs: 6, sm: 4 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                DATE
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600, mt: 0.5 }}>
-                {apptInfo?.appointment_date ? formatDate(apptInfo.appointment_date) : 'N/A'}
-              </Typography>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                TIME SLOT
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600, mt: 0.5 }}>
-                {formatTimeSlot(apptInfo?.start_time, apptInfo?.end_time) || 'N/A'}
-              </Typography>
-            </Grid>
-          </Grid>
 
-          <Divider sx={{ my: 3 }} />
+            <Divider className="summary-divider" />
 
-          {/* Action Buttons */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 2,
-              justifyContent: 'flex-end',
-            }}
-          >
-            <Button
-              variant="outlined"
-              color="inherit"
-              onClick={handleGoAppointments}
-              startIcon={<ListAltIcon />}
-              sx={{ borderRadius: 2 }}
-            >
-              Back to Appointments
-            </Button>
-
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={handleWritePrescription}
-              startIcon={<DescriptionOutlinedIcon />}
-              sx={{ borderRadius: 2 }}
-            >
-              Write Prescription
-            </Button>
-
-            {canRejoin && (
+            <Box className="summary-actions">
               <Button
-                variant="contained"
-                color="primary"
-                onClick={handleRejoin}
-                disabled={isJoining}
-                startIcon={<VideocamIcon />}
-                sx={{ borderRadius: 2 }}
+                className="summary-action"
+                variant="outlined"
+                color="inherit"
+                onClick={handleGoAppointments}
+                startIcon={<ListAltIcon />}
               >
-                {isJoining ? 'Rejoining...' : 'Rejoin Call'}
+                Back to Appointments
               </Button>
-            )}
-          </Box>
-        </CardContent>
-      </Card>
-    </Box>
+
+              <Button
+                className="summary-action"
+                variant="outlined"
+                color="primary"
+                onClick={handleWritePrescription}
+                startIcon={<DescriptionOutlinedIcon />}
+              >
+                Write Prescription
+              </Button>
+
+              {canRejoin && (
+                <Button
+                  className="summary-action"
+                  variant="contained"
+                  color="primary"
+                  onClick={handleRejoin}
+                  disabled={isJoining}
+                  startIcon={<VideocamIcon />}
+                >
+                  {isJoining ? 'Rejoining...' : 'Rejoin Call'}
+                </Button>
+              )}
+            </Box>
+          </CardContent>
+        </Card>
+      </Box>
+    </MeetingWrapper>
   );
 }

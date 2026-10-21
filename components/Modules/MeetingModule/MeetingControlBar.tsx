@@ -2,16 +2,18 @@
 
 import { resetMeetingAndGetSummaryPath } from '@/hooks/commons/meeting/meetingSessionLeave';
 import { useMeetingMedia } from '@/hooks/commons/meeting/useMeetingMedia';
-import { useMeeting } from '@videosdk.live/react-sdk';
+import { EndCallDialog, MeetingParticipantsPopover } from '@/styles/CustomStyled/MeetingWrapper';
 import CallEndIcon from '@mui/icons-material/CallEnd';
 import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import {
+  Badge,
   Box,
-  Dialog,
+  Button,
   DialogActions,
   DialogContent,
   DialogContentText,
@@ -20,19 +22,19 @@ import {
   Menu,
   MenuItem,
   Tooltip,
-  Button,
+  Typography,
 } from '@mui/material';
+import { useMeeting } from '@videosdk.live/react-sdk';
 import { useRouter } from 'next/navigation';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 export default function MeetingControlBar() {
-  // 1. States & Refs
   const [cameraAnchorEl, setCameraAnchorEl] = useState<null | HTMLElement>(null);
+  const [participantsAnchorEl, setParticipantsAnchorEl] = useState<null | HTMLElement>(null);
   const [isEndModalOpen, setIsEndModalOpen] = useState(false);
 
-  // 2. Hooks
   const router = useRouter();
-  const { leave } = useMeeting();
+  const { leave, participants, localParticipant } = useMeeting();
   const {
     isMicOn,
     isCameraOn,
@@ -44,7 +46,23 @@ export default function MeetingControlBar() {
     switchCamera,
   } = useMeetingMedia();
 
-  // 3. useMemo & Functions
+  const participantList = useMemo(
+    () => Array.from(participants?.values?.() ?? []),
+    [participants],
+  );
+  const participantCount = participants?.size ?? participantList.length;
+
+  const handleOpenParticipants = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      setParticipantsAnchorEl(event.currentTarget);
+    },
+    [],
+  );
+
+  const handleCloseParticipants = useCallback(() => {
+    setParticipantsAnchorEl(null);
+  }, []);
+
   const handleOpenEndModal = useCallback(() => {
     setIsEndModalOpen(true);
   }, []);
@@ -82,24 +100,15 @@ export default function MeetingControlBar() {
     [switchCamera, handleCameraMenuClose]
   );
 
-  // 4. useEffects
-  // (none)
-
-  // 5. Render Guards & JSX
   return (
     <>
       <Box className="control-bar">
         {/* Microphone Toggle */}
         <Tooltip title={isMicOn ? 'Mute Microphone' : 'Unmute Microphone'}>
           <IconButton
-            className="control-btn"
+            className={`control-btn${isMicOn ? '' : ' is-off'}`}
             onClick={toggleMic}
             aria-label={isMicOn ? 'Mute Microphone' : 'Unmute Microphone'}
-            sx={{
-              backgroundColor: isMicOn ? '#ffffff' : '#fef2f2 !important',
-              color: isMicOn ? '#334155' : '#ef4444 !important',
-              borderColor: isMicOn ? 'rgba(15, 23, 42, 0.06)' : '#fca5a5 !important',
-            }}
           >
             {isMicOn ? <MicIcon /> : <MicOffIcon />}
           </IconButton>
@@ -108,14 +117,9 @@ export default function MeetingControlBar() {
         {/* Camera Toggle */}
         <Tooltip title={isCameraOn ? 'Turn Camera Off' : 'Turn Camera On'}>
           <IconButton
-            className="control-btn"
+            className={`control-btn${isCameraOn ? '' : ' is-off'}`}
             onClick={toggleCamera}
             aria-label={isCameraOn ? 'Turn Camera Off' : 'Turn Camera On'}
-            sx={{
-              backgroundColor: isCameraOn ? '#ffffff' : '#fef2f2 !important',
-              color: isCameraOn ? '#334155' : '#ef4444 !important',
-              borderColor: isCameraOn ? 'rgba(15, 23, 42, 0.06)' : '#fca5a5 !important',
-            }}
           >
             {isCameraOn ? <VideocamIcon /> : <VideocamOffIcon />}
           </IconButton>
@@ -151,6 +155,61 @@ export default function MeetingControlBar() {
           </>
         )}
 
+        <Tooltip title="Participants">
+          <IconButton
+            className="control-btn"
+            onClick={handleOpenParticipants}
+            aria-label={`Participants, ${participantCount} joined`}
+          >
+            <Badge
+              className="participants-badge"
+              badgeContent={participantCount}
+              color="primary"
+              overlap="circular"
+            >
+              <PeopleAltOutlinedIcon />
+            </Badge>
+          </IconButton>
+        </Tooltip>
+        <MeetingParticipantsPopover
+          open={Boolean(participantsAnchorEl)}
+          anchorEl={participantsAnchorEl}
+          onClose={handleCloseParticipants}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Typography className="participants-title">
+            Participants ({participantCount})
+          </Typography>
+          {participantList.length === 0 ? (
+            <Typography className="participants-empty">No one has joined yet.</Typography>
+          ) : (
+            participantList.map((participant) => {
+              const isLocal = participant.id === localParticipant?.id;
+              return (
+                <Box className="participant-row" key={participant.id}>
+                  <Typography className="participant-name" noWrap>
+                    {participant.displayName || 'Participant'}
+                    {isLocal ? ' (You)' : ''}
+                  </Typography>
+                  <Box className="participant-media">
+                    {participant.micOn ? (
+                      <MicIcon />
+                    ) : (
+                      <MicOffIcon className="is-off" />
+                    )}
+                    {participant.webcamOn ? (
+                      <VideocamIcon />
+                    ) : (
+                      <VideocamOffIcon className="is-off" />
+                    )}
+                  </Box>
+                </Box>
+              );
+            })
+          )}
+        </MeetingParticipantsPopover>
+
         {/* End Call Button */}
         <Tooltip title="End Call">
           <IconButton
@@ -164,7 +223,7 @@ export default function MeetingControlBar() {
       </Box>
 
       {/* End Call Confirmation Dialog */}
-      <Dialog
+      <EndCallDialog
         open={isEndModalOpen}
         onClose={handleCloseEndModal}
         aria-labelledby="end-call-dialog-title"
@@ -176,7 +235,7 @@ export default function MeetingControlBar() {
             the post-consultation summary.
           </DialogContentText>
         </DialogContent>
-        <DialogActions sx={{ pb: 2, px: 3 }}>
+        <DialogActions>
           <Button onClick={handleCloseEndModal} color="inherit">
             Cancel
           </Button>
@@ -189,7 +248,7 @@ export default function MeetingControlBar() {
             Yes, End Call
           </Button>
         </DialogActions>
-      </Dialog>
+      </EndCallDialog>
     </>
   );
 }

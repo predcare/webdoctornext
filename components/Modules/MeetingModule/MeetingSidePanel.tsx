@@ -13,16 +13,12 @@ import { useRouter } from 'next/navigation';
 import { memo, useCallback, useMemo } from 'react';
 
 function MeetingSidePanel() {
-  // 1. States & Refs
-  // (none)
 
-  // 2. Hooks
   const router = useRouter();
   const patientInfo = useMeetingStore((state) => state.patientInfo);
   const doctorNotes = useMeetingStore((state) => state.doctorNotes);
   const setDoctorNotes = useMeetingStore((state) => state.setDoctorNotes);
 
-  // 3. useMemo & Functions
   const patientName = patientInfo?.name || 'Patient';
   const patientId = patientInfo?.alphanumericId || patientInfo?.id || 'N/A';
   const age = useMemo(() => {
@@ -52,10 +48,6 @@ function MeetingSidePanel() {
     [setDoctorNotes]
   );
 
-  // 4. useEffects
-  // (none)
-
-  // 5. Render Guards & JSX
   return (
     <Box className="side-panel">
       <Box className="panel-card profile-block">

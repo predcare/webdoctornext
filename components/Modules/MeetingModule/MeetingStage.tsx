@@ -2,33 +2,31 @@
 
 import { useMeetingCountdown } from '@/hooks/commons/meeting/useMeetingCountdown';
 import { useMeetingStore } from '@/zustand/stores/useMeetingStore';
+import { useNetworkStore } from '@/zustand/stores/useNetworkStore';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import HdIcon from '@mui/icons-material/Hd';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import SignalCellularAltIcon from '@mui/icons-material/SignalCellularAlt';
 import { Box, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import LocalVideoTile from './LocalVideoTile';
 import MeetingControlBar from './MeetingControlBar';
 import RemoteStage from './RemoteStage';
 
 export default function MeetingStage() {
-  // 1. States & Refs
   const [networkLabel, setNetworkLabel] = useState<string>('GOOD');
 
-  // 2. Hooks
   const patientInfo = useMeetingStore((state) => state.patientInfo);
-  const remoteParticipantId = useMeetingStore((state) => state.remoteParticipantId);
+  const remoteParticipantId = useMeetingStore(
+    (state) => state.remoteParticipantId,
+  );
+  const isOffline = useNetworkStore((state) => state.isOffline);
   const { formattedTime, isWarning, isUrgent } = useMeetingCountdown();
 
-  // 3. useMemo & Functions
   const patientDisplayName = patientInfo?.name || 'Patient';
+  const networkStatusLabel = isOffline ? 'OFFLINE' : networkLabel;
 
-  // 4. useEffects
-  // (none)
-
-  // 5. Render Guards & JSX
   return (
     <Box className="stage">
       <Box className="remote-feed">
@@ -42,14 +40,7 @@ export default function MeetingStage() {
         {/* Top Status Indicators */}
         <Box className="status-row">
           <Box
-            className={`status-pill timer ${isUrgent ? 'urgent' : isWarning ? 'warning' : ''}`}
-            sx={{
-              backgroundColor: isUrgent
-                ? '#dc2626 !important'
-                : isWarning
-                  ? '#d97706 !important'
-                  : undefined,
-            }}
+            className={`status-pill timer${isUrgent ? ' urgent' : isWarning ? ' warning' : ''}`}
           >
             <AccessTimeIcon />
             <span>{formattedTime}</span>
@@ -58,9 +49,9 @@ export default function MeetingStage() {
             <HdIcon />
             <span>HD</span>
           </Box>
-          <Box className="status-pill net">
+          <Box className={`status-pill net${isOffline ? ' offline' : ''}`}>
             <SignalCellularAltIcon />
-            <span>NET: {networkLabel}</span>
+            <span>NET: {networkStatusLabel}</span>
             <ArrowUpwardIcon className="net-arrow" />
           </Box>
           <Box className="status-pill encrypted">
@@ -73,8 +64,6 @@ export default function MeetingStage() {
         <Typography className="remote-name" component="p">
           {patientDisplayName}
         </Typography>
-
-        {/* Controls: Mute, Camera, Camera switch, End Call */}
         <MeetingControlBar />
       </Box>
 

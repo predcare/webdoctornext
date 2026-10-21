@@ -24,7 +24,6 @@ export default function MeetingPage({
   const meetingId = useMeetingStore((state) => state.meetingId);
   const setPatientInfo = useMeetingStore((state) => state.setPatientInfo);
 
-  // 3. useMemo & Functions
   const handleBackToAppointments = () => {
     router.push('/dashboard/appointments');
   };
@@ -47,42 +46,42 @@ export default function MeetingPage({
     }
   }, [initialPatient, patientId, setPatientInfo]);
 
-  // 5. Render Guards & JSX
+  useEffect(() => {
+    if (!token) return;
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [token]);
+
   if (!token || !meetingId) {
     return (
-      <Box
-        sx={{
-          minHeight: '60vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 2,
-          textAlign: 'center',
-          p: 3,
-        }}
-      >
-        <VideocamOffIcon sx={{ fontSize: 64, color: '#94a3b8' }} />
-        <Typography variant="h5" sx={{ fontWeight: 600 }} color="text.primary">
-          No Active Video Call Session
-        </Typography>
-        <Typography
-          variant="body1"
-          color="text.secondary"
-          sx={{ maxWidth: 420 }}
-        >
-          Please start or join your consultation directly from the Appointments
-          list.
-        </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleBackToAppointments}
-          sx={{ mt: 1, borderRadius: 2 }}
-        >
-          View Appointments
-        </Button>
-      </Box>
+      <MeetingWrapper>
+        <Box className="session-empty">
+          <VideocamOffIcon className="session-empty-icon" />
+          <Typography className="session-empty-title" component="h2">
+            No Active Video Call Session
+          </Typography>
+          <Typography className="session-empty-copy">
+            Please start or join your consultation directly from the Appointments
+            list.
+          </Typography>
+          <Button
+            className="session-empty-action"
+            variant="contained"
+            color="primary"
+            onClick={handleBackToAppointments}
+          >
+            View Appointments
+          </Button>
+        </Box>
+      </MeetingWrapper>
     );
   }
 

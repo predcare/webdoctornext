@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, styled } from '@mui/material';
+import { Box, Dialog, Popover, styled } from '@mui/material';
 
 const headerOffsetLg = 77;
 
@@ -63,6 +63,14 @@ export const MeetingWrapper = styled(Box)`
 
     &.timer {
       background: #6a4b16;
+
+      &.warning {
+        background: #d97706;
+      }
+
+      &.urgent {
+        background: #dc2626;
+      }
     }
 
     &.hd {
@@ -72,6 +80,10 @@ export const MeetingWrapper = styled(Box)`
     &.net,
     &.encrypted {
       background: #17803d;
+    }
+
+    &.net.offline {
+      background: ${({ theme }) => theme.palette.customColors.error};
     }
   }
 
@@ -139,41 +151,67 @@ export const MeetingWrapper = styled(Box)`
     }
   }
 
+  && .control-btn.is-off {
+    background: ${({ theme }) => theme.palette.customColors.errorBg};
+    color: ${({ theme }) => theme.palette.customColors.error};
+    border-color: ${({ theme }) => theme.palette.customColors.error};
+  }
+
+  .participants-badge .MuiBadge-badge {
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
   .local-tile {
     position: absolute;
     right: 12px;
     bottom: 68px;
-    z-index: 2;
+    z-index: 4;
     width: 120px;
     height: 78px;
-    border-radius: 10px;
+    border-radius: 12px;
     border: 2px solid #ffffff;
     overflow: hidden;
-    background: linear-gradient(180deg, #d5dee8 0%, #9aabbd 100%);
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
+    background: #1e293b;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.25);
+  }
 
-    &::before {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: 18px;
-      width: 26px;
-      height: 26px;
-      margin-left: -13px;
-      border-radius: 50%;
-      background: #6d7c8d;
-    }
+  .local-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+  }
 
-    &::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      bottom: -6px;
-      width: 64px;
-      height: 42px;
-      margin-left: -32px;
-      border-radius: 32px 32px 0 0;
-      background: #5c6b7c;
+  .local-camera-off {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: #334155;
+    color: #94a3b8;
+  }
+
+  .local-mute {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: ${({ theme }) => theme.palette.customColors.error};
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+    .MuiSvgIcon-root {
+      font-size: 13px;
     }
   }
 
@@ -383,6 +421,227 @@ export const MeetingWrapper = styled(Box)`
     }
   }
 
+  .session-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-height: 60vh;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .session-empty-icon.MuiSvgIcon-root {
+    font-size: 64px;
+    color: ${({ theme }) => theme.palette.customColors.textMuted};
+  }
+
+  .session-empty-title {
+    margin: 0;
+    color: ${({ theme }) => theme.palette.customColors.heading};
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  .session-empty-copy {
+    max-width: 420px;
+    margin: 0;
+    color: ${({ theme }) => theme.palette.customColors.textSecondary};
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .session-empty-action {
+    margin-top: 8px;
+    border-radius: 10px;
+  }
+
+  .remote-video {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #0f172a;
+  }
+
+  .remote-player,
+  .remote-player-video,
+  .mini-player-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #0f172a;
+  }
+
+  .remote-waiting,
+  .remote-cam-off {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    color: #f8fafc;
+    text-align: center;
+  }
+
+  .remote-waiting {
+    padding: 24px;
+  }
+
+  .remote-spinner.MuiCircularProgress-root {
+    color: ${({ theme }) => theme.palette.customColors.brandTeal};
+  }
+
+  .remote-waiting-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .remote-waiting-copy,
+  .remote-cam-note {
+    max-width: 360px;
+    margin: 0;
+    color: #94a3b8;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .remote-cam-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: none;
+  }
+
+  .remote-avatar.MuiAvatar-root {
+    width: 96px;
+    height: 96px;
+    background: ${({ theme }) => theme.palette.customColors.brandTeal};
+    font-size: 40px;
+    font-weight: 700;
+    box-shadow: 0 0 0 8px ${({ theme }) => theme.palette.customColors.brandTealLight};
+  }
+
+  .summary-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-height: 60vh;
+  }
+
+  .summary-spinner.MuiCircularProgress-root {
+    color: ${({ theme }) => theme.palette.customColors.brandTeal};
+  }
+
+  .summary-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  .summary-card.MuiPaper-root {
+    overflow: hidden;
+    border-radius: 16px;
+    background: ${({ theme }) => theme.palette.customColors.cardBg};
+    border: 1px solid ${({ theme }) => theme.palette.customColors.border};
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
+  }
+
+  .summary-banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 24px;
+    background: ${({ theme }) => theme.palette.customColors.successBg};
+    border-bottom: 1px solid ${({ theme }) => theme.palette.customColors.border};
+  }
+
+  .summary-banner-icon.MuiSvgIcon-root {
+    font-size: 36px;
+    color: ${({ theme }) => theme.palette.customColors.success};
+  }
+
+  .summary-banner-title {
+    margin: 0;
+    color: ${({ theme }) => theme.palette.customColors.success};
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .summary-banner-copy {
+    margin: 4px 0 0;
+    color: ${({ theme }) => theme.palette.customColors.success};
+    font-size: 14px;
+  }
+
+  .summary-body.MuiCardContent-root,
+  .summary-body.MuiCardContent-root:last-child {
+    padding: 24px;
+  }
+
+  .summary-identity {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .summary-avatar.MuiAvatar-root {
+    width: 56px;
+    height: 56px;
+    background: ${({ theme }) => theme.palette.customColors.brandTeal};
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .summary-name {
+    margin: 0;
+    color: ${({ theme }) => theme.palette.customColors.heading};
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .summary-identity-copy {
+    margin: 4px 0 0;
+    color: ${({ theme }) => theme.palette.customColors.textSecondary};
+    font-size: 14px;
+  }
+
+  .summary-divider {
+    margin: 20px 0;
+    border-color: ${({ theme }) => theme.palette.customColors.border};
+  }
+
+  .summary-meta-label {
+    color: ${({ theme }) => theme.palette.customColors.textSecondary};
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .summary-meta-value {
+    margin: 4px 0 0;
+    color: ${({ theme }) => theme.palette.customColors.heading};
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .summary-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: flex-end;
+  }
+
+  .summary-action {
+    border-radius: 10px;
+  }
+
   ${({ theme }) => theme.breakpoints.up('sm')} {
     .stage {
       min-height: 480px;
@@ -409,6 +668,16 @@ export const MeetingWrapper = styled(Box)`
       bottom: 76px;
       width: 156px;
       height: 100px;
+    }
+
+    .summary-page {
+      padding: 40px 24px;
+    }
+
+    .summary-body.MuiCardContent-root,
+    .summary-body.MuiCardContent-root:last-child,
+    .summary-banner {
+      padding: 32px;
     }
   }
 
@@ -456,5 +725,182 @@ export const MeetingWrapper = styled(Box)`
     .notes-block {
       margin-top: auto;
     }
+  }
+`;
+
+export const MeetingParticipantsPopover = styled(Popover)`
+  .MuiPopover-paper {
+    width: 280px;
+    max-width: calc(100vw - 32px);
+    margin-top: -8px;
+    padding: 12px;
+    border-radius: 16px;
+    background: ${({ theme }) => theme.palette.customColors.cardBg};
+    border: 1px solid ${({ theme }) => theme.palette.customColors.border};
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+  }
+
+  .participants-title {
+    margin: 0;
+    padding: 0 8px 8px;
+    color: ${({ theme }) => theme.palette.customColors.heading};
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .participants-empty {
+    margin: 0;
+    padding: 8px;
+    color: ${({ theme }) => theme.palette.customColors.textSecondary};
+    font-size: 14px;
+  }
+
+  .participant-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 8px;
+  }
+
+  .participant-name {
+    min-width: 0;
+    overflow: hidden;
+    color: ${({ theme }) => theme.palette.customColors.heading};
+    font-size: 14px;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .participant-media {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 4px;
+    color: ${({ theme }) => theme.palette.customColors.textSecondary};
+
+    .MuiSvgIcon-root {
+      font-size: 16px;
+    }
+
+    .is-off {
+      color: ${({ theme }) => theme.palette.customColors.error};
+    }
+  }
+`;
+
+export const EndCallDialog = styled(Dialog)`
+  .MuiDialogActions-root {
+    padding: 8px 24px 16px;
+  }
+`;
+
+export const MeetingMiniPlayerShell = styled(Box)`
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 1400;
+  display: flex;
+  flex-direction: column;
+  width: 260px;
+  height: 160px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  background: #0f172a;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+
+  .mini-top {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    left: 8px;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .mini-timer {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .mini-expand {
+    background: rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.85);
+    }
+  }
+
+  .mini-stage {
+    position: relative;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: #1e293b;
+  }
+
+  .mini-player-frame,
+  .mini-player-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #1e293b;
+  }
+
+  .mini-avatar.MuiAvatar-root {
+    width: 48px;
+    height: 48px;
+    background: ${({ theme }) => theme.palette.customColors.brandTeal};
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .mini-controls {
+    position: absolute;
+    right: 0;
+    bottom: 6px;
+    left: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .mini-btn.MuiIconButton-root {
+    width: 28px;
+    height: 28px;
+    background: #ffffff;
+    color: #0f172a;
+
+    .MuiSvgIcon-root {
+      font-size: 16px;
+    }
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  .mini-btn.is-off.MuiIconButton-root,
+  .mini-btn.end-call.MuiIconButton-root {
+    background: ${({ theme }) => theme.palette.customColors.error};
+    color: #ffffff;
+  }
+
+  .mini-btn.end-call.MuiIconButton-root:hover {
+    filter: brightness(0.94);
   }
 `;
