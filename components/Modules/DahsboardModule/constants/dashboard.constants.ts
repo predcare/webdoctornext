@@ -15,4 +15,5 @@ export const todayAppointmentsQueryParams: IMyApptQueryParams = {
   limit: 2,
   status: 'upcoming,pending',
   date_range: 'today',
+  consultation_type: 'video',
 };
