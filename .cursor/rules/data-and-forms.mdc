@@ -1,0 +1,14 @@
+---
+description: PredCare API client, React Query, forms, and Zustand
+alwaysApply: true
+---
+
+# Data and forms
+
+Follow `.agents/rules/data-and-forms.md`.
+
+- HTTP goes through `services/api/apiClient.ts`. Paths live in `services/api/endpoints.ts`. The interceptor already attaches auth, clinic id, toasts, and 401 handling.
+- Domain data is split into `hooks/react-query/<domain>/*.funcs.ts`, `*.hooks.ts`, and query key enums in `query.keys.ts`. Put params in the query key and `enabled` on id-scoped queries.
+- Forms use Yup schemas in `lib/schemas/`, `yupResolver`, `useForm` with `mode: 'onBlur'`, `Controller`, and `CommonErrorText`.
+- Client session, clinic, theme, loading, and alerts stay in the existing Zustand stores under `zustand/stores/`.
+- Entity types go in `typescripts/interfaces/`. Do not duplicate them inside components.
