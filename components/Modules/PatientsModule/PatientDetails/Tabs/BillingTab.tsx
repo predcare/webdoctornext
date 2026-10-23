@@ -96,19 +96,18 @@ function BillingTab({ patientId }: IBillingProps) {
                 <TableCell>
                   <Box
                     component="span"
-                    className={`tag ${
-                      ['cash'].includes((invoiceItem?.payment_mode || '').toLowerCase().trim())
-                        ? 'success'
-                        : ['card', 'pos', 'credit_card', 'debit_card'].includes(
-                            (invoiceItem?.payment_mode || '').toLowerCase().trim(),
-                          )
+                    className={`tag ${['cash'].includes((invoiceItem?.payment_mode || '').toLowerCase().trim())
+                      ? 'success'
+                      : ['card', 'pos', 'credit_card', 'debit_card'].includes(
+                        (invoiceItem?.payment_mode || '').toLowerCase().trim(),
+                      )
                         ? 'warning'
                         : ['razorpay', 'online', 'upi', 'netbanking'].includes(
-                            (invoiceItem?.payment_mode || '').toLowerCase().trim(),
-                          )
-                        ? 'teal'
-                        : 'neutral'
-                    }`}
+                          (invoiceItem?.payment_mode || '').toLowerCase().trim(),
+                        )
+                          ? 'teal'
+                          : 'neutral'
+                      }`}
                     sx={{
                       display: 'inline-flex',
                       alignItems: 'center',
