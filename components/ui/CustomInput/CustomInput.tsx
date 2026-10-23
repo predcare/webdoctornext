@@ -1,3 +1,5 @@
+'use client';
+
 import { InputLabel, styled } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';

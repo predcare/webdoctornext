@@ -400,3 +400,8 @@ export const shouldHideJoinForCallDuration = ({
   const used = Math.max(0, Number(callDurationSeconds || 0));
   return used >= allowed - CALL_NEAR_END_SECONDS;
 };
+
+export const _cleanParams = <T extends object>(params: T): Partial<T> =>
+  Object.fromEntries(
+    Object.entries(params).filter(([, value]) => value != null && value !== ''),
+  ) as Partial<T>;

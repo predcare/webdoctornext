@@ -18,6 +18,7 @@ import {
   uploadEmr,
 } from './patients.funcs';
 import {
+  IEmrPatientParams,
   IGetMyPatientConsultsInfiniteParams,
   ILinkExistingPatientPayload,
 } from './payload.interfaces';
@@ -83,10 +84,10 @@ export const useMyPatientInfo = (params?: { patientId?: number | string }) =>
     select: (v) => (!v?.data ? null : v.data),
   });
 
-export const useMyPatientEmrs = (params?: { patientId?: number | string }) =>
+export const useMyPatientEmrs = (params: IEmrPatientParams) =>
   useQuery({
     queryKey: [PatientsQueryKeys.EmrRecords, params],
-    queryFn: () => getMyPatientsEmrs(params?.patientId!),
+    queryFn: () => getMyPatientsEmrs(params),
     enabled: !!params?.patientId,
     select: (v) => {
       if (Array.isArray(v?.data)) return v.data;

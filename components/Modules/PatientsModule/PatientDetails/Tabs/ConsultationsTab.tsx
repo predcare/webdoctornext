@@ -24,7 +24,7 @@ function ConsultationsTab({ patientId }: ConsultationsTabProps) {
   const [page, setPage] = useState(1);
   const { data: ptConsults, isPending: ptConsultPending } =
     useMyPatientConsults({
-      limit: 10,
+      limit: 5,
       page,
       patientId,
       status: 'completed,confirmed,in-progress',

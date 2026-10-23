@@ -132,11 +132,13 @@ function UploadMedicalRecordModal({
 
   const onSubmit = (data: TEMRUploadFormValues) => {
     const formData = new FormData();
+    const clinicId = useAuthStore.getState().userData?.clinic?.id;
     if (data.file) formData.append('file', data.file);
     formData.append('title', data.title.trim());
     formData.append('document_type', data.category);
     formData.append('description', (data.notes || '').trim());
     formData.append('patient_id', String(patientId));
+    if (clinicId) formData.append('clinic_id', String(clinicId));
     if (userData?.id) formData.append('doctor_id', String(userData.id));
     formData.append(
       'visible_to_patient',

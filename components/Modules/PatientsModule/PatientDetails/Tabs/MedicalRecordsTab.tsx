@@ -5,7 +5,9 @@ import TabSectionCard from '@/components/Modules/PatientsModule/PatientDetails/C
 import MedicalRecordRow from '@/components/Modules/PatientsModule/PatientDetails/MedicalRecords/MedicalRecordRow';
 import UploadMedicalRecordModal from '@/components/Modules/PatientsModule/PatientDetails/Modal/UploadMedicalRecordModal';
 import { queryClient } from '@/components/Providers/ReactQueryProvider';
+import CustomInput from '@/components/ui/CustomInput/CustomInput';
 import CustomTable from '@/components/ui/CustomTable/CustomTable';
+import { useDebounce } from '@/hooks/commons/useDebounce';
 import {
   useMyPatientEmrs,
   useShareEmrDocument,
@@ -19,15 +21,16 @@ import {
 import { showInDevelopment, showSuccessToast } from '@/lib/commons/toast';
 import { PatientTabContentWrapper } from '@/styles/CustomStyled/PatientTabContentWrapper';
 import { useAlertStore } from '@/zustand/stores/useAlertStore';
+import CloseIcon from '@mui/icons-material/Close';
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import {
   Box,
-  Button,
+  IconButton,
   MenuItem,
   Select,
   TextField,
-  Typography,
+  Typography
 } from '@mui/material';
 import { memo, useState } from 'react';
 
@@ -50,12 +53,47 @@ function MedicalRecordsTab({ patientId }: IMedicalRecordProps) {
 
   const [updatingDocId, setUpdatingDocId] = useState<number | null>(null);
 
-  const { data: medicalRecords, isPending: medicalRecordsPending } =
-    useMyPatientEmrs({
-      patientId,
-    });
+  const [filterStates, setFilterStates] = useState({
+    search: '',
+    category: '',
+    startDate: '',
+    endDate: '',
+  });
+  const debounceSearch = useDebounce(filterStates.search, 500);
+
+  const {
+    data: medicalRecords,
+    isPending: medicalRecordsPending,
+    refetch,
+  } = useMyPatientEmrs({
+    patientId: patientId,
+    category: filterStates?.category || '',
+    endDate: filterStates?.endDate || '',
+    search: debounceSearch,
+    startDate: filterStates?.startDate || '',
+  });
   const { mutate: shareEmrDocument } = useShareEmrDocument();
   const showConfirm = useAlertStore((state) => state.showConfirm);
+
+  const hasActiveFilters = Boolean(
+    filterStates.search.trim() ||
+    (filterStates.category && filterStates.category !== 'all') ||
+    filterStates.startDate ||
+    filterStates.endDate,
+  );
+
+  const handleResetOrRefresh = async () => {
+    if (hasActiveFilters) {
+      setFilterStates({
+        search: '',
+        category: '',
+        startDate: '',
+        endDate: '',
+      });
+    } else {
+      await refetch();
+    }
+  };
 
   const handleToggleVisibility = (docId: number, visible: boolean) => {
     setUpdatingDocId(docId);
@@ -103,13 +141,26 @@ function MedicalRecordsTab({ patientId }: IMedicalRecordProps) {
             <TextField
               className="filter-input"
               placeholder="Search document title..."
+              value={filterStates.search}
+              onChange={(e) =>
+                setFilterStates((prev) => ({ ...prev, search: e.target.value }))
+              }
             />
           </Box>
           <Box className="filter-field">
             <Typography component="p" className="filter-label">
               Filter by Category
             </Typography>
-            <Select className="filter-select" defaultValue="all">
+            <Select
+              className="filter-select"
+              value={filterStates.category || 'all'}
+              onChange={(e) =>
+                setFilterStates((prev) => ({
+                  ...prev,
+                  category: e.target.value === 'all' ? '' : e.target.value,
+                }))
+              }
+            >
               <MenuItem value="all">All Categories</MenuItem>
               {EMR_RECORD_CATEGORIES.map((category) => (
                 <MenuItem key={category} value={category}>
@@ -122,22 +173,45 @@ function MedicalRecordsTab({ patientId }: IMedicalRecordProps) {
             <Typography component="p" className="filter-label">
               From Date
             </Typography>
-            <TextField className="filter-input" type="date" />
+            <CustomInput
+              className="filter-input"
+              type="date"
+              value={filterStates.startDate}
+              onChange={(e) =>
+                setFilterStates((prev) => ({
+                  ...prev,
+                  startDate: e.target.value,
+                }))
+              }
+            />
           </Box>
           <Box className="filter-field">
             <Typography component="p" className="filter-label">
               To Date
             </Typography>
-            <TextField className="filter-input" type="date" />
+            <TextField
+              className="filter-input"
+              type="date"
+              value={filterStates.endDate}
+              onChange={(e) =>
+                setFilterStates((prev) => ({
+                  ...prev,
+                  endDate: e.target.value,
+                }))
+              }
+            />
           </Box>
-          <Button
+          <IconButton
             className="reset-btn"
-            variant="contained"
-            disableElevation
-            aria-label="Reset filters"
+            aria-label={hasActiveFilters ? 'Clear filters' : 'Reset filters'}
+            onClick={handleResetOrRefresh}
           >
-            <RefreshIcon fontSize="small" />
-          </Button>
+            {hasActiveFilters ? (
+              <CloseIcon fontSize="small" />
+            ) : (
+              <RefreshIcon fontSize="small" />
+            )}
+          </IconButton>
         </Box>
 
         <CustomTable
@@ -177,11 +251,13 @@ function MedicalRecordsTab({ patientId }: IMedicalRecordProps) {
         </CustomTable>
       </TabSectionCard>
 
-      <UploadMedicalRecordModal
-        open={uploadMedicalRecordModalOpen}
-        patientId={patientId}
-        onClose={() => setUploadMedicalRecordModalOpen(false)}
-      />
+      {uploadMedicalRecordModalOpen && (
+        <UploadMedicalRecordModal
+          open={uploadMedicalRecordModalOpen}
+          patientId={patientId}
+          onClose={() => setUploadMedicalRecordModalOpen(false)}
+        />
+      )}
     </PatientTabContentWrapper>
   );
 }

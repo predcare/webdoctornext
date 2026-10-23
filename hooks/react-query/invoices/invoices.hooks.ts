@@ -15,7 +15,7 @@ export const useMPatientsInvoices = (params?: { doctorId?: number | string }) =>
     queryKey: [MyInvoices.PatientInvoices, params],
     queryFn: () => getMyPatientInvoices(params?.doctorId!),
     enabled: !!params?.doctorId,
-    select: v => v.data || (v as any).invoices,
+    select: (v) => v.data || (v as any).invoices,
   });
 
 export const useDownloadInvoicePdf = () =>
@@ -28,10 +28,12 @@ export const useInvoiceSettings = (params?: { doctorId?: number | string }) =>
     queryKey: [MyInvoices.InvoiceSettings, params],
     queryFn: () => getInvoiceSettings(params?.doctorId!),
     enabled: !!params?.doctorId,
-    select: v => v.settings,
+    select: (v) => v.settings,
   });
 
-export const useMyAllInvoices = (params?: Omit<IGetMyAllInvoicesParams, 'page'>) =>
+export const useMyAllInvoices = (
+  params?: Omit<IGetMyAllInvoicesParams, 'page'>,
+) =>
   useInfiniteQuery({
     queryKey: [MyInvoices.AllInvoices, params],
     queryFn: ({ pageParam = 1 }) =>
@@ -41,7 +43,7 @@ export const useMyAllInvoices = (params?: Omit<IGetMyAllInvoicesParams, 'page'>)
         limit: params?.limit ?? 10,
       }),
     initialPageParam: 1,
-    getNextPageParam: lastPage => {
+    getNextPageParam: (lastPage) => {
       if (lastPage?.meta?.hasNextPage) {
         return (lastPage.meta.page || 1) + 1;
       }
@@ -62,5 +64,5 @@ export const useInvoicesStats = (params?: {
   useQuery({
     queryKey: [MyInvoices.InvoicesStats, params],
     queryFn: () => getInvoicesStats(params as any),
-    select: v => v?.data,
+    select: (v) => v?.data,
   });

@@ -1,3 +1,4 @@
+import { _cleanParams } from '@/lib/commons/common.utils';
 import axiosInstance from '../../../services/api/apiClient';
 import { endpoints } from '../../../services/api/endpoints';
 import { IPatientConsultApptRoot } from '../../../typescripts/interfaces/appointments.interfaces';
@@ -14,6 +15,7 @@ import {
 import { IPatientPrescriptionDoc } from '../../../typescripts/interfaces/prescriptions.interfaces';
 import { IPatientEMRDoc } from '../../../typescripts/interfaces/profile.interfaces';
 import {
+  IEmrPatientParams,
   ILinkExistingPatientPayload,
   IUpdatePatientInfo,
 } from './payload.interfaces';
@@ -73,9 +75,16 @@ export const getMyPatientsInfo = async (patientId: number | string) => {
   return res.data;
 };
 
-export const getMyPatientsEmrs = async (patientId: number | string) => {
+export const getMyPatientsEmrs = async (params: IEmrPatientParams) => {
+  const queryParams = {
+    search: params?.search,
+    category: params?.category,
+    start_date: params?.startDate,
+    end_date: params?.endDate,
+  };
   const res = await axiosInstance.get<IRootResponse<IPatientEMRDoc[]>>(
-    `${endpoints.patients.emrRecords(patientId)}`,
+    `${endpoints.patients.emrRecords(params.patientId)}`,
+    { params: _cleanParams(queryParams) },
   );
   return res.data;
 };

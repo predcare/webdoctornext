@@ -25,3 +25,11 @@ export interface IGetMyPatientConsultsInfiniteParams {
   status?: string;
   limit?: number;
 }
+
+export interface IEmrPatientParams {
+  patientId: string | number;
+  search?: string;
+  category?: string;
+  startDate?: string;
+  endDate?: string;
+}
