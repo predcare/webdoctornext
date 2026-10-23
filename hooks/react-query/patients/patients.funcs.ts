@@ -37,7 +37,7 @@ export const getMyPatientsList = async (params?: IGetMyPatientsParams) => {
   const res = await axiosInstance.get<IRootResponse<IMyPatientDoc[]>>(
     `${endpoints.patients.get}`,
     {
-      params: queryParams,
+      params: _cleanParams(queryParams),
     },
   );
   return res.data;

@@ -23,6 +23,9 @@ import {
 } from '@mui/material';
 import { memo, useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+import { projectRoutes } from '@/routes';
+
 const headList = [
   'Invoice No.',
   'Type',
@@ -37,6 +40,7 @@ interface IBillingProps {
 }
 
 function BillingTab({ patientId }: IBillingProps) {
+  const router = useRouter();
   const [filterStates, setFilterStates] = useState({
     page: 1,
     limit: 5,
@@ -58,6 +62,7 @@ function BillingTab({ patientId }: IBillingProps) {
         title="Billing"
         icon={<ReceiptLongOutlinedIcon />}
         actionLabel="New Invoice"
+        actionOnClick={() => router.push(projectRoutes.createInvoice(patientId))}
       >
         <CustomTable
           className="tab-table"

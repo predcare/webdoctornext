@@ -7,6 +7,7 @@ import {
   IMyInvoiceListRoot,
   TInvoiceByPatientIdListRoot,
 } from '../../../typescripts/interfaces/invoices.interfaces';
+import { ICreateManualInvoicePayload } from './payload.interfaces';
 
 export const getMyPatientInvoices = async (doctorId: number | string) => {
   const res = await axiosInstance.get<IMyInvoiceListRoot>(
@@ -64,7 +65,7 @@ export const getMyAllInvoices = async (params: IGetMyAllInvoicesParams) => {
   return res.data;
 };
 
-export const createInvoices = async (body: any) => {
+export const createInvoices = async (body: ICreateManualInvoicePayload) => {
   const res = await axiosInstance.post<ICommonRoot>(
     `${endpoints.invoices.create}`,
     body,

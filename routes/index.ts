@@ -67,6 +67,11 @@ export const projectRoutes = {
     }
     return `/dashboard/prescriptions/manage?${params.toString()}`;
   },
+  invoices: '/dashboard/invoices',
+  createInvoice: (patientId?: string | number) =>
+    patientId
+      ? `/dashboard/invoices/create?patientId=${encodeUrlParam(patientId)}`
+      : '/dashboard/invoices/create',
 
   // Legal Pages
   privacyPolicy: '/privacy-policy',
