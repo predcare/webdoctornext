@@ -52,7 +52,7 @@ const patientTabs: PatientTab[] = [
     id: 'billing',
     label: 'Billing',
     icon: <ReceiptLongOutlinedIcon />,
-    render: () => <BillingTab />,
+    render: (_, patientId) => <BillingTab patientId={patientId || ''} />,
   },
   {
     id: 'family',
@@ -98,7 +98,7 @@ type PatientDetailTabsProps = {
 };
 
 function PatientDetailTabs({ patientInfo, patientId }: PatientDetailTabsProps) {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(3);
 
   const handleChange = (_event: SyntheticEvent, newValue: number) => {
     setValue(newValue);

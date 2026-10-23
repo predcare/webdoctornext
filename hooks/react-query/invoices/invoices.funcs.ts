@@ -2,28 +2,34 @@ import axiosInstance from '../../../services/api/apiClient';
 import { endpoints } from '../../../services/api/endpoints';
 import { ICommonRoot } from '../../../typescripts/interfaces/common.interfaces';
 import {
-    IInvoiceSettingRoot,
-    IInvoiceStatsRoot,
-    IMyInvoiceListRoot,
+  IInvoiceSettingRoot,
+  IInvoiceStatsRoot,
+  IMyInvoiceListRoot,
+  TInvoiceByPatientIdListRoot,
 } from '../../../typescripts/interfaces/invoices.interfaces';
 
 export const getMyPatientInvoices = async (doctorId: number | string) => {
   const res = await axiosInstance.get<IMyInvoiceListRoot>(
-    `${endpoints.invoices.patientInvoices}${doctorId}`
+    `${endpoints.invoices.patientInvoices}${doctorId}`,
   );
   return res.data;
 };
 
-export const getInvoicePdf = async (invoiceId: number | string): Promise<ArrayBuffer> => {
-  const res = await axiosInstance.get(endpoints.invoices.downloadPdf(invoiceId), {
-    responseType: 'arraybuffer',
-  });
+export const getInvoicePdf = async (
+  invoiceId: number | string,
+): Promise<ArrayBuffer> => {
+  const res = await axiosInstance.get(
+    endpoints.invoices.downloadPdf(invoiceId),
+    {
+      responseType: 'arraybuffer',
+    },
+  );
 
   return res.data as ArrayBuffer;
 };
 export const getInvoiceSettings = async (doctorId: number | string) => {
   const res = await axiosInstance.get<IInvoiceSettingRoot>(
-    `${endpoints.invoices.invoiceSettings}${doctorId}`
+    `${endpoints.invoices.invoiceSettings}${doctorId}`,
   );
   return res.data;
 };
@@ -49,14 +55,20 @@ export const getMyAllInvoices = async (params: IGetMyAllInvoicesParams) => {
     cleanParams.payment_status = params.payment_status.toLowerCase();
   }
 
-  const res = await axiosInstance.get<IMyInvoiceListRoot>(`${endpoints.invoices.getAll}`, {
-    params: cleanParams,
-  });
+  const res = await axiosInstance.get<IMyInvoiceListRoot>(
+    `${endpoints.invoices.getAll}`,
+    {
+      params: cleanParams,
+    },
+  );
   return res.data;
 };
 
 export const createInvoices = async (body: any) => {
-  const res = await axiosInstance.post<ICommonRoot>(`${endpoints.invoices.create}`, body);
+  const res = await axiosInstance.post<ICommonRoot>(
+    `${endpoints.invoices.create}`,
+    body,
+  );
   return res.data;
 };
 
@@ -65,6 +77,26 @@ export const getInvoicesStats = async (params: {
   end_date: string;
   start_date: string;
 }) => {
-  const res = await axiosInstance.get<IInvoiceStatsRoot>(`${endpoints.invoices.stats}`);
+  const res = await axiosInstance.get<IInvoiceStatsRoot>(
+    `${endpoints.invoices.stats}`,
+  );
+  return res.data;
+};
+
+// Get Patient Invoices
+export const getInvoicesByPatientId = async (params: {
+  patient_id: string;
+  page: number;
+  limit: number;
+}) => {
+  const res = await axiosInstance.get<TInvoiceByPatientIdListRoot>(
+    `${endpoints.invoices.getPatientInvoices(params.patient_id)}`,
+    {
+      params: {
+        page: params.page,
+        limit: params.limit,
+      },
+    },
+  );
   return res.data;
 };

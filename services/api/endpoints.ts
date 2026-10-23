@@ -93,6 +93,8 @@ export const endpoints = {
     invoiceSettings: '/doctor/invoices/settings/',
     create: '/invoices/manual',
     stats: '/invoices/stats',
+    getPatientInvoices: (patientId: string | number) =>
+      `/invoices/patient/${patientId}`,
   },
   prescritions: {
     create: '/prescriptions',

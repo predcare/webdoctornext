@@ -295,19 +295,21 @@ export const formatReviewText = (items: number, text: string): string => {
   }
 };
 
-export const formatNumberToShortForm = (num: number): string => {
-  if (num === null || num === undefined || isNaN(num)) return '0';
+export const _formatShortNum = (num: number | string): string => {
+  const numVal = Number(num);
 
-  const absNum = Math.abs(num);
+  if (numVal === null || numVal === undefined || isNaN(numVal)) return '0';
+
+  const absNum = Math.abs(numVal);
 
   if (absNum >= 1_000_000_000_000) {
-    return (num / 1_000_000_000_000).toFixed(1).replace(/\.0$/, '') + 'T';
+    return (numVal / 1_000_000_000_000).toFixed(1).replace(/\.0$/, '') + 'T';
   } else if (absNum >= 1_000_000_000) {
-    return (num / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + 'B';
+    return (numVal / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + 'B';
   } else if (absNum >= 1_000_000) {
-    return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+    return (numVal / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
   } else if (absNum >= 1_000) {
-    return (num / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+    return (numVal / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
   } else {
     return num.toString();
   }

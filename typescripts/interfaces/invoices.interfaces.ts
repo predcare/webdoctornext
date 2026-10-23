@@ -1,5 +1,6 @@
 import { IRootResponse } from './common.interfaces';
 export type IMyInvoiceListRoot = IRootResponse<IInvoiceDoc[]>;
+export type TInvoiceByPatientIdListRoot = IRootResponse<IInvoiceDoc[]>
 
 export type IInvoiceStatsRoot = IRootResponse<IInvoiceStatsDoc>;
 export interface IInvoiceItem {

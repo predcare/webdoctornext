@@ -3,6 +3,7 @@ import { MyInvoices } from '../query.keys';
 import {
   createInvoices,
   getInvoicePdf,
+  getInvoicesByPatientId,
   getInvoiceSettings,
   getInvoicesStats,
   getMyAllInvoices,
@@ -65,4 +66,16 @@ export const useInvoicesStats = (params?: {
     queryKey: [MyInvoices.InvoicesStats, params],
     queryFn: () => getInvoicesStats(params as any),
     select: (v) => v?.data,
+  });
+
+// Get Patient Invoices By Id
+export const useGetInvoicesByPatientId = (params: {
+  patient_id: string;
+  page: number;
+  limit: number;
+}) =>
+  useQuery({
+    queryKey: [MyInvoices.PatientInvoices, params],
+    queryFn: () => getInvoicesByPatientId(params),
+    enabled: !!params?.patient_id,
   });
