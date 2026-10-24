@@ -137,7 +137,7 @@ function CreateInvoicePage({ patientId }: ICreateInvoicePageProps) {
 
       const payload: ICreateManualInvoicePayload = {
         clinic_id: String(clinicId),
-        patient_id: String(data.patient_id || selectedPatient?.id || ''),
+        patient_id: String(selectedPatient?.user_id || ''),
         patient_name: selectedPatient?.name || '',
         patient_phone: selectedPatient?.phone_number || '',
         patient_email: selectedPatient?.email || '',
@@ -155,10 +155,10 @@ function CreateInvoicePage({ patientId }: ICreateInvoicePageProps) {
           if (res?.success) {
             showSuccessToast('Invoice generated successfully.');
           }
-          if (data.patient_id) {
-            router.push(projectRoutes.patientDetails(data.patient_id));
+          if (selectedPatient?.id) {
+            router.push(projectRoutes.patientDetails(selectedPatient?.user_id));
           } else {
-            router.push(projectRoutes.dashboard);
+            router.push(projectRoutes.patients);
           }
         },
       });

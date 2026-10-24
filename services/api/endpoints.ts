@@ -135,6 +135,7 @@ export const successEndpoints = [
   endpoints?.patients?.linkExisting,
   endpoints?.patients?.newCreate,
   endpoints?.invoices?.invoiceSettings,
+  endpoints?.invoices?.create,
 ];
 
 export const exclude401Routes = [
