@@ -75,9 +75,6 @@ export default function InvoiceSettingsSection() {
     const formData = new FormData();
     const clinicId = useAuthStore.getState().userData?.clinic?.id;
     if (!clinicId) return showErrorToast('Clinic not found');
-    if (clinicId) {
-      formData.append('clinic_id', String(clinicId));
-    }
 
     formData.append('header_type', data.header_type);
     if (data.header_type === 'html') {

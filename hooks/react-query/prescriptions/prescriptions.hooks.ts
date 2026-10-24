@@ -11,8 +11,10 @@ import {
   getAllPrescriptionsForDoctor,
   getPrescriptionByApptID,
   getPrescriptionDetails,
+  getPrescriptionSettings,
   resendPrescriptionEmail,
   updatePrescription,
+  updatePrescriptionSettings,
 } from './prescriptions.funcs';
 
 export const useCreatePrescription = () => {
@@ -103,5 +105,22 @@ export const useGetPrescriptionByApptID = (params: {
     queryFn: () => getPrescriptionByApptID(params?.appointmentId),
     enabled: !!params?.appointmentId,
     select: (v) => v.data,
+  });
+};
+
+// Get Presciption Settings Hook
+export const useGetPrescriptionSettings = () => {
+  return useQuery({
+    queryKey: [PrescriptionQueryKeys.GetPresciptionSettings],
+    queryFn: () => getPrescriptionSettings(),
+    select: (v) => v?.data,
+  });
+};
+
+// Update Presciption Settings Hook
+export const useUpdatePrescriptionSettings = () => {
+  return useMutation({
+    mutationKey: [PrescriptionQueryKeys.UpdatePresciptionSettings],
+    mutationFn: (body: FormData) => updatePrescriptionSettings(body),
   });
 };

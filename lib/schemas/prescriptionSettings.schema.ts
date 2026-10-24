@@ -1,15 +1,27 @@
 import * as yup from 'yup';
 
 export const PrescriptionSettingsSchema = yup.object().shape({
-  clinic_name: yup.string().optional().nullable(),
-  clinic_address: yup.string().optional().nullable(),
-  clinic_phone: yup.string().optional().nullable(),
-  clinic_email: yup.string().optional().nullable(),
-  reg_no: yup.string().optional().nullable(),
+  clinic_id: yup.string().optional().nullable(),
+  header_type: yup
+    .string()
+    .oneOf(['default', 'html', 'image'])
+    .default('default')
+    .required(),
   header_text: yup.string().optional().nullable(),
+  header_image: yup.mixed<File>().optional().nullable(),
+  footer_type: yup
+    .string()
+    .oneOf(['default', 'html', 'image'])
+    .default('default')
+    .required(),
   footer_text: yup.string().optional().nullable(),
-  sig_mode: yup.string().oneOf(['upload', 'generated']).default('upload'),
-  typed_name: yup.string().optional().nullable(),
+  footer_image: yup.mixed<File>().optional().nullable(),
+  signature_mode: yup
+    .string()
+    .oneOf(['upload', 'none'])
+    .default('upload')
+    .required(),
+  signature_image: yup.mixed<File>().optional().nullable(),
 });
 
 export type TPrescriptionSettingsSchemaType = yup.InferType<

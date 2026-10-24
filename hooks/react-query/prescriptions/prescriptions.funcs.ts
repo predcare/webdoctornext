@@ -5,7 +5,10 @@ import {
   ICommonRoot,
   IRootResponse,
 } from '../../../typescripts/interfaces/common.interfaces';
-import { IPatientPrescriptionDoc } from '../../../typescripts/interfaces/prescriptions.interfaces';
+import {
+  IPatientPrescriptionDoc,
+  TPrescriptionSettingRoot,
+} from '../../../typescripts/interfaces/prescriptions.interfaces';
 import {
   ICreatePrescriptionPayload,
   IGetDoctorPrescriptionsParams,
@@ -105,6 +108,23 @@ export const getPrescriptionByApptID = async (
 ) => {
   const res = await axiosInstance.get<IRootResponse<IPatientPrescriptionDoc[]>>(
     endpoints.prescritions.getPrescriptionsByAppointment(appointmentId),
+  );
+  return res.data;
+};
+
+// Get Presciption Settings
+export const getPrescriptionSettings = async () => {
+  const res = await axiosInstance.get<TPrescriptionSettingRoot>(
+    endpoints.prescritions.prescriptionSettings,
+  );
+  return res.data;
+};
+
+// Update Presciption Settings
+export const updatePrescriptionSettings = async (body: FormData) => {
+  const res = await axiosInstance.put<ICommonRoot>(
+    endpoints.prescritions.prescriptionSettings,
+    body,
   );
   return res.data;
 };

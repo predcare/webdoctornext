@@ -99,6 +99,7 @@ export const endpoints = {
   prescritions: {
     create: '/prescriptions',
     getAll: `/prescriptions/doc-my-prescriptions`,
+    prescriptionSettings: '/doctor-prescriptions/settings',
     update: (id: string | number) => `/prescriptions/${id}`,
     upsertDraft: (id?: string | number) =>
       id
@@ -136,6 +137,7 @@ export const successEndpoints = [
   endpoints?.patients?.newCreate,
   endpoints?.invoices?.invoiceSettings,
   endpoints?.invoices?.create,
+  endpoints?.prescritions?.prescriptionSettings,
 ];
 
 export const exclude401Routes = [

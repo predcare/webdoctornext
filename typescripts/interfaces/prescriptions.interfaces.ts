@@ -1,3 +1,5 @@
+import { IRootResponse } from './common.interfaces';
+
 export interface IPatientPrescriptionListRoot {
   success: boolean;
   count: number;
@@ -8,6 +10,7 @@ export interface IPatientPrescriptionInfoRoot {
   success: boolean;
   prescription: IPatientPrescriptionDoc;
 }
+export type TPrescriptionSettingRoot = IRootResponse<IPrescriptionSetttingDoc>;
 
 export interface IPatientPrescriptionDoc {
   id: number;
@@ -113,4 +116,29 @@ export interface IPatientLabTest {
   text?: string;
   name?: string;
   instructions?: string;
+}
+
+export interface IPrescriptionSetttingDoc {
+  id: string;
+  doctor_id: string;
+  clinic_id: string;
+  clinic_name: string;
+  clinic_address: string;
+  clinic_phone: string;
+  clinic_email: string;
+  reg_no: string;
+  gstin: string;
+  header_text: any;
+  header_type: string;
+  header_image_path: any;
+  header_image_url: any;
+  footer_text: any;
+  footer_type: string;
+  footer_image_path: any;
+  footer_image_url: any;
+  signature_image_path: any;
+  signature_image_url: any;
+  signature_mode: string;
+  created_at: string;
+  updated_at: string;
 }
