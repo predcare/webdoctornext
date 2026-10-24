@@ -144,6 +144,7 @@ export interface IMyClinic {
   created_at?: string;
   updated_at?: string;
   email?: string;
+  clinic_gstin?: string;
 }
 
 export interface IMyClinicsDoc {

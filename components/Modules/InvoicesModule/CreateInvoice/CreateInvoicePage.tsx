@@ -145,7 +145,7 @@ function CreateInvoicePage({ patientId }: ICreateInvoicePageProps) {
         invoice_date: "",
         payment_mode: data.paymentMode,
         payment_status: data.paymentStatus?.toLowerCase() || 'unpaid',
-        gst_type: 'CGST_SGST',
+        gst_type: '',
         items: formattedItems,
         notes: data.notes || '',
       };

@@ -38,6 +38,12 @@ export const CreateInvoiceWrapper = styled(Box)`
     gap: 20px;
     align-items: stretch;
 
+    .invoice-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
     @media (max-width: 900px) {
       grid-template-columns: 1fr;
     }
@@ -129,7 +135,7 @@ export const CreateInvoiceWrapper = styled(Box)`
     display: flex;
     flex-direction: column;
     gap: 16px;
-    height: 100%;
+    flex: 1;
     justify-content: space-between;
 
     .status-select-wrap {
@@ -148,7 +154,8 @@ export const CreateInvoiceWrapper = styled(Box)`
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-top: 12px;
+      padding-top: 14px;
+      margin-top: auto;
       border-top: 1px solid ${({ theme }) => theme.palette.customColors.border};
       font-size: 12px;
       color: ${({ theme }) => theme.palette.customColors.textSecondary};
@@ -156,10 +163,11 @@ export const CreateInvoiceWrapper = styled(Box)`
       .meta-item {
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 3px;
 
         .meta-val {
           font-weight: 700;
+          font-size: 13px;
           color: ${({ theme }) => theme.palette.customColors.heading};
         }
       }
@@ -179,7 +187,9 @@ export const CreateInvoiceWrapper = styled(Box)`
         background: ${({ theme }) => theme.palette.customColors.pageBg};
         color: ${({ theme }) => theme.palette.customColors.textSecondary};
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
         padding: 10px 12px;
         text-align: left;
         border-bottom: 1px solid ${({ theme }) => theme.palette.customColors.border};
@@ -191,9 +201,13 @@ export const CreateInvoiceWrapper = styled(Box)`
       }
 
       td {
-        padding: 10px 8px;
+        padding: 12px 8px;
         border-bottom: 1px solid ${({ theme }) => theme.palette.customColors.border};
         vertical-align: top;
+      }
+
+      tr:hover td {
+        background: rgba(15, 118, 110, 0.015);
       }
     }
 
@@ -208,15 +222,16 @@ export const CreateInvoiceWrapper = styled(Box)`
       display: flex;
       align-items: center;
       gap: 6px;
-      min-width: 130px;
+      min-width: 140px;
     }
 
     .calc-val {
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 13.5px;
+      font-weight: 700;
       color: ${({ theme }) => theme.palette.customColors.heading};
       white-space: nowrap;
       padding-top: 10px;
+      display: block;
     }
   }
 

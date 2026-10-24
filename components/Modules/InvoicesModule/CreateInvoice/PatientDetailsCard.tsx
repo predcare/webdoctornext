@@ -12,7 +12,7 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { Avatar, Box, Typography } from '@mui/material';
-import { memo, useMemo, useState } from 'react';
+import { memo, useLayoutEffect, useMemo, useState } from 'react';
 
 interface PatientDetailsCardProps {
   patientId?: string;
@@ -64,6 +64,17 @@ function PatientDetailsCard({
       .filter(Boolean)
       .join(', ');
   }, [selectedPatient]);
+
+  useLayoutEffect(() => {
+    if (patientId && !selectedPatient) {
+      const patient = patientOptions.find(
+        (p) => String(p.user_id) === patientId,
+      );
+      if (patient) {
+        onSelectPatient(patient);
+      }
+    }
+  }, [patientId, patientOptions]);
 
   return (
     <Box className="invoice-card">
@@ -161,14 +172,16 @@ function PatientDetailsCard({
                 </span>
               ) : null}
             </Box>
-            <Box
-              component="span"
-              className="clear-patient-btn"
-              onClick={handleClearPatient}
-              title="Remove patient"
-            >
-              <CloseIcon sx={{ fontSize: 18 }} />
-            </Box>
+            {!patientId && (
+              <Box
+                component="span"
+                className="clear-patient-btn"
+                onClick={handleClearPatient}
+                title="Remove patient"
+              >
+                <CloseIcon sx={{ fontSize: 18 }} />
+              </Box>
+            )}
           </Box>
 
           <Box className="patient-details-line">

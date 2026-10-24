@@ -1,7 +1,10 @@
 'use client';
 
-import CustomSelect, { TSelectOption } from '@/components/ui/CustomSelect/CustomSelect';
+import CustomSelect, {
+  TSelectOption,
+} from '@/components/ui/CustomSelect/CustomSelect';
 import { TCreateInvoiceSchemaType } from '@/lib/schemas/createInvoice.schema';
+import { useAuthStore } from '@/zustand/stores/useAuthStore';
 import { Box, Typography } from '@mui/material';
 import { memo } from 'react';
 import { Control, Controller } from 'react-hook-form';
@@ -16,8 +19,7 @@ interface PaymentStatusCardProps {
 }
 
 function PaymentStatusCard({ control }: PaymentStatusCardProps) {
-  const clinicGstin = 'GST12348';
-  const regNumber = 'CRN78909';
+  const { userData } = useAuthStore((state) => state);
 
   return (
     <Box className="invoice-card">
@@ -49,11 +51,15 @@ function PaymentStatusCard({ control }: PaymentStatusCardProps) {
         <Box className="clinic-meta-row">
           <Box className="meta-item">
             <span>Clinic GSTIN</span>
-            <span className="meta-val">{clinicGstin}</span>
+            <span className="meta-val">
+              {userData?.clinic?.clinic_gstin || 'N/A'}
+            </span>
           </Box>
           <Box className="meta-item" sx={{ textAlign: 'right' }}>
             <span>Reg. Number</span>
-            <span className="meta-val">{regNumber}</span>
+            <span className="meta-val">
+              {userData?.clinic?.clinic_reg_number || 'N/A'}
+            </span>
           </Box>
         </Box>
       </Box>

@@ -123,6 +123,7 @@ export const sideNavItems: SideNavItem[] = [
     name: 'Settings',
     icon: 'settings',
     section: 'footer',
+    href: projectRoutes.profile,
   },
   {
     id: 'help',
