@@ -5,6 +5,7 @@ import TodayAppointmentsTable from '@/components/Modules/DahsboardModule/TodayAp
 import StatCard from '@/components/ui/StatCard/StatCard';
 import useStatIcons from '@/components/ui/StatCard/useStatIcons';
 import { useDoctorStats } from '@/hooks/react-query/stats/stats.hooks';
+import { _formatShortNum } from '@/lib/commons/common.utils';
 import { DashboardStatsGrid } from '@/styles/CustomStyled/StatCardWrapper';
 import { useAuthStore } from '@/zustand/stores/useAuthStore';
 import { Box } from '@mui/material';
@@ -47,11 +48,7 @@ export default function DashboardModulePage() {
             {
                 id: 'billed',
                 title: 'Billed Amount',
-                value: new Intl.NumberFormat('en-IN', {
-                    style: 'currency',
-                    currency: statsInfo?.currency || 'INR',
-                    maximumFractionDigits: 0,
-                }).format(statsInfo?.earnings ?? 0),
+                value: _formatShortNum(statsInfo?.earnings || 0),
                 period: 'Monthly',
                 icon: 'billing',
                 tone: 'success',
