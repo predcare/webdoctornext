@@ -446,6 +446,7 @@ export const ProfileWrapper = styled(Box)`
 
   .mode-block:has(input[value='default']:checked) .mode-default,
   .mode-block:has(input[value='editor']:checked) .mode-editor,
+  .mode-block:has(input[value='html']:checked) .mode-editor,
   .mode-block:has(input[value='image']:checked) .mode-image {
     display: flex;
   }

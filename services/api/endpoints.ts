@@ -90,7 +90,7 @@ export const endpoints = {
     patientInvoices: '/doctor/invoices/doctor/',
     downloadPdf: (invoiceId: number | string) =>
       `/doctor/invoices/${invoiceId}/pdf`,
-    invoiceSettings: '/doctor/invoices/settings/',
+    invoiceSettings: '/invoices/settings',
     create: '/invoices/manual',
     stats: '/invoices/stats',
     getPatientInvoices: (patientId: string | number) =>
@@ -134,6 +134,7 @@ export const successEndpoints = [
   endpoints?.patients?.patientUpdate,
   endpoints?.patients?.linkExisting,
   endpoints?.patients?.newCreate,
+  endpoints?.invoices?.invoiceSettings,
 ];
 
 export const exclude401Routes = [

@@ -15,8 +15,10 @@ type CustomRadioProps = {
   value: string;
   label: string;
   icon?: ReactNode;
+  checked?: boolean;
   defaultChecked?: boolean;
   disabled?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 export function CustomRadio({
@@ -24,8 +26,10 @@ export function CustomRadio({
   value,
   label,
   icon,
-  defaultChecked = false,
+  checked,
+  defaultChecked,
   disabled = false,
+  onChange,
 }: CustomRadioProps) {
   return (
     <label className={disabled ? 'radio-option is-disabled' : 'radio-option'}>
@@ -33,8 +37,10 @@ export function CustomRadio({
         type="radio"
         name={name}
         value={value}
+        checked={checked}
         defaultChecked={defaultChecked}
         disabled={disabled}
+        onChange={onChange}
       />
       {icon}
       <span>{label}</span>
@@ -45,7 +51,9 @@ export function CustomRadio({
 type CustomRadioGroupProps = {
   name: string;
   options: CustomRadioOption[];
+  value?: string;
   defaultValue?: string;
+  onChange?: (value: string) => void;
   ariaLabel: string;
   variant?: 'segmented' | 'choice';
   disabled?: boolean;
@@ -54,11 +62,15 @@ type CustomRadioGroupProps = {
 export default function CustomRadioGroup({
   name,
   options,
+  value,
   defaultValue,
+  onChange,
   ariaLabel,
   variant = 'choice',
   disabled = false,
 }: CustomRadioGroupProps) {
+  const isControlled = value !== undefined;
+
   return (
     <CustomRadioWrapper
       className={variant === 'segmented' ? 'is-segmented' : 'is-choice'}
@@ -72,8 +84,10 @@ export default function CustomRadioGroup({
           value={option.value}
           label={option.label}
           icon={option.icon}
-          defaultChecked={option.value === defaultValue}
+          checked={isControlled ? option.value === value : undefined}
+          defaultChecked={!isControlled ? option.value === defaultValue : undefined}
           disabled={disabled || option.disabled}
+          onChange={() => onChange?.(option.value)}
         />
       ))}
     </CustomRadioWrapper>

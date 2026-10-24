@@ -2,6 +2,7 @@ import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import { MyInvoices } from '../query.keys';
 import {
   createInvoices,
+  createInvoiceSettings,
   getInvoicePdf,
   getInvoicesByPatientId,
   getInvoiceSettings,
@@ -24,12 +25,11 @@ export const useDownloadInvoicePdf = () =>
     mutationFn: (invoiceId: number | string) => getInvoicePdf(invoiceId),
   });
 
-export const useInvoiceSettings = (params?: { doctorId?: number | string }) =>
+export const useInvoiceSettings = () =>
   useQuery({
-    queryKey: [MyInvoices.InvoiceSettings, params],
-    queryFn: () => getInvoiceSettings(params?.doctorId!),
-    enabled: !!params?.doctorId,
-    select: (v) => v.settings,
+    queryKey: [MyInvoices.InvoiceSettings],
+    queryFn: () => getInvoiceSettings(),
+    select: (v) => v.data,
   });
 
 export const useMyAllInvoices = (
@@ -79,3 +79,10 @@ export const useGetInvoicesByPatientId = (params: {
     queryFn: () => getInvoicesByPatientId(params),
     enabled: !!params?.patient_id,
   });
+
+// Create / Update Invoice Settings
+export const useCreateInvoiceSettings = () => {
+  return useMutation({
+    mutationFn: createInvoiceSettings,
+  });
+};

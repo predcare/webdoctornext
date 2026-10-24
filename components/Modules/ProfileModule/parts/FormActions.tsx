@@ -2,13 +2,18 @@
 
 import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
-import { Box, Button } from '@mui/material';
+import { Box, Button, CircularProgress } from '@mui/material';
 
 type FormActionsProps = {
   saveLabel: string;
   addLabel?: string;
   showCancel?: boolean;
   showCheck?: boolean;
+  type?: 'button' | 'submit';
+  loading?: boolean;
+  disabled?: boolean;
+  onSave?: () => void;
+  onCancel?: () => void;
 };
 
 export default function FormActions({
@@ -16,6 +21,11 @@ export default function FormActions({
   addLabel,
   showCancel = false,
   showCheck = false,
+  type = 'submit',
+  loading = false,
+  disabled = false,
+  onSave,
+  onCancel,
 }: FormActionsProps) {
   return (
     <Box className={addLabel ? 'form-actions' : 'form-actions is-end'}>
@@ -31,18 +41,26 @@ export default function FormActions({
       ) : null}
       <Box className="form-actions-end">
         {showCancel ? (
-          <Button type="button" className="cancel-btn">
+          <Button type="button" className="cancel-btn" onClick={onCancel}>
             Cancel
           </Button>
         ) : null}
         <Button
-          type="button"
+          type={type}
           className="save-btn"
           variant="contained"
           disableElevation
-          startIcon={showCheck ? <CheckIcon /> : undefined}
+          disabled={disabled || loading}
+          onClick={type === 'button' ? onSave : undefined}
+          startIcon={
+            loading ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : showCheck ? (
+              <CheckIcon />
+            ) : undefined
+          }
         >
-          {saveLabel}
+          {loading ? 'Saving...' : saveLabel}
         </Button>
       </Box>
     </Box>

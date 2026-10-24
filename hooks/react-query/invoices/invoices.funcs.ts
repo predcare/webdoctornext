@@ -2,9 +2,9 @@ import axiosInstance from '../../../services/api/apiClient';
 import { endpoints } from '../../../services/api/endpoints';
 import { ICommonRoot } from '../../../typescripts/interfaces/common.interfaces';
 import {
-  IInvoiceSettingRoot,
   IInvoiceStatsRoot,
   IMyInvoiceListRoot,
+  TGetDoctorInvoiceSettingRoot,
   TInvoiceByPatientIdListRoot,
 } from '../../../typescripts/interfaces/invoices.interfaces';
 import { ICreateManualInvoicePayload } from './payload.interfaces';
@@ -28,9 +28,9 @@ export const getInvoicePdf = async (
 
   return res.data as ArrayBuffer;
 };
-export const getInvoiceSettings = async (doctorId: number | string) => {
-  const res = await axiosInstance.get<IInvoiceSettingRoot>(
-    `${endpoints.invoices.invoiceSettings}${doctorId}`,
+export const getInvoiceSettings = async () => {
+  const res = await axiosInstance.get<TGetDoctorInvoiceSettingRoot>(
+    `${endpoints.invoices.invoiceSettings}`,
   );
   return res.data;
 };
@@ -98,6 +98,15 @@ export const getInvoicesByPatientId = async (params: {
         limit: params.limit,
       },
     },
+  );
+  return res.data;
+};
+
+// Create / Update Invoice Settings
+export const createInvoiceSettings = async (body: FormData) => {
+  const res = await axiosInstance.put<ICommonRoot>(
+    `${endpoints.invoices.invoiceSettings}`,
+    body,
   );
   return res.data;
 };
