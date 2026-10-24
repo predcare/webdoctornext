@@ -1,6 +1,11 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ProfileQueryKeys } from '../query.keys';
-import { getDoctorClinics, getProfile, updateProfile } from './profile.funcs';
+import {
+  getDoctorClinics,
+  getProfile,
+  updateDocProfile,
+  updateProfile,
+} from './profile.funcs';
 
 type TQueryEnabled = {
   enabled?: boolean;
@@ -30,4 +35,9 @@ export const useDoctorClinics = (options?: TQueryEnabled) =>
 export const useUpdateProfile = () =>
   useMutation({
     mutationFn: updateProfile,
+  });
+
+export const useUpdateDocProfile = () =>
+  useMutation({
+    mutationFn: updateDocProfile,
   });

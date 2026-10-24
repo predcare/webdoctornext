@@ -8,7 +8,7 @@ import {
   useCountries,
   useStatesByCId,
 } from '@/hooks/react-query/common/common.hooks';
-import { useUpdateProfile } from '@/hooks/react-query/profile/profile.hooks';
+import { useUpdateDocProfile } from '@/hooks/react-query/profile/profile.hooks';
 import {
   UpdateDoctorProfileSchema,
   type TProfileLocationOption,
@@ -72,6 +72,8 @@ export default function BasicInfoSection() {
   const { data: rawCities, isFetching: loadingCities } = useCitiesBySId(
     selectedStateId ? { sId: selectedStateId } : undefined,
   );
+  const { mutate: updateProfile, isPending: updatingProfile } =
+    useUpdateDocProfile();
 
   const countries = useMemo(() => {
     if (!Array.isArray(rawCountries)) return [];
@@ -96,9 +98,6 @@ export default function BasicInfoSection() {
       name: c.name,
     }));
   }, [rawCities]);
-
-  const { mutate: updateProfile, isPending: updatingProfile } =
-    useUpdateProfile();
 
   const onSubmit = (data: TUpdateDoctorProfileSchemaType) => {
     const formData = new FormData();

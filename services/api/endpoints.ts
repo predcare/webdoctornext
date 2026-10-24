@@ -28,6 +28,7 @@ export const endpoints = {
   profile: {
     get: '/users/profile',
     update: '/users/profile-update',
+    updateDocProfile: '/doctors/update/profile',
     allPatients: '/users/doctor-all-users',
     doctorClinics: '/doctors/my-clinics',
   },

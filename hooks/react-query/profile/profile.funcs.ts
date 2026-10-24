@@ -29,3 +29,11 @@ export const updateProfile = async (data: FormData) => {
   );
   return res.data;
 };
+
+export const updateDocProfile = async (data: FormData) => {
+  const res = await axiosInstance.post<ICommonRoot>(
+    `${endpoints.profile.updateDocProfile}`,
+    data,
+  );
+  return res.data;
+};
