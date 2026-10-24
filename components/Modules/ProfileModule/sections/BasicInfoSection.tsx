@@ -158,7 +158,7 @@ export default function BasicInfoSection() {
     }
     formData.append('address', data.street);
     formData.append('postalCode', data.postalCode);
-    formData.append('aboutMe', data.aboutMe);
+    formData.append('bio', data.aboutMe);
     formData.append('country', data.country?.name || '');
     formData.append('state', data.state?.name || '');
     formData.append('city', data.city?.name || '');
