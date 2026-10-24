@@ -15,6 +15,7 @@ const locationOptionSchema = yup
   .default(null);
 
 export const UpdateDoctorProfileSchema = yup.object({
+  profile_image: yup.mixed().optional().nullable(),
   street: yup.string().trim().optional().default(''),
   country: locationOptionSchema,
   state: locationOptionSchema,

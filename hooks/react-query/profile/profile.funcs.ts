@@ -31,7 +31,7 @@ export const updateProfile = async (data: FormData) => {
 };
 
 export const updateDocProfile = async (data: FormData) => {
-  const res = await axiosInstance.post<ICommonRoot>(
+  const res = await axiosInstance.put<ICommonRoot>(
     `${endpoints.profile.updateDocProfile}`,
     data,
   );

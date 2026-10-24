@@ -37,6 +37,7 @@ import {
   Chip,
   Divider,
   MenuItem,
+  Radio,
   Typography,
 } from '@mui/material';
 import dayjs from 'dayjs';
@@ -71,12 +72,13 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
     useClinicStore((state) => state);
 
   const clinicMenuWidth = clinicAnchor?.classList.contains('clinic-btn')
-    ? clinicAnchor.offsetWidth
-    : undefined;
+    ? Math.max(clinicAnchor.offsetWidth, 320)
+    : 320;
 
   const { clinicLabel, clinicName } = useMemo(() => {
     const selectedClinic = clinics.find(
-      (clinic) => String(clinic.id) === String(userData?.clinic?.id),
+      (clinic) =>
+        String(clinic.id) === String(activeClinic || userData?.clinic?.id),
     );
 
     return {
@@ -84,7 +86,7 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
       clinicName:
         selectedClinic?.name || userData?.clinic_name || 'Select clinic',
     };
-  }, [clinics, userData?.clinic?.id, userData?.clinic_name]);
+  }, [clinics, activeClinic, userData?.clinic?.id, userData?.clinic_name]);
 
   const handleLogout = (allDevices: boolean) => {
     showLoader(allDevices ? 'Signing out of all devices...' : 'Signing out...');
@@ -216,28 +218,60 @@ const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
         }}
         {...menuOrigin}
       >
-        {clinics.map((clinic) => (
-          <MenuItem
-            key={clinic.id}
-            className="clinic-item"
-            selected={String(clinic.id) === String(userData?.clinic?.id)}
-            disabled={String(clinic.id) === String(userData?.clinic?.id)}
-            onClick={() => {
-              setActiveClinic(String(clinic.id));
-              setClinicAnchor(null);
-            }}
-          >
-            <span className="clinic-item-icon">
-              <ClinicIcon size={16} />
-            </span>
-            <span className="clinic-item-copy">
-              <span className="clinic-item-label">
-                {clinic.is_primary ? 'Primary center' : 'Clinic'}
+        {clinics.map((clinic) => {
+          const isSelected =
+            String(clinic.id) ===
+            String(activeClinic || userData?.clinic?.id);
+          const initial =
+            clinic.name?.trim()?.charAt(0)?.toUpperCase() || 'C';
+          const clinicType = clinic.is_primary ? 'Primary Center' : 'Clinic';
+          const clinicCode =
+            clinic.clinic_reg_number ||
+            (clinic.id
+              ? String(clinic.id).startsWith('CL')
+                ? clinic.id
+                : `CL${String(clinic.id).padStart(4, '0')}`
+              : '');
+          const clinicSubtitle = clinicCode
+            ? `${clinicType} • ID: ${clinicCode.replace(/^ID:\s*/i, '')}`
+            : clinicType;
+
+          return (
+            <MenuItem
+              key={clinic.id}
+              className="clinic-item"
+              selected={isSelected}
+              onClick={() => {
+                if (isSelected) {
+                  return setClinicAnchor(null);
+                }
+                setActiveClinic(String(clinic.id));
+                setClinicAnchor(null);
+              }}
+            >
+              <span className="clinic-item-left">
+                <span className="clinic-item-avatar">{initial}</span>
+                <span className="clinic-item-copy">
+                  <span className="clinic-item-name">{clinic.name}</span>
+                  <span className="clinic-item-sub">{clinicSubtitle}</span>
+                </span>
               </span>
-              <span className="clinic-item-name">{clinic.name}</span>
-            </span>
-          </MenuItem>
-        ))}
+              <Radio
+                checked={isSelected}
+                size="small"
+                tabIndex={-1}
+                disableRipple
+                sx={{
+                  p: 0,
+                  color: (theme) => theme.palette.customColors.border,
+                  '&.Mui-checked': {
+                    color: (theme) => theme.palette.customColors.brandTeal,
+                  },
+                }}
+              />
+            </MenuItem>
+          );
+        })}
       </ClinicMenu>
 
       <NoticeMenu

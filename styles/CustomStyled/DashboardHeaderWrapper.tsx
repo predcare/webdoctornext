@@ -299,31 +299,72 @@ export const DashboardHeaderWrapper = styled('header')`
 
 export const ClinicMenu = styled(Menu)`
   .MuiPaper-root {
-    width: 280px;
+    width: 340px;
+    min-width: 300px;
     max-width: calc(100vw - 32px);
     margin-top: 8px;
-    border-radius: 12px;
+    border-radius: 14px;
     background: ${({ theme }) => theme.palette.customColors.cardBg};
     border: 1px solid ${({ theme }) => theme.palette.customColors.border};
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
   }
 
   .MuiList-root {
     padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
 
   .clinic-item {
-    align-items: flex-start;
-    gap: 10px;
-    min-height: 52px;
-    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 54px;
+    padding: 10px 12px;
+    border-radius: 10px;
     white-space: normal;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background-color: ${({ theme }) => theme.palette.customColors.hoverBg};
+    }
+
+    &.Mui-selected {
+      background-color: ${({ theme }) => theme.palette.customColors.brandTealLight}33;
+
+      &:hover {
+        background-color: ${({ theme }) => theme.palette.customColors.brandTealLight}4d;
+      }
+    }
+  }
+
+  .clinic-item-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .clinic-item-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: ${({ theme }) => theme.palette.customColors.brandTeal};
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
   }
 
   .clinic-item-icon {
     width: 28px;
     height: 28px;
-    margin-top: 2px;
     border-radius: 8px;
     display: inline-flex;
     align-items: center;
@@ -336,7 +377,29 @@ export const ClinicMenu = styled(Menu)`
   .clinic-item-copy {
     display: flex;
     flex-direction: column;
+    gap: 2px;
     min-width: 0;
+    flex: 1;
+  }
+
+  .clinic-item-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    line-height: 18px;
+    color: ${({ theme }) => theme.palette.customColors.heading};
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .clinic-item-sub {
+    font-size: 11.5px;
+    font-weight: 500;
+    line-height: 16px;
+    color: ${({ theme }) => theme.palette.customColors.textMuted};
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .clinic-item-label {
@@ -346,13 +409,6 @@ export const ClinicMenu = styled(Menu)`
     text-transform: uppercase;
     line-height: 14px;
     color: ${({ theme }) => theme.palette.customColors.textMuted};
-  }
-
-  .clinic-item-name {
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 16px;
-    color: ${({ theme }) => theme.palette.customColors.heading};
   }
 `;
 
