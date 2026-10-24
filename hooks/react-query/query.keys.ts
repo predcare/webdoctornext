@@ -12,6 +12,10 @@ export enum ProfileQueryKeys {
   DoctorProfile = 'DoctorProfile',
   ALL_PATIENTS = 'ALL_PATIENTS',
   DoctorClinics = 'DoctorClinics',
+  DoctorEducation = 'DoctorEducation',
+  DoctorEducationDetail = 'DoctorEducationDetail',
+  DoctorExperience = 'DoctorExperience',
+  DoctorExperienceDetail = 'DoctorExperienceDetail',
 }
 
 export enum NotificationQueryKeys {

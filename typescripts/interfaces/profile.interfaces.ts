@@ -171,3 +171,55 @@ export interface IMyClinicsDoc {
   created_at: string;
   updated_at: string;
 }
+
+export interface IDoctorEducation {
+  id?: number | string;
+  doctor_id?: number | string;
+  institution: string;
+  degree: string;
+  field_of_study?: string;
+  start_year: string;
+  end_year?: string;
+  is_current?: boolean;
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ICreateDoctorEducationPayload {
+  institution: string;
+  degree: string;
+  field_of_study?: string;
+  start_year: string;
+  end_year?: string;
+  is_current?: boolean;
+  description?: string;
+}
+
+export type TUpdateDoctorEducationPayload =
+  Partial<ICreateDoctorEducationPayload>;
+
+export interface IDoctorExperience {
+  id?: number | string;
+  doctor_id?: number | string;
+  position: string;
+  organization: string;
+  start_date: string;
+  end_date?: string;
+  is_current?: boolean;
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ICreateDoctorExperiencePayload {
+  position: string;
+  organization: string;
+  start_date: string;
+  end_date?: string;
+  is_current?: boolean;
+  description?: string;
+}
+
+export type TUpdateDoctorExperiencePayload =
+  Partial<ICreateDoctorExperiencePayload>;

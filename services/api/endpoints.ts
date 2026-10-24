@@ -32,6 +32,21 @@ export const endpoints = {
     allPatients: '/users/doctor-all-users',
     doctorClinics: '/doctors/my-clinics',
   },
+  doctorInfo: {
+    educationList: '/users/doctor-education',
+    educationCreate: '/users/doctor-education',
+    educationDetail: (id: string | number) => `/users/doctor-education/${id}`,
+    educationUpdate: (id: string | number) => `/users/doctor-education/${id}`,
+    educationDelete: (id: string | number) => `/users/doctor-education/${id}`,
+    experienceList: '/users/doctor-experiences',
+    experienceCreate: '/users/doctor-experiences',
+    experienceDetail: (id: string | number) =>
+      `/users/doctor-experiences/${id}`,
+    experienceUpdate: (id: string | number) =>
+      `/users/doctor-experiences/${id}`,
+    experienceDelete: (id: string | number) =>
+      `/users/doctor-experiences/${id}`,
+  },
   patients: {
     get: '/doctors/my-patients',
     delete: '/doctor/patients/',
@@ -139,6 +154,8 @@ export const successEndpoints = [
   endpoints?.invoices?.invoiceSettings,
   endpoints?.invoices?.create,
   endpoints?.prescritions?.prescriptionSettings,
+  endpoints?.doctorInfo?.educationCreate,
+  endpoints?.doctorInfo?.experienceCreate,
 ];
 
 export const exclude401Routes = [
