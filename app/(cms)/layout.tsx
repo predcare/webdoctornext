@@ -1,12 +1,16 @@
-import Wrapper from "@/layouts/Wrapper/Wrapper";
-import React from "react";
+import Wrapper from '@/layouts/Wrapper/Wrapper';
+import React, { Suspense } from 'react';
 
 interface ICmsLayoutProps {
   children: React.ReactNode;
 }
 
 const CmsLayout = ({ children }: ICmsLayoutProps) => {
-  return <Wrapper>{children}</Wrapper>;
+  return (
+    <Suspense fallback={null}>
+      <Wrapper>{children}</Wrapper>
+    </Suspense>
+  );
 };
 
 export default CmsLayout;

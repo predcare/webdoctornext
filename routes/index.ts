@@ -72,6 +72,11 @@ export const projectRoutes = {
     patientId
       ? `/dashboard/invoices/create?patientId=${encodeUrlParam(patientId)}`
       : '/dashboard/invoices/create',
+  invoiceDetails: (id: string | number) =>
+    `/dashboard/invoices/${encodeUrlParam(id)}`,
+  editInvoice: (id: string | number) =>
+    `/dashboard/invoices/${encodeUrlParam(id)}/edit`,
+  predCareInvoices: '/dashboard/invoices/predcare-invoices',
 
   // Legal Pages
   privacyPolicy: '/privacy-policy',

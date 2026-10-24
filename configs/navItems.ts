@@ -104,8 +104,16 @@ export const sideNavItems: SideNavItem[] = [
     icon: 'billing',
     section: 'main',
     children: [
-      { id: 'billing-invoices', name: 'Clinic Invoices' },
-      { id: 'billing-payments', name: 'PRED Care Invoices' },
+      {
+        id: 'billing-invoices',
+        name: 'Clinic Invoices',
+        href: projectRoutes.invoices,
+      },
+      {
+        id: 'billing-payments',
+        name: 'PRED Care Invoices',
+        href: projectRoutes.predCareInvoices,
+      },
     ],
   },
   {

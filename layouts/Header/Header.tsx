@@ -1,6 +1,5 @@
 'use client';
 import Assets from '@/resources/assets';
-/* eslint-disable @next/next/no-img-element -- landing images stay native img tags inside figure */
 
 import { projectRoutes } from '@/routes';
 import { CmsLandingWrapper } from '@/styles/CustomStyled/CmsLandingWrapper';
