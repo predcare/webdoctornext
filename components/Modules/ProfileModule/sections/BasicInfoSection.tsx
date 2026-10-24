@@ -64,7 +64,6 @@ export default function BasicInfoSection() {
 
   const countryName = useWatch({ control, name: 'country' });
   const stateName = useWatch({ control, name: 'state' });
-  const cityName = useWatch({ control, name: 'city' });
 
   const { data: rawCountries, isLoading: loadingCountries } = useCountries();
   const { data: rawStates, isFetching: loadingStates } = useStatesByCId(
